@@ -1,12 +1,13 @@
 """Overlay viz: two simulators' trajectories per species + match summary.
 
-Renders one Plotly figure with a small-multiples grid of species.
-Each panel overlays both engines' time series; the surrounding HTML
-includes a summary banner colored by the nRMSE bucket from the
-:class:`SimulatorComparisonStep`.
-
-The function is wired into a composite document by
-:func:`pbg_biomodels.composites.compare_biomodel.build_compare_biomodel`.
+Direct ``Visualization`` subclass. Earlier this module used the
+``@as_visualization`` decorator from ``pbg_superpowers.visualization``, but
+that helper is branch-specific in the in-development pbg-superpowers tree
+(present on release-v0.6.1, absent on main) — and the dashboard's
+post-run viz collector (:func:`pbg_superpowers.visualization.render_results`)
+is on the opposite branch. Subclassing directly works regardless and
+satisfies both the Step contract and ``find_instance_paths``' isinstance
+check used by ``render_results``.
 """
 from __future__ import annotations
 
@@ -15,7 +16,7 @@ from typing import Any, Dict, List
 
 from plotly.offline import get_plotlyjs
 
-from pbg_superpowers.visualization import as_visualization
+from pbg_superpowers.visualization import Visualization
 
 
 _BUCKET_COLOR = {
@@ -112,62 +113,64 @@ def _build_figure(
     return {"data": traces, "layout": layout}
 
 
-@as_visualization(
-    inputs={
-        "engine_a_result": "numeric_result",
-        "engine_b_result": "numeric_result",
-        "comparison": {
-            "n_shared":         "integer",
-            "rmse_by_species":  "map[float]",
-            "nrmse_by_species": "map[float]",
-            "mean_nrmse":       "maybe[float]",
-            "bucket":           "string",
-            "bucket_label":     "string",
-        },
-    },
-    name="CompareOverlay",
-)
-def update_compare_overlay(state: Dict[str, Any]) -> Dict[str, str]:  # noqa: D401
-    """Render an overlay HTML with both engines' trajectories per species.
+class CompareOverlay(Visualization):
+    """Plotly small-multiples overlay of two simulator trajectories.
 
-    Wired by :func:`build_compare_biomodel`; reads the two
-    ``numeric_result`` payloads and the ``SimulatorComparisonStep`` summary,
-    returns a self-contained HTML fragment with embedded Plotly JS.
+    Inputs:
+        engine_a_result: ``numeric_result`` from the first simulator.
+        engine_b_result: ``numeric_result`` from the second simulator.
+        comparison:      summary dict from :class:`SimulatorComparisonStep`.
+
+    Output: an HTML fragment with embedded Plotly JS plus a bucket-colored
+    banner showing the mean nRMSE across shared species.
     """
-    a = state.get("engine_a_result") or {}
-    b = state.get("engine_b_result") or {}
-    comparison = state.get("comparison") or {}
 
-    a_series = _series_by_species(a)
-    b_series = _series_by_species(b)
-    a_time = a.get("time") or []
-    b_time = b.get("time") or []
+    config_schema = {
+        "title": {"_type": "string", "_default": ""},
+    }
 
-    fig = _build_figure(
-        a_series, a_time, "engine_a",
-        b_series, b_time, "engine_b",
-    )
+    def inputs(self) -> Dict[str, Any]:
+        return {
+            "engine_a_result": "numeric_result",
+            "engine_b_result": "numeric_result",
+            "comparison": {
+                "n_shared":         "integer",
+                "rmse_by_species":  "map[float]",
+                "nrmse_by_species": "map[float]",
+                "mean_nrmse":       "maybe[float]",
+                "bucket":           "string",
+                "bucket_label":     "string",
+            },
+        }
 
-    banner = _bucket_banner_html(comparison)
-    fig_json = json.dumps(fig).replace("</", "<\\/")
-    html = (
-        f'<div>{banner}'
-        f'<div id="overlay-plot"></div>'
-        f'<script>{get_plotlyjs()}</script>'
-        f'<script>'
-        f'(function() {{'
-        f'  var d = {fig_json};'
-        f'  Plotly.newPlot("overlay-plot", d.data, d.layout, '
-        f'    {{responsive: true, displaylogo: false}});'
-        f'}})();'
-        f'</script>'
-        f'</div>'
-    )
-    return {"html": html}
+    def update(self, state: Dict[str, Any]) -> Dict[str, str]:
+        a = state.get("engine_a_result") or {}
+        b = state.get("engine_b_result") or {}
+        comparison = state.get("comparison") or {}
 
+        a_series = _series_by_species(a)
+        b_series = _series_by_species(b)
+        a_time = a.get("time") or []
+        b_time = b.get("time") or []
 
-# Module-level alias matching the decorator's name= override. as_visualization
-# replaces the def-bound symbol (here `update_compare_overlay`) with the
-# synthesized class whose __name__ is "CompareOverlay"; this alias makes the
-# class importable under that same name for explicit registration in core.py.
-CompareOverlay = update_compare_overlay
+        fig = _build_figure(
+            a_series, a_time, "engine_a",
+            b_series, b_time, "engine_b",
+        )
+
+        banner = _bucket_banner_html(comparison)
+        fig_json = json.dumps(fig).replace("</", "<\\/")
+        html = (
+            f'<div>{banner}'
+            f'<div id="overlay-plot"></div>'
+            f'<script>{get_plotlyjs()}</script>'
+            f'<script>'
+            f'(function() {{'
+            f'  var d = {fig_json};'
+            f'  Plotly.newPlot("overlay-plot", d.data, d.layout, '
+            f'    {{responsive: true, displaylogo: false}});'
+            f'}})();'
+            f'</script>'
+            f'</div>'
+        )
+        return {"html": html}
