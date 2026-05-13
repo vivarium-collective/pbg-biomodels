@@ -1,5 +1,19 @@
 [
   {
+    "name": "pbg-biomodels-bundle",
+    "description": "Biomodels corpus, regression harness, and analysis Steps (local checkout; not yet on vivarium-collective)",
+    "source": "file:///Users/eranagmon/code/pbg-biomodels-bundle",
+    "ref": "main",
+    "package": "biomodels_regression",
+    "homepage": "file:///Users/eranagmon/code/pbg-biomodels-bundle",
+    "tags": [
+      "sbml",
+      "biomodels",
+      "regression",
+      "local"
+    ]
+  },
+  {
     "name": "pbg-bioreactordesign",
     "description": "Process-bigraph wrapper for BioReactorDesign (BiRD) bioreactor simulation",
     "source": "https://github.com/vivarium-collective/pbg-bioreactordesign.git",
