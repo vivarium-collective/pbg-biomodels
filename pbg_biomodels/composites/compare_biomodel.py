@@ -22,14 +22,16 @@ import biomodels
 from pbg_biomodels_bundle.run_biomodels import (
     BiomodelLoadResult,
     load_biomodel,
-    make_utc_step_state,
 )
 
 
-# The pbsim_common addresses are the canonical local-Python UTC Steps.
-# Override either via the keyword args if you've registered alternates.
-COPASI_STEP_ADDRESS = "local:pbsim_common.simulators.copasi_process.CopasiUTCStep"
-TELLURIUM_STEP_ADDRESS = "local:pbsim_common.simulators.tellurium_process.TelluriumUTCStep"
+# The bundle's Local* UTC Steps declare empty inputs() so they fire on
+# composite startup. The earlier `pbsim_common.*UTCStep` addresses needed
+# their species_concentrations / species_counts input stores to change
+# before firing, which nothing in the composite ever did — so the Steps
+# never triggered and `results` stayed empty.
+COPASI_STEP_ADDRESS = "local:pbg_biomodels_bundle.steps.local_simulators.LocalCopasiUTCStep"
+TELLURIUM_STEP_ADDRESS = "local:pbg_biomodels_bundle.steps.local_simulators.LocalTelluriumUTCStep"
 COMPARISON_STEP_ADDRESS = "local:pbg_biomodels_bundle.steps.simulator_comparison.SimulatorComparisonStep"
 VISUALIZATION_STEP_ADDRESS = "local:pbg_biomodels.visualizations.compare_overlay.CompareOverlay"
 
@@ -69,15 +71,38 @@ def build_compare_biomodel(
     copasi_key = f"{biomodel_id}_copasi"
     tellurium_key = f"{biomodel_id}_tellurium"
 
+    # Pre-populate the `results` map with placeholder entries for each
+    # engine. The Steps write into `results[<engine_key>]`; without a
+    # pre-existing key the bigraph runtime's apply() won't auto-extend the
+    # map and the output is silently dropped.
+    empty_numeric: Dict[str, Any] = {"time": [], "columns": [], "values": []}
     state: Dict[str, Any] = {
-        "species_concentrations": {},
-        "species_counts": {},
-        "results": {},
+        "results": {
+            copasi_key:    dict(empty_numeric),
+            tellurium_key: dict(empty_numeric),
+        },
         "comparison": {},
     }
 
-    state.update(make_utc_step_state(copasi_key, copasi_address, sbml_path, utc))
-    state.update(make_utc_step_state(tellurium_key, tellurium_address, sbml_path, utc))
+    # Local* Steps declare no inputs, so the only wires they need are
+    # outputs. Each writes a numeric_result into results[<engine_key>].
+    sim_config = {
+        "model_source": sbml_path,
+        "time": float(utc.duration),
+        "n_points": int(utc.number_of_points),
+    }
+    state[f"{copasi_key}_step"] = {
+        "_type": "step",
+        "address": copasi_address,
+        "config": sim_config,
+        "outputs": {"result": ["results", copasi_key]},
+    }
+    state[f"{tellurium_key}_step"] = {
+        "_type": "step",
+        "address": tellurium_address,
+        "config": sim_config,
+        "outputs": {"result": ["results", tellurium_key]},
+    }
 
     state["compare"] = {
         "_type": "step",
@@ -112,7 +137,6 @@ def build_compare_biomodel(
         emit_wires = {
             "results": ["results"],
             "comparison": ["comparison"],
-            "global_time": ["global_time"],
         }
         state["emitter"] = {
             "_type": "step",
@@ -122,8 +146,6 @@ def build_compare_biomodel(
         }
 
     schema: Dict[str, Any] = {
-        "species_concentrations": "map[float]",
-        "species_counts": "map[float]",
         "results": "map[numeric_result]",
         # Mirrors SimulatorComparisonStep.outputs() so the store accepts
         # the Step's update payload without coercion.
@@ -138,4 +160,8 @@ def build_compare_biomodel(
         "viz_html": "string",
     }
 
-    return {"schema": schema, "state": state}
+    # `run_steps_on_init=True` is required: our Local* simulator Steps
+    # declare no inputs and rely on initial firing rather than input-change
+    # triggering. The Composite default is False, so without this flag the
+    # Steps never execute and `results` stays empty.
+    return {"schema": schema, "state": state, "run_steps_on_init": True}
