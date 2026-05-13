@@ -1,35 +1,34 @@
 """Composite builder: fetch one BioModel, run it in two simulators, compare.
 
-A composite produced by :func:`build_compare_biomodel` runs the named
-BioModel under both COPASI and Tellurium (via the UTC Steps that live in
-``pbsim_common``), feeds both engines' trajectories into the bundle's
-``SimulatorComparisonStep``, and renders an overlay visualization showing
-both traces per species plus the match summary.
+A composite produced by :func:`build_compare_biomodel` runs a single
+**biomodel_id → load → COPASI + Tellurium → compare → visualize**
+pipeline as a single process-bigraph document.
 
-Biomodel-ID is a **builder parameter**, not a runtime composite input —
-the two UTC Steps require ``model_source`` in their config (set at
-composite-construction time), so different BioModels mean different
-composite documents. Build one composite per ID; iterate the builder
-across the BioModels corpus.
+``biomodel_id`` is the only externally-supplied parameter and lives in
+the composite's state as a string store. A :class:`LoadBiomodelStep`
+reads it, fetches the SBML + SED-ML via the BioModels REST API, and
+writes ``sbml_path``, ``time``, and ``n_points`` into downstream stores.
+:class:`LocalCopasiUTCStep` and :class:`LocalTelluriumUTCStep` read
+those values as runtime inputs (not config), simulate the model, and
+emit ``numeric_result`` payloads into the ``results`` map. The
+:class:`SimulatorComparisonStep` reads both engine results and
+writes a per-species RMSE summary; :class:`CompareOverlay` (a
+``@as_visualization`` Step) renders an HTML overlay of the two
+trajectories plus a bucket-colored match banner.
+
+The composite uses ``run_steps_on_init=True`` so the Step chain fires
+on construction. Output stores are pre-populated with empty placeholder
+shapes — required because the bigraph runtime's ``apply()`` refuses to
+auto-extend ``map[numeric_result]`` with brand-new keys at write time.
 """
 from __future__ import annotations
 
-import os
-from typing import Any, Dict, Optional
-
-import biomodels
-
-from pbg_biomodels_bundle.run_biomodels import (
-    BiomodelLoadResult,
-    load_biomodel,
-)
+from typing import Any, Dict
 
 
-# The bundle's Local* UTC Steps declare empty inputs() so they fire on
-# composite startup. The earlier `pbsim_common.*UTCStep` addresses needed
-# their species_concentrations / species_counts input stores to change
-# before firing, which nothing in the composite ever did — so the Steps
-# never triggered and `results` stayed empty.
+# Addresses of the Step classes wired into the composite. Override these
+# kwargs if you've registered local variants under different names.
+LOAD_STEP_ADDRESS = "local:pbg_biomodels_bundle.steps.load_biomodel.LoadBiomodelStep"
 COPASI_STEP_ADDRESS = "local:pbg_biomodels_bundle.steps.local_simulators.LocalCopasiUTCStep"
 TELLURIUM_STEP_ADDRESS = "local:pbg_biomodels_bundle.steps.local_simulators.LocalTelluriumUTCStep"
 COMPARISON_STEP_ADDRESS = "local:pbg_biomodels_bundle.steps.simulator_comparison.SimulatorComparisonStep"
@@ -39,44 +38,43 @@ VISUALIZATION_STEP_ADDRESS = "local:pbg_biomodels.visualizations.compare_overlay
 def build_compare_biomodel(
     biomodel_id: str,
     *,
+    load_address: str = LOAD_STEP_ADDRESS,
     copasi_address: str = COPASI_STEP_ADDRESS,
     tellurium_address: str = TELLURIUM_STEP_ADDRESS,
     comparison_address: str = COMPARISON_STEP_ADDRESS,
-    visualization_address: Optional[str] = VISUALIZATION_STEP_ADDRESS,
+    visualization_address: str | None = VISUALIZATION_STEP_ADDRESS,
     with_emitter: bool = True,
     emitter_address: str = "local:RAMEmitter",
-    load_result: Optional[BiomodelLoadResult] = None,
 ) -> Dict[str, Any]:
     """Build a single-biomodel COPASI-vs-Tellurium comparison composite.
 
     Args:
-        biomodel_id: BioModels identifier (e.g. ``"BIOMD0000000001"``).
-        with_emitter: if True (default), attach a RAMEmitter collecting both
-            engine results and the comparison output, so a post-run
-            ``gather_emitter_results`` returns the history for inspection.
-        load_result: pre-fetched ``BiomodelLoadResult`` — pass to skip the
-            biomodels API call (useful in tests).
+        biomodel_id: BioModels identifier (e.g. ``"BIOMD0000000001"``). Seeded
+            into the composite's ``biomodel_id`` store and read at runtime by
+            :class:`LoadBiomodelStep`.
+        with_emitter: if True (default), attach a ``RAMEmitter`` collecting
+            both engine results and the comparison output so
+            ``gather_emitter_results`` returns the history after the run.
+        visualization_address: pass ``None`` to skip the overlay viz Step
+            (e.g. for headless / batch use).
 
     Returns:
-        A ``{"schema": ..., "state": ...}`` document ready to feed
-        ``process_bigraph.Composite``.
+        A composite document ``{"schema", "state", "run_steps_on_init"}``
+        ready to feed ``process_bigraph.Composite``.
     """
-    if load_result is None:
-        meta = biomodels.get_metadata(biomodel_id)
-        load_result = load_biomodel(biomodel_id, meta)
+    copasi_key = "copasi"
+    tellurium_key = "tellurium"
 
-    sbml_path = os.path.abspath(load_result.sbml_path)
-    utc = load_result.utc
-
-    copasi_key = f"{biomodel_id}_copasi"
-    tellurium_key = f"{biomodel_id}_tellurium"
-
-    # Pre-populate the `results` map with placeholder entries for each
-    # engine. The Steps write into `results[<engine_key>]`; without a
-    # pre-existing key the bigraph runtime's apply() won't auto-extend the
-    # map and the output is silently dropped.
     empty_numeric: Dict[str, Any] = {"time": [], "columns": [], "values": []}
     state: Dict[str, Any] = {
+        # Inputs / intermediate stores. biomodel_id is the entry point.
+        "biomodel_id": biomodel_id,
+        "sbml_path":   "",
+        "sim_time":    0.0,
+        "n_points":    0,
+        # Pre-populated map keys: bigraph apply() won't auto-extend
+        # map[numeric_result] with new keys, so the simulator outputs
+        # need a target slot to land in.
         "results": {
             copasi_key:    dict(empty_numeric),
             tellurium_key: dict(empty_numeric),
@@ -84,30 +82,42 @@ def build_compare_biomodel(
         "comparison": {},
     }
 
-    # Local* Steps declare no inputs, so the only wires they need are
-    # outputs. Each writes a numeric_result into results[<engine_key>].
-    sim_config = {
-        "model_source": sbml_path,
-        "time": float(utc.duration),
-        "n_points": int(utc.number_of_points),
+    state["load"] = {
+        "_type": "step",
+        "address": load_address,
+        "config": {},
+        "inputs":  {"biomodel_id": ["biomodel_id"]},
+        "outputs": {
+            "sbml_path": ["sbml_path"],
+            "time":      ["sim_time"],
+            "n_points":  ["n_points"],
+        },
+    }
+
+    sim_inputs = {
+        "model_source": ["sbml_path"],
+        "time":         ["sim_time"],
+        "n_points":     ["n_points"],
     }
     state[f"{copasi_key}_step"] = {
         "_type": "step",
         "address": copasi_address,
-        "config": sim_config,
+        "config": {},
+        "inputs":  sim_inputs,
         "outputs": {"result": ["results", copasi_key]},
     }
     state[f"{tellurium_key}_step"] = {
         "_type": "step",
         "address": tellurium_address,
-        "config": sim_config,
+        "config": {},
+        "inputs":  sim_inputs,
         "outputs": {"result": ["results", tellurium_key]},
     }
 
     state["compare"] = {
         "_type": "step",
         "address": comparison_address,
-        "config": {"engine_a_name": "copasi", "engine_b_name": "tellurium"},
+        "config": {"engine_a_name": copasi_key, "engine_b_name": tellurium_key},
         "inputs": {
             "engine_a_result": ["results", copasi_key],
             "engine_b_result": ["results", tellurium_key],
@@ -119,15 +129,11 @@ def build_compare_biomodel(
         state["overlay_viz"] = {
             "_type": "step",
             "address": visualization_address,
-            "config": {
-                "title": f"{biomodel_id} — COPASI vs Tellurium overlay",
-                "engine_a_name": "copasi",
-                "engine_b_name": "tellurium",
-            },
+            "config": {"title": f"{biomodel_id} — COPASI vs Tellurium overlay"},
             "inputs": {
                 "engine_a_result": ["results", copasi_key],
                 "engine_b_result": ["results", tellurium_key],
-                "comparison": ["comparison"],
+                "comparison":      ["comparison"],
             },
             "outputs": {"html": ["viz_html"]},
         }
@@ -135,7 +141,7 @@ def build_compare_biomodel(
 
     if with_emitter:
         emit_wires = {
-            "results": ["results"],
+            "results":    ["results"],
             "comparison": ["comparison"],
         }
         state["emitter"] = {
@@ -146,9 +152,11 @@ def build_compare_biomodel(
         }
 
     schema: Dict[str, Any] = {
-        "results": "map[numeric_result]",
-        # Mirrors SimulatorComparisonStep.outputs() so the store accepts
-        # the Step's update payload without coercion.
+        "biomodel_id": "string",
+        "sbml_path":   "string",
+        "sim_time":    "float",
+        "n_points":    "integer",
+        "results":     "map[numeric_result]",
         "comparison": {
             "n_shared":         "integer",
             "rmse_by_species":  "map[float]",
@@ -160,8 +168,4 @@ def build_compare_biomodel(
         "viz_html": "string",
     }
 
-    # `run_steps_on_init=True` is required: our Local* simulator Steps
-    # declare no inputs and rely on initial firing rather than input-change
-    # triggering. The Composite default is False, so without this flag the
-    # Steps never execute and `results` stays empty.
     return {"schema": schema, "state": state, "run_steps_on_init": True}
