@@ -1,5 +1,9 @@
 [project]
-name = "biomodels"
+# NOTE: workspace dist-name is `pbg-biomodels` (not just `biomodels`) to
+# avoid shadowing the PyPI `biomodels` package — the BioModels REST API
+# client that pbg-biomodels-bundle depends on. The workspace's display
+# name in workspace.yaml stays "biomodels".
+name = "pbg-biomodels"
 version = "0.0.0"
 description = "Process-bigraph research workspace"
 requires-python = ">=3.11"
