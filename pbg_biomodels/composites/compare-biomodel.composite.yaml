@@ -1,0 +1,116 @@
+name: compare-biomodel
+description: >
+  Run one BioModel under COPASI and Tellurium, score per-species nRMSE between
+  the two trajectories, and render an overlay HTML. `biomodel_id` is the only
+  external parameter — LoadBiomodelStep fetches the SBML + SED-ML from the
+  BioModels REST API at run time and feeds sbml_path / time / n_points into
+  the simulator Steps via runtime input wires.
+
+tags: [systems-biology, ode, sbml, biomodels, comparison, visualization]
+
+requires:
+  processes:
+    - LoadBiomodelStep
+    - LocalCopasiUTCStep
+    - LocalTelluriumUTCStep
+    - SimulatorComparisonStep
+    - CompareOverlay
+    - RAMEmitter
+
+parameters:
+  biomodel_id:
+    type: string
+    default: "BIOMD0000000001"
+    description: "BioModels identifier (e.g. BIOMD0000000005, BIOMD0000000012)"
+
+# Top-level Composite flag — fires the dep-graph-ordered Step layers on
+# construction. Without it the chain stays parked in to_run.
+run_steps_on_init: true
+
+state:
+  # Entry point: seeded from the parameter at run time.
+  biomodel_id: "${biomodel_id}"
+
+  # Placeholder stores LoadBiomodelStep will write into.
+  sbml_path: ""
+  sim_time: 0.0
+  n_points: 0
+
+  # Pre-populated map slots — bigraph apply() won't auto-extend
+  # map[numeric_result] with new keys, so we need a landing slot per engine.
+  results:
+    copasi:    {time: [], columns: [], values: []}
+    tellurium: {time: [], columns: [], values: []}
+
+  comparison: {}
+  viz_html: ""
+
+  # ───── Step graph ─────
+
+  load:
+    _type: step
+    address: "local:LoadBiomodelStep"
+    config: {}
+    inputs:
+      biomodel_id: [biomodel_id]
+    outputs:
+      sbml_path: [sbml_path]
+      time:      [sim_time]
+      n_points:  [n_points]
+
+  copasi_step:
+    _type: step
+    address: "local:LocalCopasiUTCStep"
+    config: {}
+    inputs:
+      model_source: [sbml_path]
+      time:         [sim_time]
+      n_points:     [n_points]
+    outputs:
+      result: [results, copasi]
+
+  tellurium_step:
+    _type: step
+    address: "local:LocalTelluriumUTCStep"
+    config: {}
+    inputs:
+      model_source: [sbml_path]
+      time:         [sim_time]
+      n_points:     [n_points]
+    outputs:
+      result: [results, tellurium]
+
+  compare:
+    _type: step
+    address: "local:SimulatorComparisonStep"
+    config:
+      engine_a_name: copasi
+      engine_b_name: tellurium
+    inputs:
+      engine_a_result: [results, copasi]
+      engine_b_result: [results, tellurium]
+    outputs:
+      comparison: [comparison]
+
+  overlay_viz:
+    _type: step
+    address: "local:CompareOverlay"
+    config:
+      title: "${biomodel_id} — COPASI vs Tellurium overlay"
+    inputs:
+      engine_a_result: [results, copasi]
+      engine_b_result: [results, tellurium]
+      comparison:      [comparison]
+    outputs:
+      html: [viz_html]
+
+  emitter:
+    _type: step
+    address: "local:RAMEmitter"
+    config:
+      emit:
+        results:    node
+        comparison: node
+    inputs:
+      results:    [results]
+      comparison: [comparison]
