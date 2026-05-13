@@ -17,6 +17,6 @@ imports:
     description: "Biomodels corpus, regression harness, and analysis Steps (local checkout; not yet on vivarium-collective)"
     installed: true
     install_path: /Users/eranagmon/code/pbg-biomodels-bundle
-    package: biomodels_regression
+    package: pbg_biomodels_bundle
 server:
   enabled: false
