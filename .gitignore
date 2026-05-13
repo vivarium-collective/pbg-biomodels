@@ -2,6 +2,11 @@
 .pbg/server/
 .pbg/state.json
 .pbg/composite-runs.db
+# SQLite transient journal files — created by WAL-mode writes, removed
+# on clean close. Should not be tracked (they'd flip between present
+# and absent depending on whether anything is running).
+.pbg/composite-runs.db-shm
+.pbg/composite-runs.db-wal
 # Investigation runtime artifacts (results DB + rendered HTML + lock file).
 # spec.yaml + data/ are tracked; everything else is regenerated on each run.
 investigations/*/runs.db
