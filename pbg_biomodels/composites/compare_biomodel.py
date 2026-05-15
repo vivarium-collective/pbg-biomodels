@@ -27,10 +27,10 @@ from typing import Any, Dict, List
 from pbg_superpowers.composite_generator import composite_generator
 
 
-LOAD_STEP_ADDRESS = "local:pbg_biomodels_bundle.steps.load_biomodel.LoadBiomodelStep"
-COPASI_STEP_ADDRESS = "local:pbg_biomodels_bundle.steps.local_simulators.LocalCopasiUTCStep"
-TELLURIUM_STEP_ADDRESS = "local:pbg_biomodels_bundle.steps.local_simulators.LocalTelluriumUTCStep"
-COMPARISON_STEP_ADDRESS = "local:pbg_biomodels_bundle.steps.simulator_comparison.SimulatorComparisonStep"
+LOAD_STEP_ADDRESS = "local:pbg_biomodels.steps.load_biomodel.LoadBiomodelStep"
+COPASI_STEP_ADDRESS = "local:pbg_biomodels.steps.simulators.BiomodelsCopasiStep"
+TELLURIUM_STEP_ADDRESS = "local:pbg_biomodels.steps.simulators.BiomodelsTelluriumStep"
+COMPARISON_STEP_ADDRESS = "local:pbg_biomodels.steps.simulator_comparison.SimulatorComparisonStep"
 VISUALIZATION_STEP_ADDRESS = "local:pbg_biomodels.visualizations.compare_overlay.CompareOverlay"
 
 
