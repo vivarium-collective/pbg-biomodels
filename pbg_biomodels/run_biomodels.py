@@ -52,7 +52,6 @@ def _utf8_safe_get_metadata(model_id, **kwargs):
 
 biomodels.get_metadata = _utf8_safe_get_metadata
 
-from pbest.globals import get_loaded_core
 from process_bigraph import allocate_core, Composite
 from process_bigraph.emitter import add_emitter_to_composite, gather_emitter_results
 
@@ -821,9 +820,11 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     if args.single_model:
+        from pbest.globals import get_loaded_core  # lazy — only required by batch tooling
         core = get_loaded_core()
         asyncio.run(run_one_biomodel(core, args.single_model, mode=args.mode))
     elif args.no_isolate:
+        from pbest.globals import get_loaded_core  # lazy — only required by batch tooling
         core = get_loaded_core()
         loaded = asyncio.run(
             run_biomodels(core, number_of_models=args.number_of_models, mode=args.mode)

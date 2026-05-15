@@ -29,11 +29,11 @@ dependencies = [
     "rest-process",
     "python-libsedml",
     "python-libsbml",
-    "pbest",
 ]
 
 [project.optional-dependencies]
 dev = ["pytest>=7.4"]
+batch = ["pbest"]  # used by run_biomodels CLI / batch tooling
 
 [tool.uv.sources]
 vivarium-dashboard = { path = "../vivarium-dashboard", editable = true }
