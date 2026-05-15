@@ -7,8 +7,14 @@ pbg_biomodels.steps.simulators (added in Task B2).
 
 from pbg_biomodels.steps.load_biomodel import LoadBiomodelStep
 from pbg_biomodels.steps.simulator_comparison import SimulatorComparisonStep
+from pbg_biomodels.steps.simulators import (
+    BiomodelsCopasiStep,
+    BiomodelsTelluriumStep,
+)
 
 __all__ = [
     "LoadBiomodelStep",
     "SimulatorComparisonStep",
+    "BiomodelsCopasiStep",
+    "BiomodelsTelluriumStep",
 ]
