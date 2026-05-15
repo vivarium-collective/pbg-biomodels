@@ -1,14 +1,5 @@
 [
   {
-    "name": "pbg-biomodels-bundle",
-    "description": "Regression harness for BioModels: runs each model under multiple simulators (COPASI, Tellurium) and renders an interactive comparison report.",
-    "source": "https://github.com/vivarium-collective/pbg-biomodels-bundle.git",
-    "ref": "main",
-    "package": "pbg_biomodels_bundle",
-    "homepage": "https://github.com/vivarium-collective/pbg-biomodels-bundle",
-    "tags": []
-  },
-  {
     "name": "pbg-bioreactordesign",
     "description": "Process-bigraph wrapper for BioReactorDesign (BiRD) bioreactor simulation",
     "source": "https://github.com/vivarium-collective/pbg-bioreactordesign.git",

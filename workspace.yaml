@@ -8,15 +8,6 @@ visualizations: []
 simulations: []
 datasets: []
 references_bib: references/papers.bib
-imports:
-  pbg-biomodels-bundle:
-    source: file:///Users/eranagmon/code/pbg-biomodels-bundle
-    ref: main
-    mode: reference
-    path: ../pbg-biomodels-bundle
-    description: "Biomodels corpus, regression harness, and analysis Steps (local checkout; not yet on vivarium-collective)"
-    installed: true
-    install_path: /Users/eranagmon/code/pbg-biomodels-bundle
-    package: pbg_biomodels_bundle
+imports: {}
 server:
   enabled: false
