@@ -57,3 +57,13 @@ def test_biomodels_tellurium_step_returns_numeric_result(core):
     assert len(r['values']) == 11
     # Reshape should produce same-shape rows
     assert all(len(row) == len(r['columns']) for row in r['values'])
+
+
+def test_biomodels_copasi_step_rejects_n_points_below_two(core):
+    step = BiomodelsCopasiStep(core=core)
+    with pytest.raises(ValueError, match="n_points must be >= 2"):
+        step.update({
+            'model_source': _model_path(),
+            'time': 10.0,
+            'n_points': 1,
+        })

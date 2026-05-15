@@ -24,7 +24,10 @@ _UTC_INPUTS: Dict[str, str] = {
 
 
 def _validate_n_points(n: Any, where: str) -> int:
-    n = int(n)
+    try:
+        n = int(n)
+    except (TypeError, ValueError):
+        raise ValueError(f"{where}: n_points must be an integer >= 2, got {n!r}")
     if n < 2:
         raise ValueError(f"{where}: n_points must be >= 2, got {n}")
     return n
