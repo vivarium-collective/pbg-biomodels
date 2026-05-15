@@ -39,6 +39,19 @@ jobs:
           python-version: "3.11"
       - name: Install uv
         run: pip install uv
+      - name: Clone sibling repos for [tool.uv.sources]
+        # pyproject.toml's [tool.uv.sources] uses editable path references to
+        # sibling checkouts (../vivarium-dashboard, ../pbg-tellurium, etc.).
+        # CI runners only check out THIS repo, so we shallow-clone the siblings
+        # one level up so the local paths resolve. When adding a new
+        # [tool.uv.sources] entry that points at ../X, add the matching clone here.
+        run: |
+          cd ..
+          for repo in vivarium-dashboard pbg-tellurium pbg-copasi; do
+            if [ ! -d "$repo" ]; then
+              git clone --depth 1 "https://github.com/vivarium-collective/$repo.git"
+            fi
+          done
       - name: Set up venv and install
         run: |
           uv venv .venv
