@@ -52,6 +52,8 @@ def _build_figure(
     b_series: Dict[str, List[float]],
     b_time: List[float],
     b_name: str,
+    a_color: str = "#1f77b4",  # Plotly default blue
+    b_color: str = "#ff7f0e",  # Plotly default orange
 ) -> Dict[str, Any]:
     species: List[str] = []
     seen: set = set()
@@ -82,9 +84,9 @@ def _build_figure(
         y_ref = "y" if idx == 1 else f"y{idx}"
         layout[y_key] = {"title": {"text": sp}}
         layout[x_key] = {"title": {"text": "time"}}
-        for name, series, t in (
-            (a_name, a_series.get(sp), a_time),
-            (b_name, b_series.get(sp), b_time),
+        for name, series, t, color in (
+            (a_name, a_series.get(sp), a_time, a_color),
+            (b_name, b_series.get(sp), b_time, b_color),
         ):
             if series is None or t is None:
                 continue
@@ -97,6 +99,7 @@ def _build_figure(
                 "showlegend": name not in seen_legend,
                 "xaxis": x_ref,
                 "yaxis": y_ref,
+                "line": {"color": color},
             })
             seen_legend.add(name)
 
@@ -114,38 +117,63 @@ def _card_html(bid: str, comparison: Dict[str, Any]) -> str:
         f'<div class="biomodel-card" data-biomodel="{bid}" '
         f'style="border-left:6px solid {color};padding:10px 14px;'
         f'background:#fafbfc;font-family:-apple-system,sans-serif;'
-        f'cursor:pointer;border-radius:4px;">'
+        f'cursor:pointer;border-radius:4px;'
+        f'display:flex;align-items:center;gap:12px;'
+        f'transition:background 0.15s;"'
+        f' onmouseover="this.style.background=\'#f0f3f7\'"'
+        f' onmouseout="this.style.background=\'#fafbfc\'">'
+        f'<span class="chevron" style="font-size:11px;color:#888;width:10px;'
+        f'transition:transform 0.15s;display:inline-block;">▶</span>'
+        f'<div style="flex:1;">'
         f'<div style="font-weight:600;font-size:13px;">{bid}</div>'
         f'<div style="font-size:12px;color:#444;margin-top:2px;">{label} · '
         f'mean nRMSE {mean_str} · {n_shared} shared species</div>'
+        f'</div>'
         f'</div>'
     )
 
 
 def _detail_html(bid: str, fig: Dict[str, Any]) -> str:
     fig_json = json.dumps(fig).replace("</", "<\\/")
+    # Don't call Plotly.newPlot here — the pane starts display:none, so Plotly
+    # can't measure the container and the plot renders at zero size. We stash
+    # the figure in a global keyed by biomodel id; the toggle JS plots lazily
+    # on first expand, when the container has its real dimensions.
     return (
         f'<div id="detail-{bid}" class="biomodel-detail" '
-        f'style="display:none;margin:8px 0 16px 0;">'
+        f'style="display:none;padding:8px 14px 14px 28px;'
+        f'background:#fcfcfd;border-left:1px solid #e5e7eb;'
+        f'border-radius:0 0 4px 4px;margin-top:-2px;">'
         f'<div id="plot-{bid}"></div>'
         f'<script>'
-        f'(function() {{'
-        f'  var d = {fig_json};'
-        f'  Plotly.newPlot("plot-{bid}", d.data, d.layout, '
-        f'    {{responsive: true, displaylogo: false}});'
-        f'}})();'
+        f'window.__compareFigures = window.__compareFigures || {{}};'
+        f'window.__compareFigures["{bid}"] = {fig_json};'
         f'</script>'
         f'</div>'
     )
 
 
 _TOGGLE_JS = """
+window.__compareFigures = window.__compareFigures || {};
+window.__compareFigsPlotted = window.__compareFigsPlotted || {};
 document.querySelectorAll('.biomodel-card').forEach(function(card) {
   card.addEventListener('click', function() {
     var bid = card.getAttribute('data-biomodel');
     var pane = document.getElementById('detail-' + bid);
     if (!pane) return;
-    pane.style.display = (pane.style.display === 'none') ? 'block' : 'none';
+    var isOpen = pane.style.display !== 'none';
+    pane.style.display = isOpen ? 'none' : 'block';
+    var chev = card.querySelector('.chevron');
+    if (chev) chev.style.transform = isOpen ? 'rotate(0deg)' : 'rotate(90deg)';
+    // Lazy-plot on first expand: Plotly needs a visible container to size to.
+    if (!isOpen && !window.__compareFigsPlotted[bid]) {
+      var fig = window.__compareFigures[bid];
+      if (fig && window.Plotly) {
+        Plotly.newPlot('plot-' + bid, fig.data, fig.layout,
+                       {responsive: true, displaylogo: false});
+        window.__compareFigsPlotted[bid] = true;
+      }
+    }
   });
 });
 """
@@ -206,18 +234,20 @@ class CompareOverlay(Visualization):
                 '<div style="padding:20px;color:#888;font-family:-apple-system,sans-serif;">'
                 'No biomodels to compare.</div>'}
 
-        cards: List[str] = []
-        details: List[str] = []
+        # Interleave: each card is immediately followed by its detail pane so
+        # the click-revealed plot lands directly under the row that triggered
+        # it. The whole thing is a single top-to-bottom list.
+        rows: List[str] = []
         for bid, branch in per.items():
             comparison = branch.get("comparison") or {}
-            cards.append(_card_html(bid, comparison))
             a = branch.get("copasi") or {}
             b = branch.get("tellurium") or {}
             fig = _build_figure(
                 _series_by_species(a), a.get("time") or [], "COPASI",
                 _series_by_species(b), b.get("time") or [], "Tellurium",
             )
-            details.append(_detail_html(bid, fig))
+            rows.append(_card_html(bid, comparison))
+            rows.append(_detail_html(bid, fig))
 
         title = (self.config or {}).get("title", "")
         title_html = (
@@ -226,13 +256,9 @@ class CompareOverlay(Visualization):
         ) if title else ''
         return {"html": (
             f'<div>{title_html}'
-            f'<div class="biomodel-grid" style="'
-            f'display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));'
-            f'gap:10px;margin-bottom:12px;">'
-            + "".join(cards) +
-            f'</div>'
-            f'<div class="biomodel-details">'
-            + "".join(details) +
+            f'<div class="biomodel-list" style="'
+            f'display:flex;flex-direction:column;gap:4px;">'
+            + "".join(rows) +
             f'</div>'
             f'<script>{get_plotlyjs()}</script>'
             f'<script>{_TOGGLE_JS}</script>'

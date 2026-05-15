@@ -1,7 +1,7 @@
 """CompareOverlay renders a summary-card grid for N biomodels, each card
 collapsible to its species small-multiples."""
 from pbg_biomodels.core import build_core
-from pbg_biomodels.visualizations.compare_overlay import CompareOverlay
+from pbg_biomodels.visualizations.compare_overlay import CompareOverlay, _build_figure
 
 
 def _overlay(biomodel_ids):
@@ -72,3 +72,19 @@ def test_empty_biomodel_ids_does_not_crash():
     overlay = _overlay([])
     out = overlay.update({})
     assert isinstance(out, dict) and isinstance(out.get("html"), str)
+
+
+def test_engine_colors_consistent_across_subplots():
+    """All COPASI traces share one color across species subplots; all
+    Tellurium traces share another. Plotly's auto-cycle would otherwise
+    drift because traces are interleaved per-species (engine_a, engine_b,
+    engine_a, engine_b, …)."""
+    a_series = {"S1": [1.0, 2.0], "S2": [3.0, 4.0], "S3": [5.0, 6.0]}
+    b_series = {"S1": [1.1, 2.1], "S2": [3.1, 4.1], "S3": [5.1, 6.1]}
+    fig = _build_figure(a_series, [0.0, 1.0], "COPASI",
+                        b_series, [0.0, 1.0], "Tellurium")
+    copasi_colors = {t["line"]["color"] for t in fig["data"] if t["name"] == "COPASI"}
+    tellurium_colors = {t["line"]["color"] for t in fig["data"] if t["name"] == "Tellurium"}
+    assert len(copasi_colors) == 1, f"COPASI colors drift: {copasi_colors}"
+    assert len(tellurium_colors) == 1, f"Tellurium colors drift: {tellurium_colors}"
+    assert copasi_colors != tellurium_colors, "engines must visibly differ"
