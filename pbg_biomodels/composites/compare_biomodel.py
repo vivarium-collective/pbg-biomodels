@@ -1,33 +1,32 @@
-"""Composite builder: fetch one BioModel, run it in two simulators, compare.
+"""Composite generator: fan out across a list of BioModels, compare each
+under COPASI and Tellurium, render a summary-card grid of the results.
 
-A composite produced by :func:`build_compare_biomodel` runs a single
-**biomodel_id → load → COPASI + Tellurium → compare → visualize**
-pipeline as a single process-bigraph document.
+`compare-biomodel` is a :func:`@composite_generator` — discovered at import
+time and served by the dashboard alongside file-based ``*.composite.yaml``
+specs. The single user-facing parameter, ``biomodel_ids``, is a
+``list[string]``; each id spawns a load → COPASI + Tellurium →
+SimulatorComparisonStep branch.
 
-``biomodel_id`` is the only externally-supplied parameter and lives in
-the composite's state as a string store. A :class:`LoadBiomodelStep`
-reads it, fetches the SBML + SED-ML via the BioModels REST API, and
-writes ``sbml_path``, ``time``, and ``n_points`` into downstream stores.
-:class:`LocalCopasiUTCStep` and :class:`LocalTelluriumUTCStep` read
-those values as runtime inputs (not config), simulate the model, and
-emit ``numeric_result`` payloads into the ``results`` map. The
-:class:`SimulatorComparisonStep` reads both engine results and
-writes a per-species RMSE summary; :class:`CompareOverlay` (a
-``@as_visualization`` Step) renders an HTML overlay of the two
-trajectories plus a bucket-colored match banner.
+Internal state shape: every per-biomodel store is a *top-level key* suffixed
+with the biomodel id (`sbml_path_<bid>`, `copasi_<bid>`, `comparison_<bid>`,
+…). All wires are therefore one-segment paths, sidestepping bigraph-schema's
+restriction on attaching link paths to string-typed leaves of nested
+records. The viz step gets the biomodel_ids list via its `config` and
+dynamically declares one named input port per biomodel so the renderer can
+reassemble a per-biomodel view at render time.
 
-The composite uses ``run_steps_on_init=True`` so the Step chain fires
-on construction. Output stores are pre-populated with empty placeholder
-shapes — required because the bigraph runtime's ``apply()`` refuses to
-auto-extend ``map[numeric_result]`` with brand-new keys at write time.
+Internal step addresses are exposed as module constants for Python-level
+overriding (tests, alternative simulator backends). They are NOT user-
+facing parameters; the dashboard's Configure tab only shows
+``biomodel_ids``.
 """
 from __future__ import annotations
 
-from typing import Any, Dict
+from typing import Any, Dict, List
+
+from pbg_superpowers.composite_generator import composite_generator
 
 
-# Addresses of the Step classes wired into the composite. Override these
-# kwargs if you've registered local variants under different names.
 LOAD_STEP_ADDRESS = "local:pbg_biomodels_bundle.steps.load_biomodel.LoadBiomodelStep"
 COPASI_STEP_ADDRESS = "local:pbg_biomodels_bundle.steps.local_simulators.LocalCopasiUTCStep"
 TELLURIUM_STEP_ADDRESS = "local:pbg_biomodels_bundle.steps.local_simulators.LocalTelluriumUTCStep"
@@ -35,137 +34,144 @@ COMPARISON_STEP_ADDRESS = "local:pbg_biomodels_bundle.steps.simulator_comparison
 VISUALIZATION_STEP_ADDRESS = "local:pbg_biomodels.visualizations.compare_overlay.CompareOverlay"
 
 
+def _empty_numeric() -> Dict[str, Any]:
+    return {"time": [], "columns": [], "values": []}
+
+
+@composite_generator(
+    name="compare-biomodel",
+    description=(
+        "For each BioModel id in the list, fetch the SBML, run it under "
+        "COPASI and Tellurium, score per-species nRMSE between the two "
+        "trajectories, and render a summary-card grid (click a card to "
+        "expand that biomodel's species overlay)."
+    ),
+    parameters={
+        "biomodel_ids": {
+            "type": "list[string]",
+            "default": ["BIOMD0000000001"],
+            "description": (
+                "BioModels identifiers, one per line. Each id spawns its own "
+                "load + COPASI + Tellurium + compare branch."
+            ),
+        },
+    },
+    default_n_steps=1,
+)
 def build_compare_biomodel(
-    biomodel_id: str,
+    core: Any = None,
     *,
+    biomodel_ids: List[str],
+    with_emitter: bool = True,
     load_address: str = LOAD_STEP_ADDRESS,
     copasi_address: str = COPASI_STEP_ADDRESS,
     tellurium_address: str = TELLURIUM_STEP_ADDRESS,
     comparison_address: str = COMPARISON_STEP_ADDRESS,
-    visualization_address: str | None = VISUALIZATION_STEP_ADDRESS,
-    with_emitter: bool = True,
+    visualization_address: str = VISUALIZATION_STEP_ADDRESS,
     emitter_address: str = "local:RAMEmitter",
 ) -> Dict[str, Any]:
-    """Build a single-biomodel COPASI-vs-Tellurium comparison composite.
+    """Build a multi-biomodel COPASI-vs-Tellurium comparison composite.
 
     Args:
-        biomodel_id: BioModels identifier (e.g. ``"BIOMD0000000001"``). Seeded
-            into the composite's ``biomodel_id`` store and read at runtime by
-            :class:`LoadBiomodelStep`.
-        with_emitter: if True (default), attach a ``RAMEmitter`` collecting
-            both engine results and the comparison output so
-            ``gather_emitter_results`` returns the history after the run.
-        visualization_address: pass ``None`` to skip the overlay viz Step
-            (e.g. for headless / batch use).
+        biomodel_ids: BioModels identifiers; one branch is created per id.
+        with_emitter: attach a RAMEmitter capturing the per-biomodel
+            comparison stores so ``gather_emitter_results`` returns them
+            after the run.
 
     Returns:
-        A composite document ``{"schema", "state", "run_steps_on_init"}``
-        ready to feed ``process_bigraph.Composite``.
+        ``{"state", "run_steps_on_init": True}`` ready to feed
+        ``process_bigraph.Composite``.
     """
     copasi_key = "copasi"
     tellurium_key = "tellurium"
 
-    empty_numeric: Dict[str, Any] = {"time": [], "columns": [], "values": []}
-    state: Dict[str, Any] = {
-        # Inputs / intermediate stores. biomodel_id is the entry point.
-        "biomodel_id": biomodel_id,
-        "sbml_path":   "",
-        "sim_time":    0.0,
-        "n_points":    0,
-        # Pre-populated map keys: bigraph apply() won't auto-extend
-        # map[numeric_result] with new keys, so the simulator outputs
-        # need a target slot to land in.
-        "results": {
-            copasi_key:    dict(empty_numeric),
-            tellurium_key: dict(empty_numeric),
-        },
-        "comparison": {},
-    }
+    state: Dict[str, Any] = {"viz_html": ""}
+    viz_inputs: Dict[str, List[str]] = {}
+    emit_schema: Dict[str, str] = {}
 
-    state["load"] = {
-        "_type": "step",
-        "address": load_address,
-        "config": {},
-        "inputs":  {"biomodel_id": ["biomodel_id"]},
-        "outputs": {
-            "sbml_path": ["sbml_path"],
-            "time":      ["sim_time"],
-            "n_points":  ["n_points"],
-        },
-    }
+    for bid in biomodel_ids:
+        # Per-biomodel stores — flat top-level keys, suffixed with the id.
+        state[f"biomodel_id_{bid}"] = bid
+        state[f"sbml_path_{bid}"]   = ""
+        state[f"sim_time_{bid}"]    = 0.0
+        state[f"n_points_{bid}"]    = 0
+        state[f"copasi_{bid}"]      = _empty_numeric()
+        state[f"tellurium_{bid}"]   = _empty_numeric()
+        state[f"comparison_{bid}"]  = {}
 
-    sim_inputs = {
-        "model_source": ["sbml_path"],
-        "time":         ["sim_time"],
-        "n_points":     ["n_points"],
-    }
-    state[f"{copasi_key}_step"] = {
-        "_type": "step",
-        "address": copasi_address,
-        "config": {},
-        "inputs":  sim_inputs,
-        "outputs": {"result": ["results", copasi_key]},
-    }
-    state[f"{tellurium_key}_step"] = {
-        "_type": "step",
-        "address": tellurium_address,
-        "config": {},
-        "inputs":  sim_inputs,
-        "outputs": {"result": ["results", tellurium_key]},
-    }
-
-    state["compare"] = {
-        "_type": "step",
-        "address": comparison_address,
-        "config": {"engine_a_name": copasi_key, "engine_b_name": tellurium_key},
-        "inputs": {
-            "engine_a_result": ["results", copasi_key],
-            "engine_b_result": ["results", tellurium_key],
-        },
-        "outputs": {"comparison": ["comparison"]},
-    }
-
-    if visualization_address:
-        state["overlay_viz"] = {
-            "_type": "step",
-            "address": visualization_address,
-            "config": {"title": f"{biomodel_id} — COPASI vs Tellurium overlay"},
-            "inputs": {
-                "engine_a_result": ["results", copasi_key],
-                "engine_b_result": ["results", tellurium_key],
-                "comparison":      ["comparison"],
+        # Per-biomodel step quartet: load → (copasi + tellurium) → compare.
+        state[f"load_{bid}"] = {
+            "_type":   "step",
+            "address": load_address,
+            "config":  {},
+            "inputs":  {"biomodel_id": [f"biomodel_id_{bid}"]},
+            "outputs": {
+                "sbml_path": [f"sbml_path_{bid}"],
+                "time":      [f"sim_time_{bid}"],
+                "n_points":  [f"n_points_{bid}"],
             },
-            "outputs": {"html": ["viz_html"]},
         }
-        state["viz_html"] = ""
+
+        sim_inputs = {
+            "model_source": [f"sbml_path_{bid}"],
+            "time":         [f"sim_time_{bid}"],
+            "n_points":     [f"n_points_{bid}"],
+        }
+        state[f"copasi_step_{bid}"] = {
+            "_type":   "step",
+            "address": copasi_address,
+            "config":  {},
+            "inputs":  sim_inputs,
+            "outputs": {"result": [f"copasi_{bid}"]},
+        }
+        state[f"tellurium_step_{bid}"] = {
+            "_type":   "step",
+            "address": tellurium_address,
+            "config":  {},
+            "inputs":  sim_inputs,
+            "outputs": {"result": [f"tellurium_{bid}"]},
+        }
+
+        state[f"compare_{bid}"] = {
+            "_type":   "step",
+            "address": comparison_address,
+            "config":  {"engine_a_name": copasi_key, "engine_b_name": tellurium_key},
+            "inputs": {
+                "engine_a_result": [f"copasi_{bid}"],
+                "engine_b_result": [f"tellurium_{bid}"],
+            },
+            "outputs": {"comparison": [f"comparison_{bid}"]},
+        }
+
+        # Per-biomodel viz inputs (the viz declares these dynamically from
+        # its config; see CompareOverlay.inputs).
+        viz_inputs[f"copasi_{bid}"]     = [f"copasi_{bid}"]
+        viz_inputs[f"tellurium_{bid}"]  = [f"tellurium_{bid}"]
+        viz_inputs[f"comparison_{bid}"] = [f"comparison_{bid}"]
+
+        # Emitter captures per-biomodel comparison + engine results.
+        emit_schema[f"comparison_{bid}"] = "node"
+        emit_schema[f"copasi_{bid}"]     = "node"
+        emit_schema[f"tellurium_{bid}"]  = "node"
+
+    # One viz step reads every per-biomodel triplet and renders the grid.
+    state["multi_overlay_viz"] = {
+        "_type":   "step",
+        "address": visualization_address,
+        "config":  {
+            "title": "BioModels: COPASI vs Tellurium",
+            "biomodel_ids": list(biomodel_ids),
+        },
+        "inputs":  viz_inputs,
+        "outputs": {"html": ["viz_html"]},
+    }
 
     if with_emitter:
-        emit_wires = {
-            "results":    ["results"],
-            "comparison": ["comparison"],
-        }
         state["emitter"] = {
-            "_type": "step",
+            "_type":   "step",
             "address": emitter_address,
-            "config": {"emit": {k: "node" for k in emit_wires}},
-            "inputs": emit_wires,
+            "config":  {"emit": emit_schema},
+            "inputs":  {k: v for k, v in viz_inputs.items()},
         }
 
-    schema: Dict[str, Any] = {
-        "biomodel_id": "string",
-        "sbml_path":   "string",
-        "sim_time":    "float",
-        "n_points":    "integer",
-        "results":     "map[numeric_result]",
-        "comparison": {
-            "n_shared":         "integer",
-            "rmse_by_species":  "map[float]",
-            "nrmse_by_species": "map[float]",
-            "mean_nrmse":       "maybe[float]",
-            "bucket":           "string",
-            "bucket_label":     "string",
-        },
-        "viz_html": "string",
-    }
-
-    return {"schema": schema, "state": state, "run_steps_on_init": True}
+    return {"state": state, "run_steps_on_init": True}
