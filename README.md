@@ -1,18 +1,71 @@
 # biomodels
 
-A process-bigraph research workspace. Use the `/pbg-*` skills to drive the
-canonical PR flow:
+A process-bigraph workspace for running [BioModels](https://www.ebi.ac.uk/biomodels/)
+under multiple simulators (COPASI, Tellurium, simbio), comparing their
+trajectories, and turning any BioModel into a ready-to-plug process-bigraph
+module.
 
-1. `/pbg-add-model <name>` — register a new model (creates a submodule)
-2. `/pbg-pull-processes` — pull required pbg-* wrappers
-3. `/pbg-data <model>` — curate datasets + references
-4. `/pbg-expert-input <model>` — capture expert-stated expected behavior
-5. `/pbg-baseline <model>` — build minimal end-to-end composite
-6. `/pbg-phase-plan <model>` — lay out multi-phase plan
-7. `/pbg-phase <n> <model>` — implement each phase
+## CLI
 
-Optional dashboard:
+Installed as the `pbg-biomodels` console script (`pip install -e .`).
 
-- `/pbg-server start` — launch local HTTP server for live guidance + progress
+### `compare` — multi-simulator comparison report
 
-See `docs/` and `reports/index.html` for details.
+Run one or more BioModels under a set of simulators, score every pair with an
+nRMSE matrix, and write a navigable HTML report (overview + per-model overlay
+plots, the all-pairs matrix, and individual per-simulator plots).
+
+```bash
+# all simulators (copasi, tellurium, simbio), one report
+pbg-biomodels compare BIOMD0000000001 BIOMD0000000012
+
+# pick a subset
+pbg-biomodels compare BIOMD0000000001 --simulators copasi,simbio
+
+# add an external reference dataset, scored as another engine
+#   CSV layout: a `time` column + one column per species id
+pbg-biomodels compare BIOMD0000000001 \
+    --reference BIOMD0000000001:experiment=experiment.csv \
+    --out report.html --open
+```
+
+`--reference BIOMODEL_ID[:name]=path.csv` is repeatable; each reference is
+loaded and compared exactly like a simulator.
+
+### `process` — a BioModel as a pluggable process
+
+Emit a composite document with one BioModel loaded into a single simulator's
+time-coupled process (wired to a `species` store + emitter). Drop it into a
+larger bigraph and re-point the `species_input` port to couple it in.
+
+```bash
+# print the composite document
+pbg-biomodels process BIOMD0000000001 --simulator simbio
+
+# write it to a file
+pbg-biomodels process BIOMD0000000001 --simulator simbio --out module.json
+
+# run it for 20 steps and print the final species
+pbg-biomodels process BIOMD0000000001 --simulator tellurium --run 20 --interval 1.0
+```
+
+## Composites (also discoverable in the dashboard)
+
+- **`compare-simulators`** — fan out across biomodels, run each simulator, score
+  the all-pairs nRMSE matrix. (`pbg_biomodels.composites.compare_simulators`)
+- **`biomodel-process`** — a single BioModel in one simulator's process, ready
+  to plug. (`pbg_biomodels.composites.biomodel_process`)
+- **`compare-biomodel`** — the original COPASI-vs-Tellurium(-vs-simbio) overlay
+  generator.
+
+## Adding a simulator backend
+
+One entry in `pbg_biomodels/simulators.py` (the UTC-step adapter address, the
+canonical `<Sim>UTCProcess` address, its config builder, and its species output
+port) wires a new backend into both the comparison and the pluggable-process
+flows.
+
+## Workspace skills
+
+This is also a `/pbg-*` research workspace. See `docs/` and
+`reports/index.html`; `/pbg-server start` launches the local guidance server.

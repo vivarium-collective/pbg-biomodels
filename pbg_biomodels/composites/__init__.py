@@ -4,4 +4,6 @@ Each module imported here fires its ``@composite_generator`` decorator on
 package import, registering the generator with
 ``pbg_superpowers.composite_generator._REGISTRY``.
 """
+from pbg_biomodels.composites import biomodel_process  # noqa: F401
 from pbg_biomodels.composites import compare_biomodel  # noqa: F401
+from pbg_biomodels.composites import compare_simulators  # noqa: F401
