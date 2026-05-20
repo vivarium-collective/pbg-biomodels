@@ -103,13 +103,27 @@ def _overlay_figure(engines: Dict[str, Any]) -> Dict[str, Any]:
     return {"data": traces, "layout": layout}
 
 
-def _single_figure(name: str, index: int, payload: Dict[str, Any]) -> Dict[str, Any]:
-    """One engine's species trajectories on a single axis."""
+# Distinct, colorblind-friendly palette for per-species coloring (Plotly "Safe").
+_SPECIES_PALETTE = [
+    "#1f77b4", "#ff7f0e", "#2ca02c", "#d62728", "#9467bd", "#8c564b",
+    "#e377c2", "#7f7f7f", "#bcbd22", "#17becf", "#393b79", "#637939",
+    "#8c6d31", "#843c39", "#7b4173", "#5254a3", "#9c9ede", "#cedb9c",
+]
+
+
+def _species_color_map(species: List[str]) -> Dict[str, str]:
+    """Assign each species a stable color, shared across the per-simulator plots."""
+    return {sp: _SPECIES_PALETTE[i % len(_SPECIES_PALETTE)] for i, sp in enumerate(species)}
+
+
+def _single_figure(name: str, payload: Dict[str, Any],
+                   species_colors: Dict[str, str]) -> Dict[str, Any]:
+    """One engine's species trajectories, colored by species (shared map)."""
     t = (payload or {}).get("time") or []
     series = _series_by_species(payload or {})
-    color = _engine_color(name, index)
     traces = [
-        {"x": t, "y": ys, "mode": "lines", "name": sp}
+        {"x": t, "y": ys, "mode": "lines", "name": sp,
+         "line": {"color": species_colors.get(sp)}}
         for sp, ys in series.items()
     ]
     return {
@@ -120,7 +134,6 @@ def _single_figure(name: str, index: int, payload: Dict[str, Any]) -> Dict[str, 
             "margin": {"t": 40, "b": 40, "l": 55, "r": 15},
             "xaxis": {"title": {"text": "time"}},
             "yaxis": {"title": {"text": "concentration"}},
-            "colorway": [color],
         },
     }
 
@@ -187,8 +200,27 @@ def build_comparison_report(
     for bid, branch in results.items():
         engines = branch.get("engines", {}) or {}
         comparison = branch.get("comparison", {}) or {}
-        bucket = comparison.get("bucket", "none")
-        color = _BUCKET_COLOR.get(bucket, "#6b7280")
+        error = branch.get("error")
+        bucket = "error" if error else comparison.get("bucket", "none")
+        color = "#dc2626" if error else _BUCKET_COLOR.get(bucket, "#6b7280")
+
+        if error:
+            sidebar_items.append(
+                f'<a class="nav" data-target="m-{html.escape(bid)}">'
+                f'<span class="dot" style="background:{color}"></span>{html.escape(bid)}</a>'
+            )
+            overview_rows.append(
+                f"<tr data-target='m-{html.escape(bid)}'><td>{html.escape(bid)}</td>"
+                f"<td>0</td><td>—</td>"
+                f"<td><span class='badge' style='background:{color}'>error</span></td></tr>"
+            )
+            panels.append(
+                f'<section class="panel" id="m-{html.escape(bid)}">'
+                f"<h2>{html.escape(bid)}</h2>"
+                f'<p><span class="badge" style="background:{color}">error</span></p>'
+                f'<pre class="err">{html.escape(error)}</pre></section>'
+            )
+            continue
 
         # Sidebar + overview row.
         sidebar_items.append(
@@ -206,10 +238,13 @@ def build_comparison_report(
         # Figures (rendered lazily by id).
         overlay_id = f"overlay-{bid}"
         figures[overlay_id] = _overlay_figure(engines)
+        # Per-species colors shared across this model's individual plots, so a
+        # species reads the same color in every simulator's subplot.
+        species_colors = _species_color_map(_species_union(engines))
         single_divs = []
-        for k, (name, payload) in enumerate(engines.items()):
+        for name, payload in engines.items():
             fid = f"single-{bid}-{name}"
-            figures[fid] = _single_figure(name, k, payload)
+            figures[fid] = _single_figure(name, payload, species_colors)
             single_divs.append(
                 f'<div class="plot" id="{fid}" data-fig="{fid}"></div>'
             )
@@ -267,6 +302,7 @@ _TEMPLATE = """<!doctype html>
   table.matrix td.diag {{ color:#cbd5e1; }}
   table.overview {{ width:100%; }} table.overview td:first-child, table.overview th:first-child {{ text-align:left; }}
   table.overview tbody tr {{ cursor:pointer; }} table.overview tbody tr:hover {{ background:#f1f5f9; }}
+  .err {{ background:#fef2f2; color:#991b1b; padding:12px; border-radius:6px; font-size:12px; overflow:auto; }}
   .plot {{ width:100%; margin:6px 0 16px; }}
   .singles {{ display:grid; grid-template-columns:1fr 1fr; gap:14px; }}
   @media (max-width:900px) {{ .singles {{ grid-template-columns:1fr; }} }}

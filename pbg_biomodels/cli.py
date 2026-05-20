@@ -59,13 +59,15 @@ def _cmd_compare(args: argparse.Namespace) -> int:
     if references:
         print(f"Reference datasets: {references}")
 
-    results = run_comparison(args.biomodels, simulators=sims, references=references)
+    def _progress(bid, status):
+        print(f"  {bid}: {status}")
 
-    for bid, branch in results.items():
-        comp = branch.get("comparison", {})
-        print(f"  {bid}: {comp.get('bucket_label', '?')}"
-              f" (max nRMSE {comp.get('max_nrmse')})")
+    results = run_comparison(
+        args.biomodels, simulators=sims, references=references, on_progress=_progress
+    )
 
+    n_ok = sum(1 for b in results.values() if not b.get("error"))
+    print(f"{n_ok}/{len(results)} biomodel(s) completed.")
     out = build_comparison_report(results, args.out, title=args.title)
     print(f"Report written to {out}")
     if args.open:
