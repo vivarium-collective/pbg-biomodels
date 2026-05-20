@@ -105,3 +105,68 @@ def compare_two_engines(
         "bucket": bucket_id,
         "bucket_label": bucket_label,
     }
+
+
+def bucket_for(mean_nrmse: Optional[float]) -> tuple:
+    """Map a mean-nRMSE value to a ``(bucket_id, bucket_label)`` pair."""
+    if mean_nrmse is None:
+        return NO_COMPARISON_BUCKET
+    for bid, threshold, label in BUCKET_THRESHOLDS:
+        if mean_nrmse <= threshold:
+            return bid, label
+    return BUCKET_THRESHOLDS[-1][0], BUCKET_THRESHOLDS[-1][2]
+
+
+def compare_n_engines(engines: Dict[str, Optional[Dict[str, Any]]]) -> Dict[str, Any]:
+    """All-pairs comparison across N named engines (simulators + references).
+
+    Runs :func:`compare_two_engines` on every unordered pair of engines that
+    carry data, and summarizes the worst (largest mean-nRMSE) pair.
+
+    Returns::
+
+        {
+          "engines":   ["copasi", "tellurium", ...],   # engines with data
+          "pairs": {
+            "copasi__tellurium": {<compare_two_engines result>}, ...
+          },
+          "matrix":    {a: {b: mean_nrmse_or_None}},     # symmetric, diag None
+          "max_nrmse": float | None,                     # worst pair's mean nRMSE
+          "worst_pair": [a, b] | None,
+          "bucket":     str,                             # bucket of the worst pair
+          "bucket_label": str,
+        }
+    """
+    present = sorted(
+        name for name, payload in engines.items()
+        if payload and payload.get("columns")
+    )
+
+    pairs: Dict[str, Any] = {}
+    matrix: Dict[str, Dict[str, Optional[float]]] = {
+        a: {b: None for b in present} for a in present
+    }
+    max_nrmse: Optional[float] = None
+    worst_pair: Optional[List[str]] = None
+
+    for i, a in enumerate(present):
+        for b in present[i + 1:]:
+            result = compare_two_engines(engines[a], engines[b], name_a=a, name_b=b)
+            pairs[f"{a}__{b}"] = result
+            mean = result.get("mean_nrmse")
+            matrix[a][b] = mean
+            matrix[b][a] = mean
+            if mean is not None and (max_nrmse is None or mean > max_nrmse):
+                max_nrmse = mean
+                worst_pair = [a, b]
+
+    bucket_id, bucket_label = bucket_for(max_nrmse)
+    return {
+        "engines": present,
+        "pairs": pairs,
+        "matrix": matrix,
+        "max_nrmse": max_nrmse,
+        "worst_pair": worst_pair,
+        "bucket": bucket_id,
+        "bucket_label": bucket_label,
+    }

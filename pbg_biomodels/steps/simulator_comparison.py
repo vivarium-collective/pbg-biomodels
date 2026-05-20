@@ -16,7 +16,7 @@ from typing import Any, Dict
 
 from process_bigraph import Step
 
-from pbg_biomodels.comparison import compare_two_engines
+from pbg_biomodels.comparison import compare_n_engines, compare_two_engines
 
 
 class SimulatorComparisonStep(Step):
@@ -61,3 +61,30 @@ class SimulatorComparisonStep(Step):
             name_b=self.config["engine_b_name"],
         )
         return {"comparison": summary}
+
+
+class MultiSimulatorComparisonStep(Step):
+    """All-pairs comparison across N named engines (simulators + references).
+
+    The engine names are declared in ``config['engine_names']``; this Step
+    exposes one ``numeric_result`` input port per engine (named exactly after
+    the engine) and emits the :func:`compare_n_engines` result — an all-pairs
+    nRMSE matrix plus a worst-pair bucket — on the ``comparison`` port.
+
+    Generalizes :class:`SimulatorComparisonStep` (which is the pairwise case).
+    """
+
+    config_schema = {
+        "engine_names": {"_type": "list[string]", "_default": []},
+    }
+
+    def inputs(self) -> Dict[str, str]:
+        return {name: "numeric_result" for name in self.config["engine_names"]}
+
+    def outputs(self) -> Dict[str, str]:
+        # Free-form nested matrix; captured downstream as a tree/node.
+        return {"comparison": "tree"}
+
+    def update(self, state: Dict[str, Any]) -> Dict[str, Any]:
+        engines = {name: (state or {}).get(name) for name in self.config["engine_names"]}
+        return {"comparison": compare_n_engines(engines)}
