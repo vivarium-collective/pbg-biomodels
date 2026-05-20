@@ -24,6 +24,7 @@ dependencies = [
     # Simulator wrappers (absorbed from pbg-biomodels-bundle).
     "pbg-tellurium",
     "pbg-copasi",
+    "pbg-simbio",
     # BioModels corpus + SED-ML/SBML parsing (absorbed from pbg-biomodels-bundle).
     "biomodels",
     "rest-process",
@@ -39,6 +40,7 @@ batch = ["pbest"]  # used by run_biomodels CLI / batch tooling
 vivarium-dashboard = { path = "../vivarium-dashboard", editable = true }
 pbg-tellurium = { path = "../pbg-tellurium", editable = true }
 pbg-copasi = { path = "../pbg-copasi", editable = true }
+pbg-simbio = { path = "../pbg-simbio", editable = true }
 
 [build-system]
 requires = ["hatchling"]

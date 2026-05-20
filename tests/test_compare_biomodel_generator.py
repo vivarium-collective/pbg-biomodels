@@ -25,21 +25,22 @@ def test_generator_is_registered_with_list_param():
 
 
 def test_build_fans_out_per_biomodel_steps():
-    """Two biomodels → two full step quartets + one shared multi-viz."""
+    """Two biomodels → two full step quintets + one shared multi-viz."""
     doc = build_generator(_entry(), overrides={
         "biomodel_ids": ["BIOMD0000000001", "BIOMD0000000005"],
     })
     state = doc["state"] if "state" in doc else doc
 
-    # One quartet of Steps per biomodel id (top-level keys, suffixed by id).
+    # One quintet of Steps per biomodel id (top-level keys, suffixed by id):
+    # load → (copasi + tellurium + simbio) → compare.
     for bid in ("BIOMD0000000001", "BIOMD0000000005"):
-        for stem in ("load", "copasi_step", "tellurium_step", "compare"):
+        for stem in ("load", "copasi_step", "tellurium_step", "simbio_step", "compare"):
             key = f"{stem}_{bid}"
             assert key in state, f"missing step {key!r}"
             assert state[key]["_type"] == "step"
         # Per-biomodel data stores (flat top-level, suffixed by id).
         for store in ("sbml_path", "sim_time", "n_points",
-                      "copasi", "tellurium", "comparison"):
+                      "copasi", "tellurium", "simbio", "comparison"):
             assert f"{store}_{bid}" in state, f"missing store {store}_{bid}"
 
     # Per-id compare step wires into THAT biomodel's stores.
@@ -54,9 +55,10 @@ def test_build_fans_out_per_biomodel_steps():
     assert viz["_type"] == "step"
     assert viz["address"].endswith("CompareOverlay")
     assert set(viz["config"]["biomodel_ids"]) == {"BIOMD0000000001", "BIOMD0000000005"}
-    # Every per-biomodel triplet wired as a viz input port.
+    # Every per-biomodel quad wired as a viz input port (incl. simbio).
     for bid in ("BIOMD0000000001", "BIOMD0000000005"):
-        for port in (f"copasi_{bid}", f"tellurium_{bid}", f"comparison_{bid}"):
+        for port in (f"copasi_{bid}", f"tellurium_{bid}", f"simbio_{bid}",
+                     f"comparison_{bid}"):
             assert port in viz["inputs"]
 
 
