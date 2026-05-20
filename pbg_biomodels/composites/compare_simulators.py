@@ -139,11 +139,18 @@ def run_comparison(
     biomodel_ids: List[str],
     simulators="all",
     references: Optional[Mapping[str, Mapping[str, str]]] = None,
+    *,
+    on_progress=None,
 ) -> Dict[str, Any]:
     """Build, run, and collect a comparison into the report structure.
 
-    Returns ``{biomodel_id: {"engines": {name: numeric_result}, "comparison": ...}}``
-    suitable for :func:`pbg_biomodels.report.build_comparison_report`.
+    Each biomodel runs in its **own** isolated composite, so one model that
+    fails to fetch or simulate doesn't sink the rest — its entry records an
+    ``error`` instead. ``on_progress(bid, status)`` is called per model if given.
+
+    Returns ``{biomodel_id: {"engines": {name: numeric_result},
+    "comparison": ..., "error": str|None}}`` suitable for
+    :func:`pbg_biomodels.report.build_comparison_report`.
     """
     from process_bigraph import Composite, gather_emitter_results
 
@@ -153,22 +160,29 @@ def run_comparison(
     sims = resolve_simulators(simulators)
     references = references or {}
 
-    doc = build_compare_document(biomodel_ids, simulators=sims, references=references)
-    core = register_types(build_core())
-    composite = Composite(doc, core=core)
-    composite.run(0.0)  # Steps already ran on init; flush the emitter.
-
-    snapshots = gather_emitter_results(composite).get(("emitter",), [])
-    snap = snapshots[-1] if snapshots else {}
-
     results: Dict[str, Any] = {}
     for bid in biomodel_ids:
         engine_names = list(sims) + list(references.get(bid, {}))
-        engines = {name: snap.get(f"{name}_{bid}", {}) for name in engine_names}
-        results[bid] = {
-            "engines": engines,
-            "comparison": snap.get(f"comparison_{bid}", {}),
-        }
+        try:
+            doc = build_compare_document(
+                [bid], simulators=sims,
+                references={bid: references[bid]} if bid in references else None,
+            )
+            composite = Composite(doc, core=register_types(build_core()))
+            composite.run(0.0)  # Steps run on init; flush the emitter.
+            snap = (gather_emitter_results(composite).get(("emitter",)) or [{}])[-1]
+            engines = {name: snap.get(f"{name}_{bid}", {}) for name in engine_names}
+            results[bid] = {
+                "engines": engines,
+                "comparison": snap.get(f"comparison_{bid}", {}),
+                "error": None,
+            }
+            status = results[bid]["comparison"].get("bucket_label", "ok")
+        except Exception as exc:  # network / parse / simulator failure
+            results[bid] = {"engines": {}, "comparison": {}, "error": f"{type(exc).__name__}: {exc}"}
+            status = f"FAILED ({type(exc).__name__})"
+        if on_progress:
+            on_progress(bid, status)
     return results
 
 
