@@ -54,13 +54,27 @@ def _build_figure(
     b_name: str,
     a_color: str = "#1f77b4",  # Plotly default blue
     b_color: str = "#ff7f0e",  # Plotly default orange
+    c_series: Dict[str, List[float]] | None = None,
+    c_time: List[float] | None = None,
+    c_name: str | None = None,
+    c_color: str = "#2ca02c",  # Plotly default green (third engine, e.g. simbio)
 ) -> Dict[str, Any]:
+    # Engines to overlay; the third (e.g. simbio) is optional so the existing
+    # two-engine call sites and tests keep their original 6-arg signature.
+    engines = [
+        (a_name, a_series, a_time, a_color),
+        (b_name, b_series, b_time, b_color),
+    ]
+    if c_series is not None and c_name is not None:
+        engines.append((c_name, c_series, c_time, c_color))
+
     species: List[str] = []
     seen: set = set()
-    for sp in list(a_series.keys()) + list(b_series.keys()):
-        if sp not in seen:
-            seen.add(sp)
-            species.append(sp)
+    for _name, eng_series, _t, _color in engines:
+        for sp in eng_series.keys():
+            if sp not in seen:
+                seen.add(sp)
+                species.append(sp)
 
     if not species:
         return {"data": [], "layout": {"title": "No shared species"}}
@@ -84,10 +98,8 @@ def _build_figure(
         y_ref = "y" if idx == 1 else f"y{idx}"
         layout[y_key] = {"title": {"text": sp}}
         layout[x_key] = {"title": {"text": "time"}}
-        for name, series, t, color in (
-            (a_name, a_series.get(sp), a_time, a_color),
-            (b_name, b_series.get(sp), b_time, b_color),
-        ):
+        for name, eng_series, t, color in engines:
+            series = eng_series.get(sp)
             if series is None or t is None:
                 continue
             traces.append({
@@ -216,6 +228,9 @@ class CompareOverlay(Visualization):
         for bid in ids:
             decl[f"copasi_{bid}"]     = "numeric_result"
             decl[f"tellurium_{bid}"]  = "numeric_result"
+            # simbio is the optional third engine; declared maybe[...] so a
+            # branch that omits it (or a stored empty) doesn't break wiring.
+            decl[f"simbio_{bid}"]     = "maybe[numeric_result]"
             decl[f"comparison_{bid}"] = dict(comparison_shape)
         return decl
 
@@ -227,6 +242,7 @@ class CompareOverlay(Visualization):
             per[bid] = {
                 "copasi":     state.get(f"copasi_{bid}")     or {},
                 "tellurium":  state.get(f"tellurium_{bid}")  or {},
+                "simbio":     state.get(f"simbio_{bid}")     or {},
                 "comparison": state.get(f"comparison_{bid}") or {},
             }
         if not per:
@@ -242,9 +258,15 @@ class CompareOverlay(Visualization):
             comparison = branch.get("comparison") or {}
             a = branch.get("copasi") or {}
             b = branch.get("tellurium") or {}
+            c = branch.get("simbio") or {}
+            # Overlay simbio as a third trace only when its trajectory is present.
+            c_series = _series_by_species(c) if c.get("columns") else None
             fig = _build_figure(
                 _series_by_species(a), a.get("time") or [], "COPASI",
                 _series_by_species(b), b.get("time") or [], "Tellurium",
+                c_series=c_series,
+                c_time=(c.get("time") or []) if c_series is not None else None,
+                c_name="simbio" if c_series is not None else None,
             )
             rows.append(_card_html(bid, comparison))
             rows.append(_detail_html(bid, fig))

@@ -1,10 +1,10 @@
-"""Thin runtime-input wrappers around pbg-copasi / pbg-tellurium UTC Steps.
+"""Thin runtime-input wrappers around pbg-copasi / pbg-tellurium / pbg-simbio UTC Steps.
 
 Adapter Steps for the compare-biomodel composite: take ``model_source``,
 ``time``, ``n_points`` as runtime inputs (so LoadBiomodelStep can feed
 them dynamically) and emit the canonical ``numeric_result`` shape on the
 ``result`` output port. Delegates the actual simulation to the canonical
-classes in pbg-tellurium and pbg-copasi.
+classes in pbg-tellurium, pbg-copasi, and pbg-simbio.
 """
 from __future__ import annotations
 
@@ -13,6 +13,7 @@ from typing import Any, ClassVar, Dict
 from process_bigraph import Step
 
 from pbg_copasi.processes import CopasiUTCStep
+from pbg_simbio.processes import SimbioUTCStep
 from pbg_tellurium.processes import TelluriumUTCStep
 
 
@@ -109,3 +110,36 @@ class BiomodelsTelluriumStep(Step):
                 "values":  values,
             }
         }
+
+
+class BiomodelsSimbioStep(Step):
+    """Adapter: runtime ``model_source`` → ``pbg_simbio.SimbioUTCStep``.
+
+    SimbioUTCStep.config_schema uses keys: model_source, model_format, time,
+    n_points. Like the COPASI adapter, its update() already returns
+    ``{'result': {'time', 'columns', 'values'}}`` — so this wrapper passes the
+    result through directly (no reshape). model_source is an SBML file path,
+    which SimbioUTCStep loads via libSBML and rebuilds as a genuine simbio model.
+    """
+
+    config_schema: ClassVar[Dict[str, Any]] = {}
+
+    def inputs(self) -> Dict[str, str]:
+        return dict(_UTC_INPUTS)
+
+    def outputs(self) -> Dict[str, str]:
+        return {"result": "numeric_result"}
+
+    def update(self, state: Dict[str, Any]) -> Dict[str, Any]:
+        n_points = _validate_n_points(state["n_points"], "BiomodelsSimbioStep")
+        inner = SimbioUTCStep(
+            config={
+                "model_source": state["model_source"],
+                "model_format": "sbml",
+                "time":         float(state["time"]),
+                "n_points":     n_points,
+            },
+            core=self.core,
+        )
+        out = inner.update({})
+        return {"result": out["result"]}

@@ -30,6 +30,7 @@ from pbg_superpowers.composite_generator import composite_generator
 LOAD_STEP_ADDRESS = "local:pbg_biomodels.steps.load_biomodel.LoadBiomodelStep"
 COPASI_STEP_ADDRESS = "local:pbg_biomodels.steps.simulators.BiomodelsCopasiStep"
 TELLURIUM_STEP_ADDRESS = "local:pbg_biomodels.steps.simulators.BiomodelsTelluriumStep"
+SIMBIO_STEP_ADDRESS = "local:pbg_biomodels.steps.simulators.BiomodelsSimbioStep"
 COMPARISON_STEP_ADDRESS = "local:pbg_biomodels.steps.simulator_comparison.SimulatorComparisonStep"
 VISUALIZATION_STEP_ADDRESS = "local:pbg_biomodels.visualizations.compare_overlay.CompareOverlay"
 
@@ -66,6 +67,7 @@ def build_compare_biomodel(
     load_address: str = LOAD_STEP_ADDRESS,
     copasi_address: str = COPASI_STEP_ADDRESS,
     tellurium_address: str = TELLURIUM_STEP_ADDRESS,
+    simbio_address: str = SIMBIO_STEP_ADDRESS,
     comparison_address: str = COMPARISON_STEP_ADDRESS,
     visualization_address: str = VISUALIZATION_STEP_ADDRESS,
     emitter_address: str = "local:RAMEmitter",
@@ -97,6 +99,7 @@ def build_compare_biomodel(
         state[f"n_points_{bid}"]    = 0
         state[f"copasi_{bid}"]      = _empty_numeric()
         state[f"tellurium_{bid}"]   = _empty_numeric()
+        state[f"simbio_{bid}"]      = _empty_numeric()
         state[f"comparison_{bid}"]  = {}
 
         # Per-biomodel step quartet: load → (copasi + tellurium) → compare.
@@ -131,6 +134,15 @@ def build_compare_biomodel(
             "inputs":  sim_inputs,
             "outputs": {"result": [f"tellurium_{bid}"]},
         }
+        # simbio runs alongside as a third engine; its trajectory feeds the
+        # overlay as an extra trace (the nRMSE bucket stays COPASI-vs-Tellurium).
+        state[f"simbio_step_{bid}"] = {
+            "_type":   "step",
+            "address": simbio_address,
+            "config":  {},
+            "inputs":  sim_inputs,
+            "outputs": {"result": [f"simbio_{bid}"]},
+        }
 
         state[f"compare_{bid}"] = {
             "_type":   "step",
@@ -147,12 +159,14 @@ def build_compare_biomodel(
         # its config; see CompareOverlay.inputs).
         viz_inputs[f"copasi_{bid}"]     = [f"copasi_{bid}"]
         viz_inputs[f"tellurium_{bid}"]  = [f"tellurium_{bid}"]
+        viz_inputs[f"simbio_{bid}"]     = [f"simbio_{bid}"]
         viz_inputs[f"comparison_{bid}"] = [f"comparison_{bid}"]
 
         # Emitter captures per-biomodel comparison + engine results.
         emit_schema[f"comparison_{bid}"] = "node"
         emit_schema[f"copasi_{bid}"]     = "node"
         emit_schema[f"tellurium_{bid}"]  = "node"
+        emit_schema[f"simbio_{bid}"]     = "node"
 
     # One viz step reads every per-biomodel triplet and renders the grid.
     state["multi_overlay_viz"] = {
