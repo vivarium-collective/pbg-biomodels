@@ -73,6 +73,19 @@
     ]
   },
   {
+    "name": "pbg-copasi",
+    "description": "process-bigraph-compatible COPASI Steps and Processes for SBML simulation",
+    "source": "https://github.com/vivarium-collective/pbg-copasi.git",
+    "ref": "main",
+    "package": "pbg_copasi",
+    "homepage": "https://github.com/vivarium-collective/pbg-copasi",
+    "tags": [
+      "sbml",
+      "ode",
+      "kinetics"
+    ]
+  },
+  {
     "name": "pbg-lammps",
     "description": "Process-bigraph wrapper for the LAMMPS molecular dynamics simulator",
     "source": "https://github.com/vivarium-collective/pbg-lammps.git",
@@ -162,6 +175,19 @@
     "tags": [
       "particle",
       "reaction-diffusion"
+    ]
+  },
+  {
+    "name": "pbg-simbio",
+    "description": "Process-bigraph wrapper for simbio (Chemical Reaction Network simulation): load models from Antimony, simulate with simbio",
+    "source": "https://github.com/vivarium-collective/pbg-simbio.git",
+    "ref": "main",
+    "package": "pbg_simbio",
+    "homepage": "https://github.com/vivarium-collective/pbg-simbio",
+    "tags": [
+      "sbml",
+      "ode",
+      "kinetics"
     ]
   },
   {
