@@ -38,9 +38,13 @@ TYPES_DICT = {
 }
 
 
+from pbg_biomodels.types import register_simulation_types  # noqa: E402
+
+
 def register_types(core):
     """Register pbg-biomodels bigraph-schema types into a ProcessBigraph core."""
     core.register_types(TYPES_DICT)
+    register_simulation_types(core)
     return core
 
 
