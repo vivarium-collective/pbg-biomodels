@@ -246,26 +246,21 @@ class BatchCompareOverlay(Visualization):
                 'font-family:-apple-system,sans-serif;">'
                 'No biomodels to compare.</div>'}
 
+        # Build a per-bid index from results[sim][bid][doc].
+        per_bid_doc_sim: Dict[str, Dict[str, Dict[str, Any]]] = {}
+        for sim_name, per_bid in results.items():
+            for bid, per_doc in (per_bid or {}).items():
+                for doc, sim_result in (per_doc or {}).items():
+                    if not sim_result:
+                        continue
+                    per_bid_doc_sim.setdefault(bid, {}).setdefault(doc, {})
+                    per_bid_doc_sim[bid][doc][sim_name] = sim_result
+
         rows: List[str] = []
         for bid in ids:
-            per_sim = results.get(bid) or {}
-
-            # Index sedml docs in this biomodel's results (union across sims).
-            sedml_docs: List[str] = []
-            seen: set = set()
-            for sim_map in per_sim.values():
-                for doc in (sim_map or {}).keys():
-                    if doc not in seen:
-                        seen.add(doc)
-                        sedml_docs.append(doc)
-
+            doc_map = per_bid_doc_sim.get(bid) or {}
             doc_figs: Dict[str, Dict[str, Any]] = {}
-            for doc in sedml_docs:
-                sim_results = {
-                    sim_name: (sim_map or {}).get(doc) or {}
-                    for sim_name, sim_map in per_sim.items()
-                    if (sim_map or {}).get(doc)
-                }
+            for doc, sim_results in doc_map.items():
                 if not sim_results:
                     continue
                 first_kind = next(iter(sim_results.values())).get("kind")

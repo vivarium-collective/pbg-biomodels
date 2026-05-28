@@ -74,8 +74,8 @@ def build_batch_compare_biomodels(
     state: Dict[str, Any] = {
         "models":      {bid: {"sbml_path": "", "sedml_jobs": []}
                         for bid in biomodel_ids},
-        "results":     {bid: {sim: {} for sim in sims}
-                        for bid in biomodel_ids},
+        "results":     {sim: {bid: {} for bid in biomodel_ids}
+                        for sim in sims},
         "comparisons": {bid: {} for bid in biomodel_ids},
         "viz_html":    "",
     }
@@ -129,11 +129,13 @@ def build_batch_compare_biomodels(
                 "models":      "node",
                 "results":     "node",
                 "comparisons": "node",
+                "viz_html":    "string",
             }},
             "inputs":  {
                 "models":      ["models"],
                 "results":     ["results"],
                 "comparisons": ["comparisons"],
+                "viz_html":    ["viz_html"],
             },
         }
 

@@ -23,15 +23,15 @@ def test_overlay_renders_card_per_biomodel():
     )
     out = viz.update({
         "results": {
-            "BIOMD0000000001": {
-                "copasi":    {"sim1": _utc([0.0, 1.0],
-                                            {"A": [1.0, 0.5]})},
-                "tellurium": {"sim1": _utc([0.0, 1.0],
-                                            {"A": [1.0, 0.5]})},
+            "copasi": {
+                "BIOMD0000000001": {"sim1": _utc([0.0, 1.0],
+                                                  {"A": [1.0, 0.5]})},
+                "BIOMD0000000002": {"sim1": _utc([0.0, 1.0],
+                                                  {"A": [2.0, 1.0]})},
             },
-            "BIOMD0000000002": {
-                "copasi":    {"sim1": _utc([0.0, 1.0],
-                                            {"A": [2.0, 1.0]})},
+            "tellurium": {
+                "BIOMD0000000001": {"sim1": _utc([0.0, 1.0],
+                                                  {"A": [1.0, 0.5]})},
             },
         },
         "comparisons": {
