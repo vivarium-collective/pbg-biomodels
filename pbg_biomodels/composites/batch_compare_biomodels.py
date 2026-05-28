@@ -9,7 +9,9 @@ renders the HTML.
 
 Distinct from the legacy `compare-biomodel`:
 * one Step per simulator, not per (simulator × biomodel);
-* nested `results[bid][sim][sedml_doc]` instead of flat suffixed keys;
+* nested `results[sim][bid][sedml_doc]` instead of flat suffixed keys
+  (sim is outermost because each per-simulator runner writes its bid-
+  keyed slice into `results[<sim>]`);
 * supports steady-state tasks (kind="steady_state");
 * supports multiple SED-ML simulations per biomodel.
 

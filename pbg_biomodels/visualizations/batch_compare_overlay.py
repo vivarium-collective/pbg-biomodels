@@ -221,7 +221,7 @@ class BatchCompareOverlay(Visualization):
     """N-simulator + multi-sedml-doc card-grid overlay.
 
     Inputs:
-        results: `map[bid, map[sim, map[sedml_doc, simulation_result]]]`.
+        results: `map[sim, map[bid, map[sedml_doc, simulation_result]]]`.
         comparisons: `map[bid, map[sedml_doc, tree]]`.
 
     Output: a single `html` fragment.
@@ -263,11 +263,18 @@ class BatchCompareOverlay(Visualization):
             for doc, sim_results in doc_map.items():
                 if not sim_results:
                     continue
-                first_kind = next(iter(sim_results.values())).get("kind")
-                if first_kind == "steady_state":
-                    doc_figs[doc] = _ss_bar_figure(sim_results)
-                else:
-                    doc_figs[doc] = _utc_overlay_figure(sim_results)
+                utc_only = {n: r for n, r in sim_results.items()
+                            if r.get("kind") == "utc"}
+                ss_only  = {n: r for n, r in sim_results.items()
+                            if r.get("kind") == "steady_state"}
+                # If both kinds appear, route to whichever has more engines;
+                # cross-kind isn't a meaningful overlay so we just pick the
+                # majority and let the minority drop. BatchCompareStep
+                # already emits a warning + "none" bucket for this case.
+                if utc_only and (not ss_only or len(utc_only) >= len(ss_only)):
+                    doc_figs[doc] = _utc_overlay_figure(utc_only)
+                elif ss_only:
+                    doc_figs[doc] = _ss_bar_figure(ss_only)
 
             agg = _aggregate_card_bucket(comparisons.get(bid) or {})
             rows.append(_card_html(bid, agg))
