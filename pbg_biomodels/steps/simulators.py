@@ -143,3 +143,90 @@ class BiomodelsSimbioStep(Step):
         )
         out = inner.update({})
         return {"result": out["result"]}
+
+
+# ---------------------------------------------------------------------------
+# Steady-state adapters
+#
+# Each adapter lazy-imports the upstream `<Sim>SteadyStateStep` so this
+# module stays importable even when the upstream pip package hasn't shipped
+# the steady-state class yet. The upstream call is expected to return
+# {"observables": {name: float}} (a flat map of final concentrations); the
+# adapter wraps that into the `simulation_result` tagged-union shape with
+# kind="steady_state" and time=None.
+# ---------------------------------------------------------------------------
+
+
+_STEADY_STATE_INPUTS: Dict[str, str] = {
+    "model_source": "string",
+}
+
+
+def _emit_steady_state(observables_map: Dict[str, Any]) -> Dict[str, Any]:
+    return {
+        "result": {
+            "kind":        "steady_state",
+            "time":        None,
+            "observables": {k: float(v) for k, v in (observables_map or {}).items()},
+        }
+    }
+
+
+class BiomodelsCopasiSteadyStateStep(Step):
+    """Adapter: SBML path → upstream `CopasiSteadyStateStep`."""
+
+    config_schema: ClassVar[Dict[str, Any]] = {}
+
+    def inputs(self) -> Dict[str, str]:
+        return dict(_STEADY_STATE_INPUTS)
+
+    def outputs(self) -> Dict[str, str]:
+        return {"result": "simulation_result"}
+
+    def update(self, state: Dict[str, Any]) -> Dict[str, Any]:
+        from pbg_copasi.processes import CopasiSteadyStateStep  # lazy upstream import
+        inner = CopasiSteadyStateStep(
+            config={"model_source": state["model_source"]}, core=self.core,
+        )
+        out = inner.update({})
+        return _emit_steady_state(out.get("observables") or {})
+
+
+class BiomodelsTelluriumSteadyStateStep(Step):
+    """Adapter: SBML path → upstream `TelluriumSteadyStateStep`."""
+
+    config_schema: ClassVar[Dict[str, Any]] = {}
+
+    def inputs(self) -> Dict[str, str]:
+        return dict(_STEADY_STATE_INPUTS)
+
+    def outputs(self) -> Dict[str, str]:
+        return {"result": "simulation_result"}
+
+    def update(self, state: Dict[str, Any]) -> Dict[str, Any]:
+        from pbg_tellurium.processes import TelluriumSteadyStateStep  # lazy upstream import
+        inner = TelluriumSteadyStateStep(
+            config={"model_source": state["model_source"]}, core=self.core,
+        )
+        out = inner.update({})
+        return _emit_steady_state(out.get("observables") or {})
+
+
+class BiomodelsSimbioSteadyStateStep(Step):
+    """Adapter: SBML path → upstream `SimbioSteadyStateStep`."""
+
+    config_schema: ClassVar[Dict[str, Any]] = {}
+
+    def inputs(self) -> Dict[str, str]:
+        return dict(_STEADY_STATE_INPUTS)
+
+    def outputs(self) -> Dict[str, str]:
+        return {"result": "simulation_result"}
+
+    def update(self, state: Dict[str, Any]) -> Dict[str, Any]:
+        from pbg_simbio.processes import SimbioSteadyStateStep  # lazy upstream import
+        inner = SimbioSteadyStateStep(
+            config={"model_source": state["model_source"]}, core=self.core,
+        )
+        out = inner.update({})
+        return _emit_steady_state(out.get("observables") or {})
