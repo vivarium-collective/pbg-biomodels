@@ -180,6 +180,61 @@ def extract_first_uniform_time_course(sed_doc: libsedml.SedDocument) -> UniformT
     raise ValueError("No UniformTimeCourse simulation found in SED-ML.")
 
 
+def extract_all_simulations(sed_doc: libsedml.SedDocument) -> list:
+    """Yield every UTC + SteadyState simulation in the SED-ML, in order.
+
+    Returns a list of `{name, kind, time?, n_points?}` dicts. `kind` is
+    `"utc"` or `"steady_state"`. Steady-state entries have `time=None` and
+    `n_points=None`. Anything that isn't UTC or steady-state (repeated-task
+    wrappers, custom simulations, …) is skipped with a UserWarning.
+    """
+    import warnings
+
+    jobs = []
+    n_sims = int(sed_doc.getNumSimulations())
+    for i in range(n_sims):
+        sim = sed_doc.getSimulation(i)
+        if sim is None:
+            continue
+        sim_id = sim.getId() or f"sim_{i}"
+
+        is_utc = False
+        is_ss = False
+        if hasattr(sim, "isSedUniformTimeCourse"):
+            try:
+                is_utc = bool(sim.isSedUniformTimeCourse())
+            except Exception:
+                is_utc = False
+        if hasattr(sim, "isSedSteadyState"):
+            try:
+                is_ss = bool(sim.isSedSteadyState())
+            except Exception:
+                is_ss = False
+
+        if is_utc:
+            jobs.append({
+                "name":     sim_id,
+                "kind":     "utc",
+                "time":     float(sim.getOutputEndTime() - sim.getOutputStartTime()),
+                "n_points": int(sim.getNumberOfPoints()),
+            })
+        elif is_ss:
+            jobs.append({
+                "name":     sim_id,
+                "kind":     "steady_state",
+                "time":     None,
+                "n_points": None,
+            })
+        else:
+            warnings.warn(
+                f"extract_all_simulations: skipping unsupported simulation "
+                f"{sim_id!r} (not UTC or steady-state)",
+                stacklevel=2,
+            )
+
+    return jobs
+
+
 def resolve_sbml_source_from_sedml(
     sed_doc: libsedml.SedDocument,
     sedml_dir: str,
