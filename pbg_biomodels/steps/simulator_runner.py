@@ -104,7 +104,14 @@ class SimulatorRunnerStep(Step):
         return {"models": "map[biomodel_jobs]"}
 
     def outputs(self) -> Dict[str, str]:
-        return {"results": "sim_results_per_biomodel"}
+        # `tree` (not `sim_results_per_biomodel = map[map[simulation_result]]`)
+        # because the runner emits NEW keys at both nesting levels — bid +
+        # sedml_doc are not known to the upstream schema. Map's apply
+        # semantics skip update keys that don't already exist in state
+        # (no implicit `_add`); tree's apply inserts them. The shape of
+        # the leaves is still simulation_result; only the container
+        # apply-rules change.
+        return {"results": "tree"}
 
     def update(self, state: Dict[str, Any]) -> Dict[str, Any]:
         name = self.config["simulator_name"]

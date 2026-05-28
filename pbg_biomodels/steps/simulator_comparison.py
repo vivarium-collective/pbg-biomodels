@@ -123,30 +123,28 @@ class BatchCompareStep(Step):
         import warnings
 
         results = state.get("results") or {}
-        out: Dict[str, Dict[str, Any]] = {}
 
-        # Index of (bid, sedml_doc) -> {sim: simulation_result}.
-        for bid, per_sim in results.items():
-            out[bid] = {}
-            # Union the sedml-doc names across simulators that have data.
-            sedml_docs: list = []
-            seen = set()
-            for sim_map in (per_sim or {}).values():
-                for doc_name in (sim_map or {}).keys():
-                    if doc_name not in seen:
-                        seen.add(doc_name)
-                        sedml_docs.append(doc_name)
-
-            for doc_name in sedml_docs:
-                # Gather per-simulator results for this doc.
-                utc_engines: Dict[str, Dict[str, Any]] = {}
-                ss_engines: Dict[str, Dict[str, float]] = {}
-                for sim_name, sim_map in (per_sim or {}).items():
-                    sim_result = (sim_map or {}).get(doc_name)
+        # Walk results[sim][bid][doc] — runner outputs land at this shape.
+        # Build a per-bid index of (doc → {sim → sim_result}) so the
+        # comparison step still produces comparisons[bid][doc] all-pairs.
+        per_bid_doc: Dict[str, Dict[str, Dict[str, Any]]] = {}
+        for sim_name, per_bid in results.items():
+            for bid, per_doc in (per_bid or {}).items():
+                for doc_name, sim_result in (per_doc or {}).items():
                     if not sim_result:
                         continue
                     if "error" in sim_result and not sim_result.get("observables"):
                         continue  # failed job — no engine slot
+                    per_bid_doc.setdefault(bid, {}).setdefault(doc_name, {})
+                    per_bid_doc[bid][doc_name][sim_name] = sim_result
+
+        out: Dict[str, Dict[str, Any]] = {}
+        for bid, doc_map in per_bid_doc.items():
+            out[bid] = {}
+            for doc_name, sim_results_map in doc_map.items():
+                utc_engines: Dict[str, Dict[str, Any]] = {}
+                ss_engines: Dict[str, Dict[str, float]] = {}
+                for sim_name, sim_result in sim_results_map.items():
                     kind = sim_result.get("kind")
                     obs = sim_result.get("observables") or {}
                     if kind == "utc":
