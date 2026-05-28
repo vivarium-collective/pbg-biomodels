@@ -1,0 +1,95 @@
+"""The `batch-compare-biomodels` generator builds a composite with one
+LoadBiomodelStep per biomodel id, one SimulatorRunnerStep per requested
+simulator (not per simulator × biomodel), one BatchCompareStep, and one
+BatchCompareOverlay viz step.
+"""
+import pytest
+
+import pbg_biomodels.composites.batch_compare_biomodels  # noqa: F401
+from pbg_superpowers.composite_generator import _REGISTRY, build_generator
+
+
+def _entry():
+    matches = [e for e in _REGISTRY.values()
+               if e.name == "batch-compare-biomodels"]
+    assert len(matches) == 1, (
+        f"expected 1 generator named 'batch-compare-biomodels', "
+        f"got {len(matches)}"
+    )
+    return matches[0]
+
+
+def test_generator_is_registered_with_biomodel_and_simulator_params():
+    entry = _entry()
+    assert "biomodel_ids" in entry.parameters
+    assert entry.parameters["biomodel_ids"]["type"] == "list[string]"
+    assert "simulators" in entry.parameters
+    assert entry.parameters["simulators"]["type"] == "list[string]"
+
+
+def test_one_load_step_per_biomodel_one_runner_per_simulator():
+    """Two biomodels × two simulators → 2 LoadBiomodelStep + 2 SimulatorRunnerStep
+    + 1 BatchCompareStep + 1 viz step. Critically NOT one runner per (bid, sim)."""
+    doc = build_generator(_entry(), overrides={
+        "biomodel_ids": ["BIOMD0000000001", "BIOMD0000000005"],
+        "simulators":   ["copasi", "tellurium"],
+    })
+    state = doc["state"] if "state" in doc else doc
+
+    # One LoadBiomodelStep per biomodel id (keyed `load_<bid>`).
+    for bid in ("BIOMD0000000001", "BIOMD0000000005"):
+        key = f"load_{bid}"
+        assert key in state
+        assert state[key]["_type"] == "step"
+        # LoadBiomodelStep outputs sbml_path + sedml_jobs into models[bid].
+        assert state[key]["outputs"]["sbml_path"] == ["models", bid, "sbml_path"]
+        assert state[key]["outputs"]["sedml_jobs"] == ["models", bid, "sedml_jobs"]
+
+    # One SimulatorRunnerStep per simulator (keyed `runner_<sim>`).
+    for sim in ("copasi", "tellurium"):
+        key = f"runner_{sim}"
+        assert key in state
+        assert state[key]["_type"] == "step"
+        assert state[key]["address"].endswith("SimulatorRunnerStep")
+        assert state[key]["config"]["simulator_name"] == sim
+        assert state[key]["inputs"]["models"] == ["models"]
+        assert state[key]["outputs"]["results"] == ["results", sim]
+
+    # No (bid, sim) runner keys (the explosion we removed).
+    for bid in ("BIOMD0000000001", "BIOMD0000000005"):
+        for sim in ("copasi", "tellurium"):
+            assert f"runner_{sim}_{bid}" not in state
+            assert f"{sim}_step_{bid}" not in state
+
+    # One BatchCompareStep reading the full nested results.
+    assert state["compare"]["address"].endswith("BatchCompareStep")
+    assert state["compare"]["inputs"]["results"] == ["results"]
+    assert state["compare"]["outputs"]["comparisons"] == ["comparisons"]
+
+    # One viz step.
+    assert state["batch_overlay_viz"]["address"].endswith("BatchCompareOverlay")
+    assert state["batch_overlay_viz"]["inputs"]["results"] == ["results"]
+    assert state["batch_overlay_viz"]["inputs"]["comparisons"] == ["comparisons"]
+
+
+def test_unknown_simulator_rejected_at_build_time():
+    with pytest.raises(ValueError, match="Unknown simulator"):
+        build_generator(_entry(), overrides={
+            "biomodel_ids": ["BIOMD0000000001"],
+            "simulators":   ["copasi", "not-a-real-simulator"],
+        })
+
+
+def test_default_simulators_is_all_three():
+    doc = build_generator(_entry(), overrides={
+        "biomodel_ids": ["BIOMD0000000001"],
+    })
+    state = doc["state"] if "state" in doc else doc
+    for sim in ("copasi", "tellurium", "simbio"):
+        assert f"runner_{sim}" in state
+
+
+def test_legacy_compare_biomodel_generator_still_registered():
+    """The new generator does not displace the legacy one."""
+    legacy = [e for e in _REGISTRY.values() if e.name == "compare-biomodel"]
+    assert len(legacy) == 1
