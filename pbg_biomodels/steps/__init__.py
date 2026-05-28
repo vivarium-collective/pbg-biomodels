@@ -2,6 +2,7 @@
 
 from pbg_biomodels.steps.load_biomodel import LoadBiomodelStep
 from pbg_biomodels.steps.simulator_comparison import SimulatorComparisonStep
+from pbg_biomodels.steps.simulator_runner import SimulatorRunnerStep
 from pbg_biomodels.steps.simulators import (
     BiomodelsCopasiStep,
     BiomodelsCopasiSteadyStateStep,
@@ -14,6 +15,7 @@ from pbg_biomodels.steps.simulators import (
 __all__ = [
     "LoadBiomodelStep",
     "SimulatorComparisonStep",
+    "SimulatorRunnerStep",
     "BiomodelsCopasiStep",
     "BiomodelsCopasiSteadyStateStep",
     "BiomodelsTelluriumStep",
