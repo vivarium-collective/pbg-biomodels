@@ -21,6 +21,7 @@ from typing import Callable, Dict, List, TypedDict
 
 class SimulatorSpec(TypedDict):
     utc_step: str
+    steady_state_step: str
     process: str
     process_config: Callable[[str], Dict[str, object]]
     species_out: str
@@ -29,6 +30,7 @@ class SimulatorSpec(TypedDict):
 _SIMULATORS: Dict[str, SimulatorSpec] = {
     "copasi": {
         "utc_step": "local:pbg_biomodels.steps.simulators.BiomodelsCopasiStep",
+        "steady_state_step": "local:pbg_biomodels.steps.simulators.BiomodelsCopasiSteadyStateStep",
         "process": "local:CopasiUTCProcess",
         "process_config": lambda sbml: {
             "model_source": sbml,
@@ -39,12 +41,14 @@ _SIMULATORS: Dict[str, SimulatorSpec] = {
     },
     "tellurium": {
         "utc_step": "local:pbg_biomodels.steps.simulators.BiomodelsTelluriumStep",
+        "steady_state_step": "local:pbg_biomodels.steps.simulators.BiomodelsTelluriumSteadyStateStep",
         "process": "local:TelluriumProcess",
         "process_config": lambda sbml: {"model_file": sbml},
         "species_out": "species",
     },
     "simbio": {
         "utc_step": "local:pbg_biomodels.steps.simulators.BiomodelsSimbioStep",
+        "steady_state_step": "local:pbg_biomodels.steps.simulators.BiomodelsSimbioSteadyStateStep",
         "process": "local:SimbioUTCProcess",
         "process_config": lambda sbml: {"model_source": sbml, "model_format": "sbml"},
         "species_out": "species_concentrations",
@@ -108,6 +112,10 @@ def register_simulator_backends(core):
 
 def utc_step_address(name: str) -> str:
     return _SIMULATORS[name]["utc_step"]
+
+
+def steady_state_step_address(name: str) -> str:
+    return _SIMULATORS[name]["steady_state_step"]
 
 
 def process_address(name: str) -> str:
