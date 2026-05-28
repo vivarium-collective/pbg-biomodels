@@ -12,7 +12,7 @@ species RMSE, normalized RMSE, mean nRMSE, and a coarse quality bucket.
 """
 from __future__ import annotations
 
-from typing import Any, Dict
+from typing import Any, ClassVar, Dict
 
 from process_bigraph import Step
 
@@ -88,3 +88,110 @@ class MultiSimulatorComparisonStep(Step):
     def update(self, state: Dict[str, Any]) -> Dict[str, Any]:
         engines = {name: (state or {}).get(name) for name in self.config["engine_names"]}
         return {"comparison": compare_n_engines(engines)}
+
+
+class BatchCompareStep(Step):
+    """All-pairs nRMSE across simulators per (biomodel_id, sedml_doc).
+
+    Inputs:
+        results: `map[bid, map[sim, map[sedml_doc, simulation_result]]]`.
+
+    Outputs:
+        comparisons: `map[bid, map[sedml_doc, tree]]` — each leaf is the
+            `compare_n_engines` (UTC) or `compare_n_engines_steady_state`
+            (SS) return shape.
+
+    A `(bid, sedml_doc)` whose simulators produced both UTC and SS results
+    is treated as a SED-ML pathology: a warning is emitted and the leaf is
+    the `"none"` bucket with empty engines.
+    """
+
+    config_schema: ClassVar[Dict[str, Any]] = {}
+
+    def inputs(self) -> Dict[str, str]:
+        return {"results": "tree"}
+
+    def outputs(self) -> Dict[str, str]:
+        return {"comparisons": "tree"}
+
+    def update(self, state: Dict[str, Any]) -> Dict[str, Any]:
+        from pbg_biomodels.comparison import (
+            bucket_for,
+            compare_n_engines,
+            compare_n_engines_steady_state,
+        )
+        import warnings
+
+        results = state.get("results") or {}
+        out: Dict[str, Dict[str, Any]] = {}
+
+        # Index of (bid, sedml_doc) -> {sim: simulation_result}.
+        for bid, per_sim in results.items():
+            out[bid] = {}
+            # Union the sedml-doc names across simulators that have data.
+            sedml_docs: list = []
+            seen = set()
+            for sim_map in (per_sim or {}).values():
+                for doc_name in (sim_map or {}).keys():
+                    if doc_name not in seen:
+                        seen.add(doc_name)
+                        sedml_docs.append(doc_name)
+
+            for doc_name in sedml_docs:
+                # Gather per-simulator results for this doc.
+                utc_engines: Dict[str, Dict[str, Any]] = {}
+                ss_engines: Dict[str, Dict[str, float]] = {}
+                for sim_name, sim_map in (per_sim or {}).items():
+                    sim_result = (sim_map or {}).get(doc_name)
+                    if not sim_result:
+                        continue
+                    if "error" in sim_result and not sim_result.get("observables"):
+                        continue  # failed job — no engine slot
+                    kind = sim_result.get("kind")
+                    obs = sim_result.get("observables") or {}
+                    if kind == "utc":
+                        time = sim_result.get("time") or []
+                        cols = list(obs.keys())
+                        n_rows = min((len(obs[c]) for c in cols), default=0)
+                        values = [[float(obs[c][r]) for c in cols] for r in range(n_rows)]
+                        utc_engines[sim_name] = {
+                            "time":    list(time),
+                            "columns": cols,
+                            "values":  values,
+                        }
+                    elif kind == "steady_state":
+                        ss_engines[sim_name] = {k: float(v) for k, v in obs.items()}
+
+                if utc_engines and ss_engines:
+                    warnings.warn(
+                        f"BatchCompareStep: {bid!r}/{doc_name!r} has mixed kinds "
+                        f"across simulators; skipping",
+                        stacklevel=2,
+                    )
+                    bucket_id, bucket_label = bucket_for(None)
+                    out[bid][doc_name] = {
+                        "engines":      [],
+                        "pairs":        {},
+                        "matrix":       {},
+                        "max_nrmse":    None,
+                        "worst_pair":   None,
+                        "bucket":       bucket_id,
+                        "bucket_label": bucket_label,
+                    }
+                elif utc_engines:
+                    out[bid][doc_name] = compare_n_engines(utc_engines)
+                elif ss_engines:
+                    out[bid][doc_name] = compare_n_engines_steady_state(ss_engines)
+                else:
+                    bucket_id, bucket_label = bucket_for(None)
+                    out[bid][doc_name] = {
+                        "engines":      [],
+                        "pairs":        {},
+                        "matrix":       {},
+                        "max_nrmse":    None,
+                        "worst_pair":   None,
+                        "bucket":       bucket_id,
+                        "bucket_label": bucket_label,
+                    }
+
+        return {"comparisons": out}
