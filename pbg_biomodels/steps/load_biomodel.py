@@ -25,16 +25,17 @@ from process_bigraph import Step
 
 
 class LoadBiomodelStep(Step):
-    """Resolve a BioModels identifier to a local SBML file and UTC spec.
+    """Resolve a BioModels identifier to a local SBML file and a list of jobs.
 
     Inputs:
         biomodel_id: BioModels identifier, e.g. ``"BIOMD0000000001"``.
 
     Outputs:
         sbml_path: Absolute path to the cached SBML XML file.
-        time: SED-ML UniformTimeCourse duration (``output_end_time
-              - output_start_time``).
-        n_points: SED-ML UniformTimeCourse number_of_points.
+        sedml_jobs: List of `{name, kind, time?, n_points?}` records — one
+            per UTC + SteadyState simulation declared in the SED-ML.
+        time: Back-compat — first UTC job's duration (legacy composites).
+        n_points: Back-compat — first UTC job's n_points (legacy composites).
 
     Side effects:
         Caches the SBML + SED-ML files under ``models/<biomodel_id>/`` in
@@ -49,20 +50,24 @@ class LoadBiomodelStep(Step):
 
     def outputs(self) -> Dict[str, str]:
         return {
-            "sbml_path": "string",
-            "time": "float",
-            "n_points": "integer",
+            "sbml_path":  "string",
+            "sedml_jobs": "list[tree]",
+            "time":       "float",
+            "n_points":   "integer",
         }
 
     def update(self, state: Dict[str, Any]) -> Dict[str, Any]:
         # Lazy import so loading this module doesn't pull in biomodels'
-        # heavy chain (pooch, pydantic-xml, …) when only the type is being
-        # inspected (e.g. dashboard registry introspection).
+        # heavy chain when only the type is being inspected.
         import os
 
         import biomodels
 
-        from pbg_biomodels.run_biomodels import load_biomodel
+        from pbg_biomodels.run_biomodels import (
+            extract_all_simulations,
+            load_biomodel,
+            read_sedml_doc,
+        )
 
         biomodel_id = state.get("biomodel_id") or ""
         if not biomodel_id:
@@ -73,8 +78,21 @@ class LoadBiomodelStep(Step):
 
         meta = biomodels.get_metadata(biomodel_id)
         result = load_biomodel(biomodel_id, meta)
+
+        # Parse every SED-ML simulation for the new sedml_jobs output.
+        sed_doc = read_sedml_doc(result.sedml_path)
+        jobs = extract_all_simulations(sed_doc)
+
+        # Back-compat outputs — populated from the first UTC job if any.
+        first_utc = next((j for j in jobs if j["kind"] == "utc"), None)
+        legacy_time = float(first_utc["time"]) if first_utc else float(result.utc.duration)
+        legacy_n_points = (
+            int(first_utc["n_points"]) if first_utc else int(result.utc.number_of_points)
+        )
+
         return {
-            "sbml_path": os.path.abspath(result.sbml_path),
-            "time":     float(result.utc.duration),
-            "n_points": int(result.utc.number_of_points),
+            "sbml_path":  os.path.abspath(result.sbml_path),
+            "sedml_jobs": jobs,
+            "time":       legacy_time,
+            "n_points":   legacy_n_points,
         }
