@@ -170,3 +170,84 @@ def compare_n_engines(engines: Dict[str, Optional[Dict[str, Any]]]) -> Dict[str,
         "bucket": bucket_id,
         "bucket_label": bucket_label,
     }
+
+
+def compare_two_engines_steady_state(
+    engine_a: Optional[Dict[str, float]],
+    engine_b: Optional[Dict[str, float]],
+    name_a: str = "a",
+    name_b: str = "b",
+    eps: float = 1e-30,
+) -> Dict[str, Any]:
+    """Compare two `{observable_name: float}` maps observable-by-observable.
+
+    Metric: `|a-b| / max(|a|, |b|, eps)` per shared observable; the result's
+    `mean_nrmse` is the mean across shared observables. Buckets use the same
+    `BUCKET_THRESHOLDS` as the UTC version so the vocabulary is shared.
+    """
+    a = engine_a or {}
+    b = engine_b or {}
+    shared = sorted(set(a) & set(b))
+    nrmse_by_species: Dict[str, float] = {}
+    for sp in shared:
+        denom = max(abs(a[sp]), abs(b[sp]), eps)
+        nrmse_by_species[sp] = abs(a[sp] - b[sp]) / denom
+
+    if nrmse_by_species:
+        mean_nrmse: Optional[float] = (
+            sum(nrmse_by_species.values()) / len(nrmse_by_species)
+        )
+    else:
+        mean_nrmse = None
+
+    bucket_id, bucket_label = bucket_for(mean_nrmse)
+    return {
+        "n_shared":         len(shared),
+        "rmse_by_species":  {},  # SS pairs have no time-series RMSE
+        "nrmse_by_species": nrmse_by_species,
+        "mean_nrmse":       mean_nrmse,
+        "bucket":           bucket_id,
+        "bucket_label":     bucket_label,
+    }
+
+
+def compare_n_engines_steady_state(
+    engines: Dict[str, Optional[Dict[str, float]]],
+) -> Dict[str, Any]:
+    """All-pairs steady-state comparison across N named engines.
+
+    Same return shape as :func:`compare_n_engines`, but each pair is
+    scored with the steady-state metric. Engines with no observables
+    (or `None`) are dropped from the comparison.
+    """
+    present = sorted(name for name, obs in engines.items() if obs)
+    pairs: Dict[str, Any] = {}
+    matrix: Dict[str, Dict[str, Optional[float]]] = {
+        a: {b: None for b in present} for a in present
+    }
+    max_nrmse: Optional[float] = None
+    worst_pair: Optional[List[str]] = None
+
+    for i, a in enumerate(present):
+        for b in present[i + 1:]:
+            result = compare_two_engines_steady_state(
+                engines[a], engines[b], name_a=a, name_b=b,
+            )
+            pairs[f"{a}__{b}"] = result
+            mean = result.get("mean_nrmse")
+            matrix[a][b] = mean
+            matrix[b][a] = mean
+            if mean is not None and (max_nrmse is None or mean > max_nrmse):
+                max_nrmse = mean
+                worst_pair = [a, b]
+
+    bucket_id, bucket_label = bucket_for(max_nrmse)
+    return {
+        "engines":      present,
+        "pairs":        pairs,
+        "matrix":       matrix,
+        "max_nrmse":    max_nrmse,
+        "worst_pair":   worst_pair,
+        "bucket":       bucket_id,
+        "bucket_label": bucket_label,
+    }
