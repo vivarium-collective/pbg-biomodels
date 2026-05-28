@@ -94,7 +94,9 @@ class BatchCompareStep(Step):
     """All-pairs nRMSE across simulators per (biomodel_id, sedml_doc).
 
     Inputs:
-        results: `map[bid, map[sim, map[sedml_doc, simulation_result]]]`.
+        results: `map[sim, map[bid, map[sedml_doc, simulation_result]]]` —
+            the runner writes its bid-keyed slice into `results[<sim>]`,
+            so the outer key is the simulator name.
 
     Outputs:
         comparisons: `map[bid, map[sedml_doc, tree]]` — each leaf is the
