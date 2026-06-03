@@ -53,7 +53,11 @@ def test_one_load_step_per_biomodel_one_runner_per_simulator():
         assert state[key]["address"].endswith("SimulatorRunnerStep")
         assert state[key]["config"]["simulator_name"] == sim
         assert state[key]["inputs"]["models"] == ["models"]
-        assert state[key]["outputs"]["results"] == ["results", sim]
+        # Runner writes the whole nested tree; it only fills its own innermost
+        # results[bid][job][<sim>] slots, which deep-merge across runners.
+        assert state[key]["outputs"]["results"] == ["results"]
+        # diagnostics (timing/provenance) is wired the same way.
+        assert state[key]["outputs"]["diagnostics"] == ["diagnostics"]
 
     # No (bid, sim) runner keys (the explosion we removed).
     for bid in ("BIOMD0000000001", "BIOMD0000000005"):
@@ -87,6 +91,22 @@ def test_default_simulators_is_all_three():
     state = doc["state"] if "state" in doc else doc
     for sim in ("copasi", "tellurium", "simbio"):
         assert f"runner_{sim}" in state
+
+
+def test_simbio_runner_gets_tolerance_config_others_do_not():
+    """simbio_rtol/simbio_atol flow only into the simbio runner's config."""
+    doc = build_generator(_entry(), overrides={
+        "biomodel_ids": ["BIOMD0000000001"],
+        "simulators":   ["copasi", "simbio"],
+        "simbio_rtol":  1e-8,
+        "simbio_atol":  1e-11,
+    })
+    state = doc["state"] if "state" in doc else doc
+    assert state["runner_simbio"]["config"]["rtol"] == 1e-8
+    assert state["runner_simbio"]["config"]["atol"] == 1e-11
+    # COPASI ignores tolerances — no rtol/atol keys on its runner config.
+    assert "rtol" not in state["runner_copasi"]["config"]
+    assert "atol" not in state["runner_copasi"]["config"]
 
 
 def test_legacy_compare_biomodel_generator_still_registered():

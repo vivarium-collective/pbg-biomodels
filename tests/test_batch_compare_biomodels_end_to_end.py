@@ -117,14 +117,22 @@ def test_end_to_end_populates_results_and_comparisons(monkeypatch):
     comparisons = snap["comparisons"]
     viz_html = snap.get("viz_html") or ""
 
-    # Schema: results[sim][bid][sedml_doc] = simulation_result.
-    # Both simulators produced sim1 (UTC) and ss (SS) for BIOMD0000000001.
+    # Schema: results[bid][sedml_job][sim] = results leaf
+    # (flat map[observable -> timeseries]). Both simulators produced sim1 (UTC)
+    # and ss (SS) for BIOMD0000000001.
+    bid_result = results["BIOMD0000000001"]
     for sim in ("copasi", "tellurium"):
-        bid_result = results[sim]["BIOMD0000000001"]
-        assert "sim1" in bid_result
-        assert bid_result["sim1"]["kind"] == "utc"
-        assert "ss" in bid_result
-        assert bid_result["ss"]["kind"] == "steady_state"
+        # UTC leaf: reserved "time" key + per-observable trajectories.
+        utc_leaf = bid_result["sim1"][sim]
+        assert "time" in utc_leaf
+        assert utc_leaf["time"] == [0.0, 0.5, 1.0]
+        assert utc_leaf["A"] == [1.0, 0.6, 0.3]
+        assert utc_leaf["B"] == [0.0, 0.4, 0.7]
+        # Steady-state leaf: no "time" key; observables as length-1 lists.
+        ss_leaf = bid_result["ss"][sim]
+        assert "time" not in ss_leaf
+        assert ss_leaf["A"] == [0.5]
+        assert ss_leaf["B"] == [0.5]
 
     # Comparisons: comparisons[bid][sedml_doc] — one per sedml doc,
     # all-pairs across simulators.
@@ -134,6 +142,15 @@ def test_end_to_end_populates_results_and_comparisons(monkeypatch):
     assert bid_cmp["sim1"]["bucket"] == "good"
     assert set(bid_cmp["ss"]["engines"]) == {"copasi", "tellurium"}
     assert bid_cmp["ss"]["bucket"] == "good"
+
+    # Diagnostics populated: per-run timing/status + per-simulator provenance.
+    diagnostics = snap["diagnostics"]
+    for sim in ("copasi", "tellurium"):
+        rec = diagnostics["runs"]["BIOMD0000000001"]["sim1"][sim]
+        assert rec["status"] == "ok"
+        assert isinstance(rec["runtime_s"], float)
+        assert diagnostics["provenance"][sim]["simulator"] == sim
+    assert set(diagnostics["meta"]) >= {"host", "platform", "python"}
 
     # Viz produced non-empty HTML containing the biomodel id.
     assert "BIOMD0000000001" in viz_html
