@@ -2,16 +2,17 @@
 
 For each biomodel id, fetch the SBML + parse the SED-ML once into a
 `biomodel_jobs` record under `models[bid]`. For each requested simulator,
-one `SimulatorRunnerStep` iterates `models` and writes its slice of
-`results[sim]`. A single `BatchCompareStep` consumes the full nested
-`results` and writes `comparisons`. A single `BatchCompareOverlay` viz
-renders the HTML.
+one `SimulatorRunnerStep` iterates `models` and writes its disjoint
+`results[bid][job][<sim>]` slice. A single `BatchCompareStep` consumes the
+full nested `results` and writes `comparisons`. A single `BatchCompareOverlay`
+viz renders the HTML.
 
 Distinct from the legacy `compare-biomodel`:
 * one Step per simulator, not per (simulator × biomodel);
-* nested `results[sim][bid][sedml_doc]` instead of flat suffixed keys
-  (sim is outermost because each per-simulator runner writes its bid-
-  keyed slice into `results[<sim>]`);
+* nested `results[biomodel_id][sedml_job_id][simulator]` instead of flat
+  suffixed keys (simulator is the *innermost* key, so each per-simulator
+  runner writes a disjoint leaf and the `tree` apply deep-merges them);
+* each leaf is a `results` type — a flat `map[observable -> timeseries]`;
 * supports steady-state tasks (kind="steady_state");
 * supports multiple SED-ML simulations per biomodel.
 
@@ -60,6 +61,23 @@ VIZ_STEP_ADDRESS     = "local:pbg_biomodels.visualizations.batch_compare_overlay
                 "adapter."
             ),
         },
+        "simbio_rtol": {
+            "type": "float",
+            "default": 1.0e-6,
+            "description": (
+                "LSODA relative tolerance for simbio (CVODE-comparable "
+                "default). Tighten (e.g. 1e-8) for stiff models where simbio "
+                "diverges from COPASI/Tellurium. Ignored by COPASI/Tellurium."
+            ),
+        },
+        "simbio_atol": {
+            "type": "float",
+            "default": 1.0e-9,
+            "description": (
+                "LSODA absolute tolerance for simbio. Tighten alongside "
+                "simbio_rtol for stiff models."
+            ),
+        },
     },
     default_n_steps=1,
 )
@@ -68,6 +86,8 @@ def build_batch_compare_biomodels(
     *,
     biomodel_ids: List[str],
     simulators: List[str],
+    simbio_rtol: float = 1.0e-6,
+    simbio_atol: float = 1.0e-9,
     with_emitter: bool = True,
     emitter_address: str = "local:RAMEmitter",
 ) -> Dict[str, Any]:
@@ -76,9 +96,13 @@ def build_batch_compare_biomodels(
     state: Dict[str, Any] = {
         "models":      {bid: {"sbml_path": "", "sedml_jobs": []}
                         for bid in biomodel_ids},
-        "results":     {sim: {bid: {} for bid in biomodel_ids}
-                        for sim in sims},
+        # biomodel_id > sedml_job_id > simulator > results; the job + simulator
+        # levels are inserted by the runners via the `tree` apply.
+        "results":     {bid: {} for bid in biomodel_ids},
         "comparisons": {bid: {} for bid in biomodel_ids},
+        # host/provenance/per-run timing; runners fill the inner levels.
+        "diagnostics": {"meta": {}, "provenance": {},
+                        "runs": {bid: {} for bid in biomodel_ids}},
         "viz_html":    "",
     }
 
@@ -96,12 +120,20 @@ def build_batch_compare_biomodels(
         }
 
     for sim in sims:
+        config: Dict[str, Any] = {"simulator_name": sim}
+        # Tolerances only matter for simbio (LSODA); COPASI/Tellurium ignore them.
+        if sim == "simbio":
+            config["rtol"] = simbio_rtol
+            config["atol"] = simbio_atol
         state[f"runner_{sim}"] = {
             "_type":   "step",
             "address": RUNNER_STEP_ADDRESS,
-            "config":  {"simulator_name": sim},
+            "config":  config,
             "inputs":  {"models": ["models"]},
-            "outputs": {"results": ["results", sim]},
+            # writes the whole nested tree; the runner only fills its own
+            # innermost `results[bid][job][<sim>]` slots, which deep-merge.
+            # diagnostics merges the same way.
+            "outputs": {"results": ["results"], "diagnostics": ["diagnostics"]},
         }
 
     state["compare"] = {
@@ -119,7 +151,8 @@ def build_batch_compare_biomodels(
             "title":        "BioModels: batch comparison",
             "biomodel_ids": list(biomodel_ids),
         },
-        "inputs":  {"results": ["results"], "comparisons": ["comparisons"]},
+        "inputs":  {"results": ["results"], "comparisons": ["comparisons"],
+                    "diagnostics": ["diagnostics"]},
         "outputs": {"html": ["viz_html"]},
     }
 
@@ -131,12 +164,14 @@ def build_batch_compare_biomodels(
                 "models":      "node",
                 "results":     "node",
                 "comparisons": "node",
+                "diagnostics": "node",
                 "viz_html":    "string",
             }},
             "inputs":  {
                 "models":      ["models"],
                 "results":     ["results"],
                 "comparisons": ["comparisons"],
+                "diagnostics": ["diagnostics"],
                 "viz_html":    ["viz_html"],
             },
         }

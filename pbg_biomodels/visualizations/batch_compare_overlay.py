@@ -1,12 +1,21 @@
-"""BatchCompareOverlay — N-simulator + multi-sedml-doc summary-card grid.
+"""BatchCompareOverlay — overview table + N-simulator multi-sedml-job card grid.
 
-Each biomodel gets a card colored by its worst-pair bucket (aggregated
-across sedml docs); clicking the card reveals a tab strip with one tab
-per sedml doc, and each tab renders a per-observable overlay across the
-simulators that produced output. Steady-state observables render as a
-small grouped bar chart of final values instead of a line.
+The viewer has two tabs:
 
-The HTML is a self-contained fragment that includes Plotly inline.
+* **Overview** — one row per ``(biomodel_id, sedml_job_id)`` with the worst-pair
+  bucket, worst nRMSE, how many simulators produced output, and how many
+  simulators FAILED on that model/job (a failed run leaves an empty results
+  leaf).
+* **Per-model** — each biomodel gets a card colored by its worst-pair bucket
+  (aggregated across sedml jobs); clicking the card reveals a tab strip with
+  one tab per sedml job, each rendering a per-observable overlay across the
+  simulators that produced output. Steady-state observables render as a small
+  grouped bar chart of final values instead of a line.
+
+Inputs are the new nested store ``results[biomodel_id][sedml_job_id][simulator]``
+where each leaf is a flat ``map[observable -> timeseries]`` (`results` type);
+see `pbg_biomodels.result_leaf`. The HTML is a self-contained fragment that
+includes Plotly inline.
 """
 from __future__ import annotations
 
@@ -15,6 +24,7 @@ from typing import Any, Dict, List
 
 from plotly.offline import get_plotlyjs
 
+from pbg_biomodels import result_leaf
 from pbg_superpowers.visualization import Visualization
 
 
@@ -29,7 +39,7 @@ _BUCKET_RANK = {"good": 0, "borderline": 1, "large": 2, "none": -1}
 
 
 def _aggregate_card_bucket(per_doc_comparisons: Dict[str, Any]) -> Dict[str, Any]:
-    """Pick the worst (largest-mean-nrmse) bucket across this biomodel's docs."""
+    """Pick the worst (largest-mean-nrmse) bucket across this biomodel's jobs."""
     worst = None
     for cmp_dict in (per_doc_comparisons or {}).values():
         if not cmp_dict:
@@ -46,13 +56,13 @@ def _aggregate_card_bucket(per_doc_comparisons: Dict[str, Any]) -> Dict[str, Any
 
 
 def _utc_overlay_figure(
-    sim_results: Dict[str, Dict[str, Any]],
+    sim_leaves: Dict[str, Dict[str, Any]],
 ) -> Dict[str, Any]:
-    """Per-observable small-multiples overlay across simulators."""
+    """Per-observable small-multiples overlay across simulators (UTC leaves)."""
     species_order: List[str] = []
     seen: set = set()
-    for sr in sim_results.values():
-        for sp in (sr.get("observables") or {}).keys():
+    for leaf in sim_leaves.values():
+        for sp in result_leaf.observables_of(leaf).keys():
             if sp not in seen:
                 seen.add(sp)
                 species_order.append(sp)
@@ -78,11 +88,11 @@ def _utc_overlay_figure(
         y_ref = "y" if idx == 1 else f"y{idx}"
         layout[y_key] = {"title": {"text": sp}}
         layout[x_key] = {"title": {"text": "time"}}
-        for sim_name, sr in sim_results.items():
-            obs = (sr.get("observables") or {})
+        for sim_name, leaf in sim_leaves.items():
+            obs = result_leaf.observables_of(leaf)
             series = obs.get(sp)
-            time = sr.get("time")
-            if series is None or time is None:
+            time = result_leaf.time_of(leaf)
+            if series is None or not time:
                 continue
             traces.append({
                 "x": list(time), "y": list(series),
@@ -95,12 +105,14 @@ def _utc_overlay_figure(
     return {"data": traces, "layout": layout}
 
 
-def _ss_bar_figure(sim_results: Dict[str, Dict[str, Any]]) -> Dict[str, Any]:
+def _ss_bar_figure(sim_leaves: Dict[str, Dict[str, Any]]) -> Dict[str, Any]:
     """Grouped bar chart of final steady-state values across simulators."""
     species: List[str] = []
     seen: set = set()
-    for sr in sim_results.values():
-        for sp in (sr.get("observables") or {}).keys():
+    scalars_by_sim = {n: result_leaf.steady_state_scalars(leaf)
+                      for n, leaf in sim_leaves.items()}
+    for sc in scalars_by_sim.values():
+        for sp in sc.keys():
             if sp not in seen:
                 seen.add(sp)
                 species.append(sp)
@@ -111,9 +123,9 @@ def _ss_bar_figure(sim_results: Dict[str, Dict[str, Any]]) -> Dict[str, Any]:
             "type": "bar",
             "name": sim_name,
             "x":    species,
-            "y":    [float((sr.get("observables") or {}).get(sp, 0.0)) for sp in species],
+            "y":    [float(sc.get(sp, 0.0)) for sp in species],
         }
-        for sim_name, sr in sim_results.items()
+        for sim_name, sc in scalars_by_sim.items()
     ]
     return {"data": traces, "layout": {"barmode": "group", "height": 360}}
 
@@ -139,8 +151,173 @@ def _card_html(bid: str, agg: Dict[str, Any]) -> str:
     )
 
 
+def _overview_row(
+    bid: str,
+    job: str,
+    comparison: Dict[str, Any],
+    n_ok: int,
+    n_failed: int,
+) -> str:
+    """One overview-table row for a single (biomodel_id, sedml_job_id)."""
+    bucket = (comparison or {}).get("bucket") or "none"
+    label = (comparison or {}).get("bucket_label") or "No comparison"
+    max_n = (comparison or {}).get("max_nrmse")
+    max_str = f"{max_n:.4g}" if isinstance(max_n, (int, float)) else "—"
+    color = _BUCKET_COLOR.get(bucket, "#5d6573")
+    fail_color = "#b3261e" if n_failed else "#444"
+    fail_weight = "600" if n_failed else "400"
+    return (
+        '<tr style="border-bottom:1px solid #eef0f2;">'
+        f'<td style="padding:6px 10px;font-weight:600;">{bid}</td>'
+        f'<td style="padding:6px 10px;font-family:ui-monospace,monospace;">{job}</td>'
+        f'<td style="padding:6px 10px;"><span style="display:inline-block;'
+        f'width:9px;height:9px;border-radius:50%;background:{color};'
+        f'margin-right:6px;"></span>{label}</td>'
+        f'<td style="padding:6px 10px;text-align:right;">{max_str}</td>'
+        f'<td style="padding:6px 10px;text-align:right;">{n_ok}</td>'
+        f'<td style="padding:6px 10px;text-align:right;color:{fail_color};'
+        f'font-weight:{fail_weight};">{n_failed}</td>'
+        '</tr>'
+    )
+
+
+def _git_str(g: Dict[str, Any]) -> str:
+    """Render a {commit, dirty} git record (or em-dash when absent)."""
+    if not g or not g.get("commit"):
+        return "—"
+    dirty = " <span style='color:#b3261e;'>(dirty)</span>" if g.get("dirty") else ""
+    return f'<code>{g["commit"]}</code>{dirty}'
+
+
+def _provenance_panel_html(diagnostics: Dict[str, Any]) -> str:
+    """Host / when / platform context + a per-simulator version & git table."""
+    meta = (diagnostics or {}).get("meta") or {}
+    prov = (diagnostics or {}).get("provenance") or {}
+    whens = [p.get("started_utc") for p in prov.values() if p.get("started_utc")]
+    when = min(whens) if whens else "—"
+    ctx = (
+        '<div style="font-size:13px;color:#333;margin-bottom:12px;'
+        'font-family:-apple-system,sans-serif;line-height:1.6;">'
+        f'<b>Run:</b> {when} &nbsp;·&nbsp; <b>Host:</b> {meta.get("host","—")}<br>'
+        f'<b>Platform:</b> {meta.get("platform","—")} &nbsp;·&nbsp; '
+        f'<b>Python:</b> {meta.get("python","—")}'
+        '</div>'
+    )
+    head = (
+        '<tr style="text-align:left;border-bottom:2px solid #d0d4d9;'
+        'font-size:12px;color:#555;">'
+        '<th style="padding:6px 10px;">Simulator</th>'
+        '<th style="padding:6px 10px;">Library</th>'
+        '<th style="padding:6px 10px;">Wrapper</th>'
+        '<th style="padding:6px 10px;">Wrapper commit</th>'
+        '<th style="padding:6px 10px;text-align:right;">Total runtime (s)</th>'
+        '</tr>'
+    )
+    rows = []
+    for sim, p in prov.items():
+        rt = p.get("total_runtime_s")
+        rt_str = f"{rt:.3f}" if isinstance(rt, (int, float)) else "—"
+        rows.append(
+            '<tr style="border-bottom:1px solid #eef0f2;">'
+            f'<td style="padding:6px 10px;font-weight:600;">{sim}</td>'
+            f'<td style="padding:6px 10px;">{p.get("lib_version") or "—"}</td>'
+            f'<td style="padding:6px 10px;">{p.get("wrapper") or "—"} '
+            f'{p.get("wrapper_version") or ""}</td>'
+            f'<td style="padding:6px 10px;">{_git_str(p.get("wrapper_git"))}</td>'
+            f'<td style="padding:6px 10px;text-align:right;">{rt_str}</td>'
+            '</tr>'
+        )
+    body = "".join(rows) or ('<tr><td colspan="5" style="padding:10px;color:#888;">'
+                             'No provenance.</td></tr>')
+    return (
+        ctx +
+        '<table style="border-collapse:collapse;width:100%;font-size:13px;'
+        'font-family:-apple-system,sans-serif;">'
+        f'<thead>{head}</thead><tbody>{body}</tbody></table>'
+    )
+
+
+def _runtime_table_html(diagnostics: Dict[str, Any]) -> str:
+    """One row per (biomodel, sedml-job, simulator) with runtime + status."""
+    runs = (diagnostics or {}).get("runs") or {}
+    rows = []
+    for bid in sorted(runs.keys()):
+        for job, simmap in (runs[bid] or {}).items():
+            for sim, rec in (simmap or {}).items():
+                rt = rec.get("runtime_s")
+                rt_str = f"{rt:.4f}" if isinstance(rt, (int, float)) else "—"
+                status = rec.get("status") or "—"
+                ok = status == "ok"
+                sc = "#1b6e3c" if ok else "#b3261e"
+                err = rec.get("error") or ""
+                err_html = (f'<div style="color:#b3261e;font-size:11px;">{err}</div>'
+                            if err else "")
+                rows.append(
+                    '<tr style="border-bottom:1px solid #eef0f2;">'
+                    f'<td style="padding:6px 10px;font-weight:600;">{bid}</td>'
+                    f'<td style="padding:6px 10px;font-family:ui-monospace,monospace;">{job}</td>'
+                    f'<td style="padding:6px 10px;">{sim}</td>'
+                    f'<td style="padding:6px 10px;text-align:right;">{rt_str}</td>'
+                    f'<td style="padding:6px 10px;color:{sc};">{status}{err_html}</td>'
+                    '</tr>'
+                )
+    head = (
+        '<tr style="text-align:left;border-bottom:2px solid #d0d4d9;'
+        'font-size:12px;color:#555;">'
+        '<th style="padding:6px 10px;">Biomodel</th>'
+        '<th style="padding:6px 10px;">SED-ML job</th>'
+        '<th style="padding:6px 10px;">Simulator</th>'
+        '<th style="padding:6px 10px;text-align:right;">Runtime (s)</th>'
+        '<th style="padding:6px 10px;">Status</th>'
+        '</tr>'
+    )
+    body = "".join(rows) or ('<tr><td colspan="5" style="padding:10px;color:#888;">'
+                             'No runs.</td></tr>')
+    return (
+        '<table style="border-collapse:collapse;width:100%;font-size:13px;'
+        'font-family:-apple-system,sans-serif;">'
+        f'<thead>{head}</thead><tbody>{body}</tbody></table>'
+    )
+
+
+def _diagnostics_tab_html(diagnostics: Dict[str, Any]) -> str:
+    return (
+        '<h4 style="margin:4px 0 8px 0;font-family:-apple-system,sans-serif;">'
+        'Provenance</h4>'
+        + _provenance_panel_html(diagnostics) +
+        '<h4 style="margin:18px 0 8px 0;font-family:-apple-system,sans-serif;">'
+        'Per-simulation runtime</h4>'
+        + _runtime_table_html(diagnostics)
+    )
+
+
+def _overview_table_html(rows: List[str]) -> str:
+    """The Overview tab: a (biomodel × sedml-job) summary table."""
+    if not rows:
+        body = ('<tr><td colspan="6" style="padding:10px;color:#888;">'
+                'No results.</td></tr>')
+    else:
+        body = "".join(rows)
+    head = (
+        '<tr style="text-align:left;border-bottom:2px solid #d0d4d9;'
+        'font-size:12px;color:#555;">'
+        '<th style="padding:6px 10px;">Biomodel</th>'
+        '<th style="padding:6px 10px;">SED-ML job</th>'
+        '<th style="padding:6px 10px;">Status</th>'
+        '<th style="padding:6px 10px;text-align:right;">Worst nRMSE</th>'
+        '<th style="padding:6px 10px;text-align:right;">Simulators OK</th>'
+        '<th style="padding:6px 10px;text-align:right;">Simulators failed</th>'
+        '</tr>'
+    )
+    return (
+        '<table style="border-collapse:collapse;width:100%;font-size:13px;'
+        'font-family:-apple-system,sans-serif;">'
+        f'<thead>{head}</thead><tbody>{body}</tbody></table>'
+    )
+
+
 def _detail_html(bid: str, doc_figs: Dict[str, Dict[str, Any]]) -> str:
-    """Render the tab strip + plot containers for one biomodel's sedml docs."""
+    """Render the tab strip + plot containers for one biomodel's sedml jobs."""
     if not doc_figs:
         body = '<div style="color:#888;padding:8px;">No data for this biomodel.</div>'
     else:
@@ -214,15 +391,30 @@ document.querySelectorAll('.batch-tab').forEach(function(tab) {
     _ensurePlot(bid, doc);
   });
 });
+document.querySelectorAll('.batch-toptab').forEach(function(tab) {
+  tab.addEventListener('click', function() {
+    var target = tab.getAttribute('data-target');
+    document.querySelectorAll('.batch-toptab').forEach(function(t) {
+      t.style.borderBottom = '2px solid transparent'; t.style.fontWeight = '400';
+    });
+    tab.style.borderBottom = '2px solid #1b6e3c'; tab.style.fontWeight = '600';
+    document.querySelectorAll('.batch-toppane').forEach(function(p) {
+      p.style.display = 'none';
+    });
+    var pane = document.getElementById(target);
+    if (pane) pane.style.display = 'block';
+  });
+});
 """
 
 
 class BatchCompareOverlay(Visualization):
-    """N-simulator + multi-sedml-doc card-grid overlay.
+    """Overview table + N-simulator multi-sedml-job card-grid overlay.
 
     Inputs:
-        results: `map[sim, map[bid, map[sedml_doc, simulation_result]]]`.
-        comparisons: `map[bid, map[sedml_doc, tree]]`.
+        results: `map[bid, map[sedml_job, map[sim, results]]]` — the nested
+            store; each leaf is a flat `map[observable -> timeseries]`.
+        comparisons: `map[bid, map[sedml_job, tree]]`.
 
     Output: a single `html` fragment.
     """
@@ -233,11 +425,12 @@ class BatchCompareOverlay(Visualization):
     }
 
     def inputs(self) -> Dict[str, Any]:
-        return {"results": "tree", "comparisons": "tree"}
+        return {"results": "tree", "comparisons": "tree", "diagnostics": "tree"}
 
     def update(self, state: Dict[str, Any]) -> Dict[str, str]:
         results = state.get("results") or {}
         comparisons = state.get("comparisons") or {}
+        diagnostics = state.get("diagnostics") or {}
         ids = list((self.config or {}).get("biomodel_ids") or []) or list(results.keys())
 
         if not ids or not results:
@@ -246,51 +439,82 @@ class BatchCompareOverlay(Visualization):
                 'font-family:-apple-system,sans-serif;">'
                 'No biomodels to compare.</div>'}
 
-        # Build a per-bid index from results[sim][bid][doc].
-        per_bid_doc_sim: Dict[str, Dict[str, Dict[str, Any]]] = {}
-        for sim_name, per_bid in results.items():
-            for bid, per_doc in (per_bid or {}).items():
-                for doc, sim_result in (per_doc or {}).items():
-                    if not sim_result:
-                        continue
-                    per_bid_doc_sim.setdefault(bid, {}).setdefault(doc, {})
-                    per_bid_doc_sim[bid][doc][sim_name] = sim_result
-
-        rows: List[str] = []
+        overview_rows: List[str] = []
+        detail_rows: List[str] = []
         for bid in ids:
-            doc_map = per_bid_doc_sim.get(bid) or {}
+            doc_map = results.get(bid) or {}
             doc_figs: Dict[str, Dict[str, Any]] = {}
-            for doc, sim_results in doc_map.items():
-                if not sim_results:
+            for doc, sim_leaves in doc_map.items():
+                sim_leaves = sim_leaves or {}
+                # A failed simulator run leaves an empty leaf; OK = produced output.
+                n_failed = sum(1 for leaf in sim_leaves.values() if not leaf)
+                n_ok = sum(1 for leaf in sim_leaves.values() if leaf)
+                comparison = (comparisons.get(bid) or {}).get(doc) or {}
+                overview_rows.append(
+                    _overview_row(bid, doc, comparison, n_ok, n_failed))
+
+                live = {n: leaf for n, leaf in sim_leaves.items() if leaf}
+                if not live:
                     continue
-                utc_only = {n: r for n, r in sim_results.items()
-                            if r.get("kind") == "utc"}
-                ss_only  = {n: r for n, r in sim_results.items()
-                            if r.get("kind") == "steady_state"}
+                utc_only = {n: leaf for n, leaf in live.items()
+                            if result_leaf.is_utc(leaf)}
+                ss_only = {n: leaf for n, leaf in live.items()
+                           if not result_leaf.is_utc(leaf)}
                 # If both kinds appear, route to whichever has more engines;
                 # cross-kind isn't a meaningful overlay so we just pick the
-                # majority and let the minority drop. BatchCompareStep
-                # already emits a warning + "none" bucket for this case.
+                # majority and let the minority drop. BatchCompareStep already
+                # emits a warning + "none" bucket for this case.
                 if utc_only and (not ss_only or len(utc_only) >= len(ss_only)):
                     doc_figs[doc] = _utc_overlay_figure(utc_only)
                 elif ss_only:
                     doc_figs[doc] = _ss_bar_figure(ss_only)
 
             agg = _aggregate_card_bucket(comparisons.get(bid) or {})
-            rows.append(_card_html(bid, agg))
-            rows.append(_detail_html(bid, doc_figs))
+            detail_rows.append(_card_html(bid, agg))
+            detail_rows.append(_detail_html(bid, doc_figs))
 
         title = (self.config or {}).get("title", "")
         title_html = (
             f'<h3 style="margin:0 0 12px 0;font-family:-apple-system,sans-serif;">'
             f'{title}</h3>'
         ) if title else ''
-        return {"html": (
-            f'<div>{title_html}'
-            f'<div class="biomodel-list" style="'
-            f'display:flex;flex-direction:column;gap:4px;">'
-            + "".join(rows) +
+
+        top_tabs = (
+            '<div class="batch-toptab-strip" style="margin-bottom:12px;'
+            'border-bottom:1px solid #e5e7eb;font-family:-apple-system,sans-serif;">'
+            '<button class="batch-toptab" data-target="batch-overview" '
+            'style="padding:6px 14px;font-size:13px;background:none;border:none;'
+            'border-bottom:2px solid #1b6e3c;font-weight:600;cursor:pointer;">'
+            'Overview</button>'
+            '<button class="batch-toptab" data-target="batch-detail" '
+            'style="padding:6px 14px;font-size:13px;background:none;border:none;'
+            'border-bottom:2px solid transparent;cursor:pointer;">'
+            'Per-model</button>'
+            '<button class="batch-toptab" data-target="batch-diagnostics" '
+            'style="padding:6px 14px;font-size:13px;background:none;border:none;'
+            'border-bottom:2px solid transparent;cursor:pointer;">'
+            'Diagnostics</button>'
             '</div>'
+        )
+        overview_pane = (
+            '<div id="batch-overview" class="batch-toppane">'
+            + _overview_table_html(overview_rows) +
+            '</div>'
+        )
+        detail_pane = (
+            '<div id="batch-detail" class="batch-toppane" style="display:none;">'
+            '<div class="biomodel-list" style="'
+            'display:flex;flex-direction:column;gap:4px;">'
+            + "".join(detail_rows) +
+            '</div></div>'
+        )
+        diagnostics_pane = (
+            '<div id="batch-diagnostics" class="batch-toppane" style="display:none;">'
+            + _diagnostics_tab_html(diagnostics) +
+            '</div>'
+        )
+        return {"html": (
+            f'<div>{title_html}{top_tabs}{overview_pane}{detail_pane}{diagnostics_pane}'
             f'<script>{get_plotlyjs()}</script>'
             f'<script>{_TOGGLE_JS}</script>'
             '</div>'

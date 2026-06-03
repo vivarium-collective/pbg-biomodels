@@ -132,15 +132,19 @@ class BiomodelsSimbioStep(Step):
 
     def update(self, state: Dict[str, Any]) -> Dict[str, Any]:
         n_points = _validate_n_points(state["n_points"], "BiomodelsSimbioStep")
-        inner = SimbioUTCStep(
-            config={
-                "model_source": state["model_source"],
-                "model_format": "sbml",
-                "time":         float(state["time"]),
-                "n_points":     n_points,
-            },
-            core=self.core,
-        )
+        config = {
+            "model_source": state["model_source"],
+            "model_format": "sbml",
+            "time":         float(state["time"]),
+            "n_points":     n_points,
+        }
+        # Optional integration tolerances — tighten for stiff models. When
+        # absent, SimbioUTCStep uses its CVODE-comparable defaults (1e-6/1e-9).
+        if state.get("rtol") is not None:
+            config["rtol"] = float(state["rtol"])
+        if state.get("atol") is not None:
+            config["atol"] = float(state["atol"])
+        inner = SimbioUTCStep(config=config, core=self.core)
         out = inner.update({})
         return {"result": out["result"]}
 

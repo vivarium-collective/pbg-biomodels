@@ -94,16 +94,16 @@ class BatchCompareStep(Step):
     """All-pairs nRMSE across simulators per (biomodel_id, sedml_doc).
 
     Inputs:
-        results: `map[sim, map[bid, map[sedml_doc, simulation_result]]]` —
-            the runner writes its bid-keyed slice into `results[<sim>]`,
-            so the outer key is the simulator name.
+        results: `map[bid, map[sedml_job, map[sim, results]]]` — the nested
+            store the runners write, with the simulator as the innermost key
+            and each leaf a flat `map[observable -> timeseries]`.
 
     Outputs:
-        comparisons: `map[bid, map[sedml_doc, tree]]` — each leaf is the
+        comparisons: `map[bid, map[sedml_job, tree]]` — each leaf is the
             `compare_n_engines` (UTC) or `compare_n_engines_steady_state`
             (SS) return shape.
 
-    A `(bid, sedml_doc)` whose simulators produced both UTC and SS results
+    A `(bid, sedml_job)` whose simulators produced both UTC and SS leaves
     is treated as a SED-ML pathology: a warning is emitted and the leaf is
     the `"none"` bucket with empty engines.
     """
@@ -122,45 +122,25 @@ class BatchCompareStep(Step):
             compare_n_engines,
             compare_n_engines_steady_state,
         )
+        from pbg_biomodels import result_leaf
         import warnings
 
         results = state.get("results") or {}
 
-        # Walk results[sim][bid][doc] — runner outputs land at this shape.
-        # Build a per-bid index of (doc → {sim → sim_result}) so the
-        # comparison step still produces comparisons[bid][doc] all-pairs.
-        per_bid_doc: Dict[str, Dict[str, Dict[str, Any]]] = {}
-        for sim_name, per_bid in results.items():
-            for bid, per_doc in (per_bid or {}).items():
-                for doc_name, sim_result in (per_doc or {}).items():
-                    if not sim_result:
-                        continue
-                    if "error" in sim_result and not sim_result.get("observables"):
-                        continue  # failed job — no engine slot
-                    per_bid_doc.setdefault(bid, {}).setdefault(doc_name, {})
-                    per_bid_doc[bid][doc_name][sim_name] = sim_result
-
         out: Dict[str, Dict[str, Any]] = {}
-        for bid, doc_map in per_bid_doc.items():
+        # results is already keyed bid > job > sim; walk it directly.
+        for bid, doc_map in results.items():
             out[bid] = {}
-            for doc_name, sim_results_map in doc_map.items():
+            for doc_name, sim_results_map in (doc_map or {}).items():
                 utc_engines: Dict[str, Dict[str, Any]] = {}
                 ss_engines: Dict[str, Dict[str, float]] = {}
-                for sim_name, sim_result in sim_results_map.items():
-                    kind = sim_result.get("kind")
-                    obs = sim_result.get("observables") or {}
-                    if kind == "utc":
-                        time = sim_result.get("time") or []
-                        cols = list(obs.keys())
-                        n_rows = min((len(obs[c]) for c in cols), default=0)
-                        values = [[float(obs[c][r]) for c in cols] for r in range(n_rows)]
-                        utc_engines[sim_name] = {
-                            "time":    list(time),
-                            "columns": cols,
-                            "values":  values,
-                        }
-                    elif kind == "steady_state":
-                        ss_engines[sim_name] = {k: float(v) for k, v in obs.items()}
+                for sim_name, leaf in (sim_results_map or {}).items():
+                    if not leaf:
+                        continue  # failed/empty job — no engine slot
+                    if result_leaf.is_utc(leaf):
+                        utc_engines[sim_name] = result_leaf.to_numeric_result(leaf)
+                    else:
+                        ss_engines[sim_name] = result_leaf.steady_state_scalars(leaf)
 
                 if utc_engines and ss_engines:
                     warnings.warn(

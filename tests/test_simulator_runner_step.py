@@ -1,6 +1,9 @@
 """`SimulatorRunnerStep` iterates a `models` map and dispatches each
 SED-ML job to its simulator's UTC or SteadyState adapter, writing into
-a nested `results` map shaped `map[bid, map[sedml_doc, simulation_result]]`.
+the nested `results` store shaped `map[bid, map[sedml_job, map[sim, results]]]`
+(simulator innermost). Each leaf is a flat `map[observable -> timeseries]`:
+UTC carries the times under the reserved `time` key; steady-state omits `time`
+and stores length-1 lists.
 """
 from typing import Any, Dict
 
@@ -80,18 +83,20 @@ def test_runner_dispatches_utc_and_steady_state(patched_adapters):
     results = out["results"]
     bid_results = results["BIOMD0000000001"]
     assert set(bid_results.keys()) == {"utc1", "ss"}
-    assert bid_results["utc1"]["kind"] == "utc"
-    assert bid_results["utc1"]["time"] == [0.0, 0.5, 1.0]
-    assert bid_results["utc1"]["observables"]["A"] == [1.0, 0.6, 0.3]
-    assert bid_results["utc1"]["observables"]["B"] == [0.0, 0.4, 0.7]
-    assert bid_results["ss"]["kind"] == "steady_state"
-    assert bid_results["ss"]["time"] is None
-    assert bid_results["ss"]["observables"] == {"A": 0.25, "B": 0.75}
+    # simulator is the innermost key; each leaf is a flat observable->timeseries.
+    utc_leaf = bid_results["utc1"]["copasi"]
+    assert "time" in utc_leaf  # UTC marker
+    assert utc_leaf["time"] == [0.0, 0.5, 1.0]
+    assert utc_leaf["A"] == [1.0, 0.6, 0.3]
+    assert utc_leaf["B"] == [0.0, 0.4, 0.7]
+    ss_leaf = bid_results["ss"]["copasi"]
+    assert "time" not in ss_leaf  # steady-state marker
+    assert ss_leaf == {"A": [0.25], "B": [0.75]}  # length-1 lists
 
 
 def test_runner_records_per_job_failure(patched_adapters, monkeypatch):
-    """A simulator exception is recorded as `{kind, error}` for that job
-    and does not abort the runner's other jobs."""
+    """A simulator exception leaves an empty results leaf for that job
+    (and warns) without aborting the runner's other jobs."""
     import pbg_biomodels.steps.simulator_runner as mod
     monkeypatch.setattr(mod, "_UTC_CLASS_FOR", lambda name: _RaisingUTC)
     from pbg_biomodels.steps.simulator_runner import SimulatorRunnerStep
@@ -110,12 +115,56 @@ def test_runner_records_per_job_failure(patched_adapters, monkeypatch):
         }
     }})
     bid_results = out["results"]["BIOMD0000000001"]
-    assert bid_results["utc1"]["kind"] == "utc"
-    assert "error" in bid_results["utc1"]
-    assert "simulated COPASI segfault" in bid_results["utc1"]["error"]
+    # Failed job -> empty leaf under its simulator slot.
+    assert bid_results["utc1"]["copasi"] == {}
     # The other job still ran.
-    assert bid_results["ss"]["kind"] == "steady_state"
-    assert bid_results["ss"]["observables"] == {"A": 0.25, "B": 0.75}
+    assert bid_results["ss"]["copasi"] == {"A": [0.25], "B": [0.75]}
+
+
+def test_runner_emits_diagnostics_with_timing_and_provenance(patched_adapters):
+    """Alongside results, the runner emits a diagnostics tree with per-run
+    timing/status and per-simulator provenance (host, versions, git)."""
+    from pbg_biomodels.steps.simulator_runner import SimulatorRunnerStep
+    step = SimulatorRunnerStep(
+        config={"simulator_name": "copasi"}, core=allocate_core()
+    )
+    out = step.update({"models": {
+        "BIOMD0000000001": {
+            "sbml_path": "/tmp/m.xml",
+            "sedml_jobs": [
+                {"name": "utc1", "kind": "utc", "time": 1.0, "n_points": 3},
+            ],
+        }
+    }})
+    diag = out["diagnostics"]
+    # per-run timing/status, simulator innermost.
+    rec = diag["runs"]["BIOMD0000000001"]["utc1"]["copasi"]
+    assert rec["status"] == "ok"
+    assert isinstance(rec["runtime_s"], float) and rec["runtime_s"] >= 0.0
+    # provenance for this simulator + global host meta.
+    prov = diag["provenance"]["copasi"]
+    assert prov["simulator"] == "copasi"
+    assert "started_utc" in prov and "total_runtime_s" in prov
+    assert set(diag["meta"]) >= {"host", "platform", "python"}
+
+
+def test_runner_failure_is_recorded_in_diagnostics(patched_adapters, monkeypatch):
+    """A failed job is status='failed' with the error text in diagnostics."""
+    import pbg_biomodels.steps.simulator_runner as mod
+    monkeypatch.setattr(mod, "_UTC_CLASS_FOR", lambda name: _RaisingUTC)
+    from pbg_biomodels.steps.simulator_runner import SimulatorRunnerStep
+    step = SimulatorRunnerStep(
+        config={"simulator_name": "copasi"}, core=allocate_core()
+    )
+    out = step.update({"models": {
+        "BIOMD0000000001": {
+            "sbml_path": "/tmp/m.xml",
+            "sedml_jobs": [{"name": "utc1", "kind": "utc", "time": 1.0, "n_points": 3}],
+        }
+    }})
+    rec = out["diagnostics"]["runs"]["BIOMD0000000001"]["utc1"]["copasi"]
+    assert rec["status"] == "failed"
+    assert "simulated COPASI segfault" in rec["error"]
 
 
 def test_runner_writes_one_branch_per_biomodel(patched_adapters):
