@@ -47,7 +47,7 @@ jobs:
         # [tool.uv.sources] entry that points at ../X, add the matching clone here.
         run: |
           cd ..
-          for repo in vivarium-dashboard pbg-tellurium pbg-copasi; do
+          for repo in vivarium-dashboard pbg-tellurium pbg-copasi pbg-simbio; do
             if [ ! -d "$repo" ]; then
               git clone --depth 1 "https://github.com/vivarium-collective/$repo.git"
             fi
