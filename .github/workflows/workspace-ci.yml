@@ -36,7 +36,7 @@ jobs:
           ls -la external/ 2>&1 || true
       - uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
+          python-version: "3.12"
       - name: Install uv
         run: pip install uv
       - name: Clone sibling repos for [tool.uv.sources]
