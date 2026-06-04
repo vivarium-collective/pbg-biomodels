@@ -6,7 +6,7 @@
 name = "pbg-biomodels"
 version = "0.0.0"
 description = "Process-bigraph research workspace"
-requires-python = ">=3.11"
+requires-python = ">=3.12"
 dependencies = [
     "process-bigraph",
     "bigraph-schema",
