@@ -27,6 +27,8 @@ _SIM_PACKAGES: Dict[str, Dict[str, Any]] = {
                   "lib_mods": ["tellurium"],       "lib_dist": "tellurium"},
     "simbio":    {"wrapper_mod": "pbg_simbio",    "wrapper_dist": "pbg-simbio",
                   "lib_mods": ["simbio"],          "lib_dist": "simbio"},
+    "amici":     {"wrapper_mod": "pbg_amici",     "wrapper_dist": "pbg-amici",
+                  "lib_mods": ["amici"],           "lib_dist": "amici"},
 }
 
 

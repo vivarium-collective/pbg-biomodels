@@ -29,6 +29,7 @@ _ENGINE_COLORS = {
     "copasi": "#1f77b4",
     "tellurium": "#ff7f0e",
     "simbio": "#2ca02c",
+    "amici": "#d62728",
 }
 _FALLBACK_COLORS = ["#9467bd", "#8c564b", "#e377c2", "#17becf", "#bcbd22"]
 
