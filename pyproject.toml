@@ -35,6 +35,11 @@ dependencies = [
 [project.optional-dependencies]
 dev = ["pytest>=7.4"]
 batch = ["pbest"]  # used by run_biomodels CLI / batch tooling
+# AMICI as a 4th comparison engine. Optional because amici has no binary wheel
+# (it builds from source + compiles a C++ extension per model), so it must not
+# burden the base install / CI. Install with `pip install -e ".[amici]"` to
+# add it to the default simulator set.
+amici = ["pbg-amici"]
 
 [project.scripts]
 pbg-biomodels = "pbg_biomodels.cli:main"
@@ -44,6 +49,7 @@ vivarium-dashboard = { path = "../vivarium-dashboard", editable = true }
 pbg-tellurium = { path = "../pbg-tellurium", editable = true }
 pbg-copasi = { path = "../pbg-copasi", editable = true }
 pbg-simbio = { path = "../pbg-simbio", editable = true }
+pbg-amici = { path = "../pbg-amici", editable = true }
 
 [build-system]
 requires = ["hatchling"]

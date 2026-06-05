@@ -53,10 +53,36 @@ _SIMULATORS: Dict[str, SimulatorSpec] = {
         "process_config": lambda sbml: {"model_source": sbml, "model_format": "sbml"},
         "species_out": "species_concentrations",
     },
+    # AMICI bridges directly to the upstream pbg-amici one-shot Steps (no local
+    # adapter) — AmiciUTCStep / AmiciSteadyStateStep already speak the
+    # model_source/time/n_points → {result} contract. amici has no binary wheel
+    # (it compiles a C++ extension per model), so pbg-amici is an optional
+    # extra; this engine joins the default "all" set only when it's installed.
+    "amici": {
+        "utc_step": "local:pbg_amici.processes.AmiciUTCStep",
+        "steady_state_step": "local:pbg_amici.processes.AmiciSteadyStateStep",
+        "process": "local:AmiciProcess",
+        "process_config": lambda sbml: {"sbml_file": sbml},
+        "species_out": "states",
+    },
 }
 
-#: All known simulator names, in canonical order.
-ALL_SIMULATORS: List[str] = list(_SIMULATORS)
+#: Optional engines: included in the default "all" set only when their wrapper
+#: package is importable. Always explicitly selectable by name regardless.
+_OPTIONAL_BACKENDS: Dict[str, str] = {"amici": "pbg_amici"}
+
+
+def _simulator_available(name: str) -> bool:
+    mod = _OPTIONAL_BACKENDS.get(name)
+    if mod is None:
+        return True  # always-on engine
+    import importlib.util
+    return importlib.util.find_spec(mod) is not None
+
+
+#: All simulator names available in this environment, in canonical order
+#: (every always-on engine plus any installed optional engine).
+ALL_SIMULATORS: List[str] = [n for n in _SIMULATORS if _simulator_available(n)]
 
 
 def resolve_simulators(spec) -> List[str]:
@@ -77,7 +103,7 @@ def resolve_simulators(spec) -> List[str]:
     unknown = [n for n in names if n not in _SIMULATORS]
     if unknown:
         raise ValueError(
-            f"Unknown simulator(s) {unknown}; known: {ALL_SIMULATORS}"
+            f"Unknown simulator(s) {unknown}; known: {list(_SIMULATORS)}"
         )
     if not names:
         raise ValueError("No simulators selected.")
@@ -92,6 +118,7 @@ _PROCESS_CLASSES = {
     "copasi": ("pbg_copasi.processes", "CopasiUTCProcess"),
     "tellurium": ("pbg_tellurium.processes", "TelluriumProcess"),
     "simbio": ("pbg_simbio.processes", "SimbioUTCProcess"),
+    "amici": ("pbg_amici.processes", "AmiciProcess"),
 }
 
 
