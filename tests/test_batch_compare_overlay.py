@@ -98,6 +98,68 @@ def test_overlay_renders_diagnostics_tab():
     assert "2026-06-03T20:00:00+00:00" in html  # when
 
 
+def test_simulator_colors_are_consistent_across_figures():
+    """A given simulator must keep the same line color in every figure, across
+    every biomodel — copasi/tellurium/simbio resolve to their canonical hues."""
+    import json as _json
+
+    from pbg_biomodels.visualizations import batch_compare_overlay as bco
+
+    viz = BatchCompareOverlay(
+        config={"biomodel_ids": ["BIOMD0000000001", "BIOMD0000000002"]},
+        core=allocate_core(),
+    )
+    out = viz.update({
+        "results": {
+            # Different simulator iteration order per biomodel: if colors were
+            # assigned by trace index they would diverge between the two cards.
+            "BIOMD0000000001": {"sim1": {
+                "copasi":    _utc([0.0, 1.0], {"A": [1.0, 0.5]}),
+                "tellurium": _utc([0.0, 1.0], {"A": [1.0, 0.4]}),
+                "simbio":    _utc([0.0, 1.0], {"A": [1.0, 0.6]}),
+            }},
+            "BIOMD0000000002": {"sim1": {
+                "simbio":    _utc([0.0, 1.0], {"A": [2.0, 1.6]}),
+                "tellurium": _utc([0.0, 1.0], {"A": [2.0, 1.4]}),
+                "copasi":    _utc([0.0, 1.0], {"A": [2.0, 1.5]}),
+            }},
+        },
+        "comparisons": {},
+    })
+    html = out["html"]
+
+    # Pull every embedded figure blob and collect each simulator's line colors.
+    colors: dict = {}
+    # The assignment form is `window.__batchFigures["BID"] = {...}`; the leading
+    # quote distinguishes it from the unquoted JS reads in the toggle script.
+    marker = 'window.__batchFigures["'
+    i = 0
+    while (j := html.find(marker, i)) >= 0:
+        k = html.find("{", html.find("=", j))
+        depth, end = 0, k
+        while end < len(html):
+            if html[end] == "{":
+                depth += 1
+            elif html[end] == "}":
+                depth -= 1
+                if depth == 0:
+                    break
+            end += 1
+        i = end + 1
+        for fig in _json.loads(html[k:end + 1]).values():
+            for tr in fig.get("data", []):
+                name, line = tr.get("name"), (tr.get("line") or {})
+                if name and line.get("color"):
+                    colors.setdefault(name, set()).add(line["color"])
+
+    assert colors, "no colored traces were embedded"
+    for name, hues in colors.items():
+        assert len(hues) == 1, f"{name} used multiple colors: {sorted(hues)}"
+    assert colors["copasi"] == {bco._SIMULATOR_COLORS["copasi"]}
+    assert colors["tellurium"] == {bco._SIMULATOR_COLORS["tellurium"]}
+    assert colors["simbio"] == {bco._SIMULATOR_COLORS["simbio"]}
+
+
 def test_overlay_with_no_results_returns_placeholder():
     viz = BatchCompareOverlay(
         config={"biomodel_ids": []},
