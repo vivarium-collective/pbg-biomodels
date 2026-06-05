@@ -24,3 +24,7 @@ __pycache__/
 reports/assets/cache/
 # Transient brainstorm session artifacts (server PIDs, logs, rendered HTML).
 .superpowers/brainstorm/
+
+# Batch-compare results store (runtime artifact; the report HTML embeds its
+# own data, and scripts/run-batch-compare.py regenerates this on demand).
+.pbg/last_batch_results.json
