@@ -35,6 +35,12 @@ def build_core():
     # `local:<Sim>UTCProcess` resolvable for the biomodel-process composite).
     from pbg_biomodels.simulators import register_simulator_backends
     register_simulator_backends(core)
+    # Register the workspace's custom types (biomodel_jobs, simulation_result,
+    # numeric_result, …). Callers that only build_core() — e.g. the dashboard's
+    # run_runner — must get a fully-configured core, not just the Edges; without
+    # this the batch-compare composite fails to parse `map[biomodel_jobs]`.
+    from pbg_biomodels import register_types
+    register_types(core)
     return core
 
 
