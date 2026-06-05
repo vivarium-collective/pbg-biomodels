@@ -37,7 +37,15 @@ from pbg_biomodels.simulators import ALL_SIMULATORS
 
 
 def _UTC_CLASS_FOR(simulator_name: str):
-    """Return the UTC adapter class for the given simulator."""
+    """Return the UTC adapter class for the given simulator.
+
+    amici has no local Biomodels adapter — pbg-amici's AmiciUTCStep already
+    speaks the model_source/time/n_points -> {result} contract, so it's used
+    directly. Imported lazily because amici is an optional extra.
+    """
+    if simulator_name == "amici":
+        from pbg_amici.processes import AmiciUTCStep
+        return AmiciUTCStep
     from pbg_biomodels.steps.simulators import (
         BiomodelsCopasiStep,
         BiomodelsSimbioStep,
@@ -51,7 +59,14 @@ def _UTC_CLASS_FOR(simulator_name: str):
 
 
 def _SS_CLASS_FOR(simulator_name: str):
-    """Return the SteadyState adapter class for the given simulator."""
+    """Return the SteadyState adapter class for the given simulator.
+
+    As with the UTC class, amici resolves directly to pbg-amici's
+    AmiciSteadyStateStep (lazy import — optional extra).
+    """
+    if simulator_name == "amici":
+        from pbg_amici.processes import AmiciSteadyStateStep
+        return AmiciSteadyStateStep
     from pbg_biomodels.steps.simulators import (
         BiomodelsCopasiSteadyStateStep,
         BiomodelsSimbioSteadyStateStep,
