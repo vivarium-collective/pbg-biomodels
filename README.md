@@ -5,6 +5,15 @@ under multiple simulators (COPASI, Tellurium, simbio), comparing their
 trajectories, and turning any BioModel into a ready-to-plug process-bigraph
 module.
 
+## 📊 Live report
+
+**[BioModels batch comparison — first 10 models →](https://vivarium-collective.github.io/pbg-biomodels/)**
+
+An interactive overlay of COPASI vs Tellurium vs simbio across the first ten
+BioModels: per-observable trajectory overlays (with a stable color per
+simulator), the all-pairs nRMSE matrix, and per-run diagnostics. Published to
+GitHub Pages from [`reports/batch_compare_first10.html`](reports/batch_compare_first10.html).
+
 ## CLI
 
 Installed as the `pbg-biomodels` console script (`pip install -e .`).
