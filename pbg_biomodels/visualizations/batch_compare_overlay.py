@@ -37,6 +37,36 @@ _BUCKET_COLOR = {
 
 _BUCKET_RANK = {"good": 0, "borderline": 1, "large": 2, "none": -1}
 
+# Stable per-simulator colors, shared with `pbg_biomodels.report._ENGINE_COLORS`
+# so a given engine keeps the SAME color across every figure in the viewer
+# (line overlays and steady-state bars alike). Unknown simulator names fall
+# back to a deterministic palette assigned by sorted order.
+_SIMULATOR_COLORS = {
+    "copasi":    "#1f77b4",
+    "tellurium": "#ff7f0e",
+    "simbio":    "#2ca02c",
+    "amici":     "#d62728",
+}
+_FALLBACK_COLORS = ["#9467bd", "#8c564b", "#e377c2", "#17becf", "#bcbd22"]
+
+
+def _build_color_map(sim_names) -> Dict[str, str]:
+    """Map each simulator name to a stable color used across all figures.
+
+    Known engines get their canonical color; unknown names get deterministic
+    fallbacks by sorted order so the same name always resolves to the same
+    color regardless of which figure (or which biomodel) it appears in.
+    """
+    color_map: Dict[str, str] = {}
+    fallback_i = 0
+    for name in sorted(sim_names):
+        if name in _SIMULATOR_COLORS:
+            color_map[name] = _SIMULATOR_COLORS[name]
+        else:
+            color_map[name] = _FALLBACK_COLORS[fallback_i % len(_FALLBACK_COLORS)]
+            fallback_i += 1
+    return color_map
+
 
 def _aggregate_card_bucket(per_doc_comparisons: Dict[str, Any]) -> Dict[str, Any]:
     """Pick the worst (largest-mean-nrmse) bucket across this biomodel's jobs."""
@@ -57,6 +87,7 @@ def _aggregate_card_bucket(per_doc_comparisons: Dict[str, Any]) -> Dict[str, Any
 
 def _utc_overlay_figure(
     sim_leaves: Dict[str, Dict[str, Any]],
+    color_map: Dict[str, str],
 ) -> Dict[str, Any]:
     """Per-observable small-multiples overlay across simulators (UTC leaves)."""
     species_order: List[str] = []
@@ -99,13 +130,17 @@ def _utc_overlay_figure(
                 "mode": "lines", "name": sim_name,
                 "legendgroup": sim_name,
                 "showlegend": sim_name not in seen_legend,
+                "line": {"color": color_map.get(sim_name)},
                 "xaxis": x_ref, "yaxis": y_ref,
             })
             seen_legend.add(sim_name)
     return {"data": traces, "layout": layout}
 
 
-def _ss_bar_figure(sim_leaves: Dict[str, Dict[str, Any]]) -> Dict[str, Any]:
+def _ss_bar_figure(
+    sim_leaves: Dict[str, Dict[str, Any]],
+    color_map: Dict[str, str],
+) -> Dict[str, Any]:
     """Grouped bar chart of final steady-state values across simulators."""
     species: List[str] = []
     seen: set = set()
@@ -124,6 +159,7 @@ def _ss_bar_figure(sim_leaves: Dict[str, Dict[str, Any]]) -> Dict[str, Any]:
             "name": sim_name,
             "x":    species,
             "y":    [float(sc.get(sp, 0.0)) for sp in species],
+            "marker": {"color": color_map.get(sim_name)},
         }
         for sim_name, sc in scalars_by_sim.items()
     ]
@@ -439,6 +475,16 @@ class BatchCompareOverlay(Visualization):
                 'font-family:-apple-system,sans-serif;">'
                 'No biomodels to compare.</div>'}
 
+        # Build the simulator->color map once, over every simulator that appears
+        # anywhere in the store, so coloring is consistent across all figures.
+        all_sims = {
+            sim
+            for doc_map in results.values()
+            for sim_leaves in (doc_map or {}).values()
+            for sim in (sim_leaves or {})
+        }
+        color_map = _build_color_map(all_sims)
+
         overview_rows: List[str] = []
         detail_rows: List[str] = []
         for bid in ids:
@@ -465,9 +511,9 @@ class BatchCompareOverlay(Visualization):
                 # majority and let the minority drop. BatchCompareStep already
                 # emits a warning + "none" bucket for this case.
                 if utc_only and (not ss_only or len(utc_only) >= len(ss_only)):
-                    doc_figs[doc] = _utc_overlay_figure(utc_only)
+                    doc_figs[doc] = _utc_overlay_figure(utc_only, color_map)
                 elif ss_only:
-                    doc_figs[doc] = _ss_bar_figure(ss_only)
+                    doc_figs[doc] = _ss_bar_figure(ss_only, color_map)
 
             agg = _aggregate_card_bucket(comparisons.get(bid) or {})
             detail_rows.append(_card_html(bid, agg))
