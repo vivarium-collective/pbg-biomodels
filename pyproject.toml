@@ -8,8 +8,15 @@ version = "0.0.0"
 description = "Process-bigraph research workspace"
 requires-python = ">=3.12"
 dependencies = [
-    "process-bigraph",
+    # Pinned: process-bigraph 1.4.17 removed `SQLiteEmitter`, which
+    # vivarium-dashboard's run_runner.py still imports — newer versions break
+    # composite runs in the dashboard. 1.4.12 is the known-good version.
+    "process-bigraph==1.4.12",
     "bigraph-schema",
+    # Required by pbg-superpowers' readout_resolver / readout_validation /
+    # study_evaluator subpackages (undeclared optional import upstream); without
+    # it those generators are silently skipped during dashboard runs.
+    "polars",
     "bigraph-viz>=2.0.3",
     "pyyaml>=6.0",
     "jsonschema[format-nongpl]>=4.21",
