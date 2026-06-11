@@ -113,3 +113,37 @@ def test_legacy_compare_biomodel_generator_still_registered():
     """The new generator does not displace the legacy one."""
     legacy = [e for e in _REGISTRY.values() if e.name == "compare-biomodel"]
     assert len(legacy) == 1
+
+
+def test_reference_is_off_by_default():
+    """No reference_results_dir → no load_reference step; ref_grid seeded empty
+    so the runners' ref_grid input has something to read."""
+    doc = build_generator(_entry(), overrides={
+        "biomodel_ids": ["BIOMD0000000001"],
+        "simulators":   ["copasi"],
+    })
+    state = doc["state"] if "state" in doc else doc
+    assert "load_reference" not in state
+    assert state["ref_grid"] == {"BIOMD0000000001": {}}
+
+
+def test_reference_step_wired_when_dir_set():
+    """reference_results_dir set → a single load_reference step reading models
+    and writing results + ref_grid; every runner reads ref_grid."""
+    doc = build_generator(_entry(), overrides={
+        "biomodel_ids":         ["BIOMD0000000001"],
+        "simulators":           ["copasi", "tellurium"],
+        "reference_results_dir": "/data/biosimulators_sedml_results",
+    })
+    state = doc["state"] if "state" in doc else doc
+
+    assert "load_reference" in state
+    ref = state["load_reference"]
+    assert ref["config"]["reference_results_dir"] == "/data/biosimulators_sedml_results"
+    assert ref["inputs"]["models"] == ["models"]
+    assert ref["outputs"]["results"] == ["results"]
+    assert ref["outputs"]["ref_grid"] == ["ref_grid"]
+
+    # Each per-simulator runner reads the ref_grid store.
+    for sim in ("copasi", "tellurium"):
+        assert state[f"runner_{sim}"]["inputs"]["ref_grid"] == ["ref_grid"]

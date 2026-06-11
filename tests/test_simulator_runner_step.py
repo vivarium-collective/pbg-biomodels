@@ -194,3 +194,17 @@ def test_runner_rejects_unknown_simulator():
         SimulatorRunnerStep(
             config={"simulator_name": "fake-sim"}, core=allocate_core()
         ).update({"models": {}})
+
+
+def test_effective_n_points_prefers_reference_grid():
+    """The reference grid count overrides the job's own n_points so live
+    engines sample on the same grid as the reference; absent a reference, the
+    job's n_points (or the default) is used unchanged."""
+    from pbg_biomodels.steps.simulator_runner import effective_n_points
+
+    # No reference override → job's own n_points.
+    assert effective_n_points({"n_points": 5}, None) == 5
+    # Reference override present → wins.
+    assert effective_n_points({"n_points": 5}, 1001) == 1001
+    # Neither → structural default.
+    assert effective_n_points({}, None) == 2
