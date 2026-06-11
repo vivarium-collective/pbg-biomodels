@@ -28,6 +28,7 @@ from pbg_biomodels.simulators import resolve_simulators
 
 
 LOAD_STEP_ADDRESS    = "local:pbg_biomodels.steps.load_biomodel.LoadBiomodelStep"
+LOAD_REF_STEP_ADDRESS = "local:pbg_biomodels.steps.load_reference_results.LoadReferenceResultsStep"
 RUNNER_STEP_ADDRESS  = "local:pbg_biomodels.steps.simulator_runner.SimulatorRunnerStep"
 COMPARE_STEP_ADDRESS = "local:pbg_biomodels.steps.simulator_comparison.BatchCompareStep"
 VIZ_STEP_ADDRESS     = "local:pbg_biomodels.visualizations.batch_compare_overlay.BatchCompareOverlay"
@@ -78,6 +79,26 @@ VIZ_STEP_ADDRESS     = "local:pbg_biomodels.visualizations.batch_compare_overlay
                 "simbio_rtol for stiff models."
             ),
         },
+        "reference_results_dir": {
+            "type": "string",
+            "default": "",
+            "description": (
+                "Path to a BioSimulators SED-ML reference dataset (the dir "
+                "containing BIOMD*/<engine>/<version>/.../reports.h5). When set, "
+                "each model's reference engines are loaded into the comparison "
+                "as `reference:<engine>` and the live engines are sampled on the "
+                "reference time grid. Empty (default) disables reference loading."
+            ),
+        },
+        "reference_simulators": {
+            "type": "list[string]",
+            "default": [],
+            "description": (
+                "Restrict which reference engines to load, one per line (e.g. "
+                "copasi, tellurium). Empty (default) loads every engine present "
+                "on disk for each model. Ignored unless reference_results_dir is set."
+            ),
+        },
     },
     default_n_steps=1,
 )
@@ -88,6 +109,8 @@ def build_batch_compare_biomodels(
     simulators: List[str],
     simbio_rtol: float = 1.0e-6,
     simbio_atol: float = 1.0e-9,
+    reference_results_dir: str = "",
+    reference_simulators: List[str] | None = None,
     with_emitter: bool = True,
     emitter_address: str = "local:RAMEmitter",
 ) -> Dict[str, Any]:
@@ -99,6 +122,9 @@ def build_batch_compare_biomodels(
         # biomodel_id > sedml_job_id > simulator > results; the job + simulator
         # levels are inserted by the runners via the `tree` apply.
         "results":     {bid: {} for bid in biomodel_ids},
+        # biomodel_id > sedml_job_id > n_points; written by LoadReferenceResultsStep
+        # (when reference is on) and read by each runner to align its time grid.
+        "ref_grid":    {bid: {} for bid in biomodel_ids},
         "comparisons": {bid: {} for bid in biomodel_ids},
         # host/provenance/per-run timing; runners fill the inner levels.
         "diagnostics": {"meta": {}, "provenance": {},
@@ -119,6 +145,24 @@ def build_batch_compare_biomodels(
             },
         }
 
+    # Reference results are opt-in: only wire the loader (and let it drive the
+    # runners' time grid via `ref_grid`) when a dataset dir is given.
+    if reference_results_dir:
+        state["load_reference"] = {
+            "_type":   "step",
+            "address": LOAD_REF_STEP_ADDRESS,
+            "config":  {
+                "reference_results_dir": reference_results_dir,
+                "reference_simulators":  list(reference_simulators or []),
+            },
+            "inputs":  {"models": ["models"]},
+            # results[bid][job][reference:<engine>] leaves + ref_grid[bid][job];
+            # both deep-merge with the runners' slices via the `tree` apply.
+            "outputs": {"results":     ["results"],
+                        "ref_grid":    ["ref_grid"],
+                        "diagnostics": ["diagnostics"]},
+        }
+
     for sim in sims:
         config: Dict[str, Any] = {"simulator_name": sim}
         # Tolerances only matter for simbio (LSODA); COPASI/Tellurium ignore them.
@@ -129,7 +173,9 @@ def build_batch_compare_biomodels(
             "_type":   "step",
             "address": RUNNER_STEP_ADDRESS,
             "config":  config,
-            "inputs":  {"models": ["models"]},
+            # `ref_grid` lets the runner sample on the reference time grid when
+            # reference is on; it's an empty store otherwise (job n_points used).
+            "inputs":  {"models": ["models"], "ref_grid": ["ref_grid"]},
             # writes the whole nested tree; the runner only fills its own
             # innermost `results[bid][job][<sim>]` slots, which deep-merge.
             # diagnostics merges the same way.
@@ -163,6 +209,7 @@ def build_batch_compare_biomodels(
             "config":  {"emit": {
                 "models":      "node",
                 "results":     "node",
+                "ref_grid":    "node",
                 "comparisons": "node",
                 "diagnostics": "node",
                 "viz_html":    "string",
@@ -170,6 +217,7 @@ def build_batch_compare_biomodels(
             "inputs":  {
                 "models":      ["models"],
                 "results":     ["results"],
+                "ref_grid":    ["ref_grid"],
                 "comparisons": ["comparisons"],
                 "diagnostics": ["diagnostics"],
                 "viz_html":    ["viz_html"],

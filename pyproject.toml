@@ -24,6 +24,9 @@ dependencies = [
     "pypdf>=4.0",
     "matplotlib",
     "plotly",
+    # Reads BioSimulators SED-ML reference results (reports.h5) for the
+    # batch-compare composite's optional `reference_results_dir` input.
+    "h5py",
     # Web-based workspace dashboard (server + templates + assets + lib helpers).
     # Extracted from pbg-template as of v0.5.0; provides the `vivarium-dashboard
     # serve` CLI invoked by scripts/serve.sh.

@@ -28,12 +28,14 @@ from pbg_superpowers.composite_generator import _REGISTRY, build_generator
 import pbg_biomodels.composites.batch_compare_biomodels  # noqa: F401  (registers generator)
 
 
-def run(ids, simulators) -> dict:
+def run(ids, simulators, reference_results_dir="", reference_simulators=None) -> dict:
     core = register_types(build_core())
     entry = next(e for e in _REGISTRY.values() if e.name == "batch-compare-biomodels")
     doc = build_generator(entry, overrides={
-        "biomodel_ids": list(ids),
-        "simulators":   list(simulators),
+        "biomodel_ids":          list(ids),
+        "simulators":            list(simulators),
+        "reference_results_dir": reference_results_dir or "",
+        "reference_simulators":  list(reference_simulators or []),
     })
     composite = Composite(doc, core=core)
     composite.run(0.0)
@@ -53,15 +55,25 @@ def main() -> int:
     ap.add_argument("-n", "--number-of-models", type=int, default=10)
     ap.add_argument("--simulators", default=None,
                     help="comma-separated; default = all installed engines")
+    ap.add_argument("--reference-results-dir", default="",
+                    help="BioSimulators reference dataset dir (containing BIOMD*/); "
+                         "when set, reference:<engine> joins the comparison")
+    ap.add_argument("--reference-simulators", default=None,
+                    help="comma-separated reference engines to load; default = all present")
     ap.add_argument("--out", type=Path,
                     default=root / ".pbg" / "last_batch_results.json")
     args = ap.parse_args()
 
     ids = [f"BIOMD{n:010d}" for n in range(1, args.number_of_models + 1)]
     sims = resolve_simulators(args.simulators) if args.simulators else list(ALL_SIMULATORS)
+    ref_sims = (args.reference_simulators.split(",") if args.reference_simulators else None)
+    if args.reference_results_dir:
+        print(f"Reference results from {args.reference_results_dir} "
+              f"(engines: {ref_sims or 'all present'})")
     print(f"Running {len(ids)} model(s) under {sims} ...")
 
-    store = run(ids, sims)
+    store = run(ids, sims, reference_results_dir=args.reference_results_dir,
+                reference_simulators=ref_sims)
     args.out.parent.mkdir(parents=True, exist_ok=True)
     args.out.write_text(json.dumps(store), encoding="utf-8")
 

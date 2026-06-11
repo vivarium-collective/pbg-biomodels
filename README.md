@@ -15,10 +15,13 @@ turning any BioModel into a ready-to-plug process-bigraph module.
 
 **[BioModels batch comparison — first 10 models →](https://vivarium-collective.github.io/pbg-biomodels/)**
 
-An interactive overlay of COPASI vs Tellurium vs simbio vs AMICI across the
-first ten BioModels: per-observable trajectory overlays (with a stable color
-per simulator), the all-pairs nRMSE matrix, and per-run diagnostics. Published
-to GitHub Pages from [`reports/batch_compare_first10.html`](reports/batch_compare_first10.html).
+An interactive overlay of the live engines (COPASI, Tellurium, simbio) against
+the **BioSimulators SED-ML reference results** (`reference:copasi`,
+`reference:tellurium`, `reference:amici`, `reference:vcell`, `reference:pysces`)
+across the first ten BioModels: per-observable trajectory overlays (with a
+stable color per engine), the all-pairs nRMSE matrix — reference engines
+included — and per-run diagnostics. Published to GitHub Pages from
+[`reports/batch_compare_first10.html`](reports/batch_compare_first10.html).
 
 ## CLI
 

@@ -108,6 +108,19 @@ def _ss_to_results(payload: Dict[str, Any]) -> Dict[str, Any]:
     return {sp: [float(v)] for sp, v in (result.get("observables") or {}).items()}
 
 
+def effective_n_points(job: Dict[str, Any], ref_n_points: Any) -> int:
+    """Sample count for a UTC job.
+
+    When a reference grid count is supplied (``ref_grid[bid][job]``), it wins so
+    the live engine samples on the same grid as the BioSimulators reference and
+    the index-aligned comparison is meaningful. Otherwise the job's own
+    ``n_points`` (or the structural default of 2) is used.
+    """
+    if ref_n_points:
+        return int(ref_n_points)
+    return int((job or {}).get("n_points") or 2)
+
+
 class SimulatorRunnerStep(Step):
     """Run every SED-ML job of every biomodel under one configured simulator.
 
@@ -142,7 +155,10 @@ class SimulatorRunnerStep(Step):
     }
 
     def inputs(self) -> Dict[str, str]:
-        return {"models": "map[biomodel_jobs]"}
+        # `ref_grid` is the optional reference sample-count map written by
+        # LoadReferenceResultsStep (`{bid: {job: n_points}}`); empty when the
+        # reference feature is off, in which case the job's own n_points is used.
+        return {"models": "map[biomodel_jobs]", "ref_grid": "tree"}
 
     def outputs(self) -> Dict[str, str]:
         # `tree` (not `biomodel_results = map[map[map[results]]]`) because the
@@ -171,16 +187,19 @@ class SimulatorRunnerStep(Step):
         prov = provenance.simulator_provenance(name)
         t_total = time.perf_counter()
 
+        ref_grid = state.get("ref_grid") or {}
+
         out: Dict[str, Dict[str, Dict[str, Any]]] = {}
         runs: Dict[str, Dict[str, Dict[str, Any]]] = {}
         for bid, model in (state.get("models") or {}).items():
             out[bid] = {}
             runs[bid] = {}
+            ref_for_bid = ref_grid.get(bid) or {}
             sbml_path = (model or {}).get("sbml_path") or ""
             for job in (model or {}).get("sedml_jobs") or []:
                 job_name = job.get("name") or "sim"
                 kind = job.get("kind")
-                n_points = int(job.get("n_points") or 2)
+                n_points = effective_n_points(job, ref_for_bid.get(job_name))
                 status, error = "ok", ""
                 t0 = time.perf_counter()
                 try:
