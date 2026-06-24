@@ -25,7 +25,67 @@ from typing import Any, Dict, List
 from plotly.offline import get_plotlyjs
 
 from pbg_biomodels import result_leaf
+from pbg_biomodels.comparison import bucket_for
 from pbg_superpowers.visualization import Visualization
+
+
+# nRMSE at/below which two engines are treated as agreeing (matches the "good"
+# bucket boundary in pbg_biomodels.comparison.BUCKET_THRESHOLDS).
+_AGREE_NRMSE = 0.01
+
+
+def _is_reference(name: str) -> bool:
+    return str(name).startswith("reference:")
+
+
+def _ref_engine(name: str) -> str:
+    """``"reference:amici"`` → ``"amici"`` (the live-engine it mirrors)."""
+    return str(name).split("reference:", 1)[-1]
+
+
+def _engine_analysis(comparison: Dict[str, Any]) -> Dict[str, Any]:
+    """Split a comparison's pairwise matrix into the three analysis lenses.
+
+    Returns:
+        pbg_pbg_max / pbg_pbg_worst — worst nRMSE among LIVE (pbg-wrapped)
+            engine pairs only (reference engines excluded);
+        self_match — {engine: nRMSE} for each live engine that also has a
+            ``reference:<engine>`` result, i.e. does our wrapper reproduce the
+            canonical BioSimulators reference for the SAME engine;
+        self_max / self_worst — worst self-match across engines.
+    """
+    matrix = (comparison or {}).get("matrix") or {}
+    engines = list((comparison or {}).get("engines") or matrix.keys())
+    live = [e for e in engines if not _is_reference(e)]
+    refs = {_ref_engine(e) for e in engines if _is_reference(e)}
+
+    # pbg ↔ pbg: worst nRMSE among live-engine pairs.
+    pbg_pbg_max = None
+    pbg_pbg_worst = None
+    for i, a in enumerate(live):
+        for b in live[i + 1:]:
+            v = (matrix.get(a) or {}).get(b)
+            if v is not None and (pbg_pbg_max is None or v > pbg_pbg_max):
+                pbg_pbg_max, pbg_pbg_worst = v, [a, b]
+
+    # pbg ↔ own reference: each live engine vs reference:<engine>.
+    self_match: Dict[str, float] = {}
+    for e in live:
+        if e in refs:
+            v = (matrix.get(e) or {}).get(f"reference:{e}")
+            if v is not None:
+                self_match[e] = v
+    self_max = max(self_match.values()) if self_match else None
+    self_worst = (
+        max(self_match, key=self_match.get) if self_match else None
+    )
+    return {
+        "pbg_pbg_max": pbg_pbg_max,
+        "pbg_pbg_worst": pbg_pbg_worst,
+        "self_match": self_match,
+        "self_max": self_max,
+        "self_worst": self_worst,
+    }
 
 
 _BUCKET_COLOR = {
@@ -46,6 +106,7 @@ _SIMULATOR_COLORS = {
     "tellurium": "#ff7f0e",
     "simbio":    "#2ca02c",
     "amici":     "#d62728",
+    "pysces":    "#9467bd",
 }
 _FALLBACK_COLORS = ["#9467bd", "#8c564b", "#e377c2", "#17becf", "#bcbd22"]
 
@@ -194,14 +255,30 @@ def _overview_row(
     n_ok: int,
     n_failed: int,
 ) -> str:
-    """One overview-table row for a single (biomodel_id, sedml_job_id)."""
-    bucket = (comparison or {}).get("bucket") or "none"
-    label = (comparison or {}).get("bucket_label") or "No comparison"
-    max_n = (comparison or {}).get("max_nrmse")
-    max_str = f"{max_n:.4g}" if isinstance(max_n, (int, float)) else "—"
+    """One overview-table row for a single (biomodel_id, sedml_job_id).
+
+    The model is classified by its worst pbg↔pbg agreement (cross-engine
+    divergence among our wrappers); the pbg↔reference self-match is shown
+    alongside as a separate regression signal.
+    """
+    analysis = _engine_analysis(comparison)
+    pbg = analysis["pbg_pbg_max"]
+    self_n = analysis["self_max"]
+    bucket, label = bucket_for(pbg)
     color = _BUCKET_COLOR.get(bucket, "#5d6573")
+
+    def _cell(val, worst):
+        if not isinstance(val, (int, float)):
+            return '<td style="padding:6px 10px;text-align:right;color:#999;">—</td>'
+        tip = f' title="worst: {worst}"' if worst else ""
+        hot = "#b3261e" if val > 0.10 else ("#b8741a" if val > 0.01 else "#1b6e3c")
+        return (f'<td style="padding:6px 10px;text-align:right;color:{hot};"{tip}>'
+                f'{val:.4g}</td>')
+
     fail_color = "#b3261e" if n_failed else "#444"
     fail_weight = "600" if n_failed else "400"
+    pbg_worst = analysis["pbg_pbg_worst"]
+    worst_lbl = " vs ".join(pbg_worst) if pbg_worst else ""
     return (
         '<tr style="border-bottom:1px solid #eef0f2;">'
         f'<td style="padding:6px 10px;font-weight:600;">{bid}</td>'
@@ -209,7 +286,8 @@ def _overview_row(
         f'<td style="padding:6px 10px;"><span style="display:inline-block;'
         f'width:9px;height:9px;border-radius:50%;background:{color};'
         f'margin-right:6px;"></span>{label}</td>'
-        f'<td style="padding:6px 10px;text-align:right;">{max_str}</td>'
+        + _cell(pbg, worst_lbl)
+        + _cell(self_n, analysis["self_worst"]) +
         f'<td style="padding:6px 10px;text-align:right;">{n_ok}</td>'
         f'<td style="padding:6px 10px;text-align:right;color:{fail_color};'
         f'font-weight:{fail_weight};">{n_failed}</td>'
@@ -327,10 +405,138 @@ def _diagnostics_tab_html(diagnostics: Dict[str, Any]) -> str:
     )
 
 
+def _fmt_n(v) -> str:
+    return f"{v:.4g}" if isinstance(v, (int, float)) else "—"
+
+
+def _nrmse_color(v) -> str:
+    if not isinstance(v, (int, float)):
+        return "#999"
+    return "#b3261e" if v > 0.10 else ("#b8741a" if v > 0.01 else "#1b6e3c")
+
+
+def _cross_engine_tab_html(comparisons: Dict[str, Any], ids: List[str]) -> str:
+    """Two rollups across all models, computed from the stored pairwise matrices.
+
+    1. **pbg ↔ reference self-consistency** — for each live engine that also has
+       a ``reference:<engine>`` result, how well our wrapper reproduces the
+       canonical BioSimulators reference (per-engine, across models).
+    2. **within-pbg cross-engine divergence** — a median pairwise nRMSE matrix
+       among the live (pbg-wrapped) engines.
+    """
+    import statistics
+
+    self_by_engine: Dict[str, List[tuple]] = {}   # engine -> [(nrmse, bid), ...]
+    pair_vals: Dict[tuple, List[float]] = {}        # (a,b) live pair -> [nrmse...]
+    live_engines: set = set()
+
+    for bid in ids:
+        for doc, comparison in (comparisons.get(bid) or {}).items():
+            a = _engine_analysis(comparison)
+            for eng, v in a["self_match"].items():
+                self_by_engine.setdefault(eng, []).append((v, bid))
+            matrix = (comparison or {}).get("matrix") or {}
+            engines = [e for e in ((comparison or {}).get("engines") or [])
+                       if not _is_reference(e)]
+            live_engines.update(engines)
+            for i, x in enumerate(engines):
+                for y in engines[i + 1:]:
+                    val = (matrix.get(x) or {}).get(y)
+                    if val is not None:
+                        pair_vals.setdefault(tuple(sorted((x, y))), []).append(val)
+
+    # --- Table 1: self-consistency ---
+    rows1 = []
+    for eng in sorted(self_by_engine):
+        vals = [v for v, _ in self_by_engine[eng]]
+        agree = sum(1 for v in vals if v <= _AGREE_NRMSE)
+        drift = len(vals) - agree
+        med = statistics.median(vals) if vals else None
+        worst_v, worst_bid = max(self_by_engine[eng]) if vals else (None, "—")
+        rows1.append(
+            '<tr style="border-bottom:1px solid #eef0f2;">'
+            f'<td style="padding:6px 10px;font-weight:600;">{eng}</td>'
+            f'<td style="padding:6px 10px;text-align:right;">{len(vals)}</td>'
+            f'<td style="padding:6px 10px;text-align:right;color:#1b6e3c;">{agree}</td>'
+            f'<td style="padding:6px 10px;text-align:right;color:'
+            f'{"#b3261e" if drift else "#444"};">{drift}</td>'
+            f'<td style="padding:6px 10px;text-align:right;color:{_nrmse_color(med)};">'
+            f'{_fmt_n(med)}</td>'
+            f'<td style="padding:6px 10px;text-align:right;color:{_nrmse_color(worst_v)};">'
+            f'{_fmt_n(worst_v)} <span style="color:#888;">({worst_bid})</span></td>'
+            '</tr>'
+        )
+    head1 = (
+        '<tr style="text-align:left;border-bottom:2px solid #d0d4d9;'
+        'font-size:12px;color:#555;">'
+        '<th style="padding:6px 10px;">Engine</th>'
+        '<th style="padding:6px 10px;text-align:right;">Models</th>'
+        '<th style="padding:6px 10px;text-align:right;">Agree (≤1%)</th>'
+        '<th style="padding:6px 10px;text-align:right;">Drift (>1%)</th>'
+        '<th style="padding:6px 10px;text-align:right;">Median nRMSE</th>'
+        '<th style="padding:6px 10px;text-align:right;">Worst (model)</th>'
+        '</tr>'
+    )
+    body1 = "".join(rows1) or ('<tr><td colspan="6" style="padding:10px;color:#888;">'
+                               'No engine has both a live run and a reference result.'
+                               '</td></tr>')
+    table1 = (
+        '<table style="border-collapse:collapse;width:100%;font-size:13px;'
+        'font-family:-apple-system,sans-serif;">'
+        f'<thead>{head1}</thead><tbody>{body1}</tbody></table>'
+    )
+
+    # --- Table 2: within-pbg median pairwise matrix ---
+    order = sorted(live_engines)
+    head2 = ('<tr style="font-size:12px;color:#555;"><th style="padding:6px 10px;">'
+             '</th>' + "".join(
+                 f'<th style="padding:6px 10px;text-align:right;">{e}</th>'
+                 for e in order) + '</tr>')
+    rows2 = []
+    for a in order:
+        cells = [f'<td style="padding:6px 10px;font-weight:600;">{a}</td>']
+        for b in order:
+            if a == b:
+                cells.append('<td style="padding:6px 10px;text-align:right;'
+                             'color:#ccc;">·</td>')
+                continue
+            vals = pair_vals.get(tuple(sorted((a, b))))
+            med = statistics.median(vals) if vals else None
+            cells.append(f'<td style="padding:6px 10px;text-align:right;'
+                         f'color:{_nrmse_color(med)};">{_fmt_n(med)}</td>')
+        rows2.append('<tr style="border-bottom:1px solid #f3f4f6;">'
+                     + "".join(cells) + '</tr>')
+    table2 = (
+        '<table style="border-collapse:collapse;font-size:13px;'
+        'font-family:-apple-system,sans-serif;">'
+        f'<thead>{head2}</thead><tbody>{"".join(rows2)}</tbody></table>'
+    ) if order else '<div style="color:#888;">No live engines.</div>'
+
+    return (
+        '<div style="font-family:-apple-system,sans-serif;">'
+        '<h4 style="margin:4px 0 4px 0;">pbg ↔ reference self-consistency</h4>'
+        '<div style="font-size:12px;color:#666;margin-bottom:8px;">'
+        'Does each pbg wrapper reproduce its own BioSimulators reference engine? '
+        'Per-engine nRMSE between the live <code>pbg</code> run and '
+        '<code>reference:&lt;engine&gt;</code>, across models. High drift means '
+        'the wrapper diverges from the canonical reference.</div>'
+        + table1 +
+        '<h4 style="margin:20px 0 4px 0;">within-pbg cross-engine divergence</h4>'
+        '<div style="font-size:12px;color:#666;margin-bottom:8px;">'
+        'Median pairwise nRMSE among the live pbg-wrapped engines (references '
+        'excluded) — how much our simulators differ from one another.</div>'
+        + table2 +
+        '</div>'
+    )
+
+
 def _overview_table_html(rows: List[str]) -> str:
-    """The Overview tab: a (biomodel × sedml-job) summary table."""
+    """The Overview tab: a (biomodel × sedml-job) summary table.
+
+    Classified by pbg↔pbg agreement; pbg↔reference self-match shown alongside.
+    """
     if not rows:
-        body = ('<tr><td colspan="6" style="padding:10px;color:#888;">'
+        body = ('<tr><td colspan="7" style="padding:10px;color:#888;">'
                 'No results.</td></tr>')
     else:
         body = "".join(rows)
@@ -339,8 +545,12 @@ def _overview_table_html(rows: List[str]) -> str:
         'font-size:12px;color:#555;">'
         '<th style="padding:6px 10px;">Biomodel</th>'
         '<th style="padding:6px 10px;">SED-ML job</th>'
-        '<th style="padding:6px 10px;">Status</th>'
-        '<th style="padding:6px 10px;text-align:right;">Worst nRMSE</th>'
+        '<th style="padding:6px 10px;">Status (pbg↔pbg)</th>'
+        '<th style="padding:6px 10px;text-align:right;" '
+        'title="Worst nRMSE among live pbg-wrapped engines">pbg↔pbg</th>'
+        '<th style="padding:6px 10px;text-align:right;" '
+        'title="Worst nRMSE of a pbg engine vs its own BioSimulators reference">'
+        'pbg↔ref (self)</th>'
         '<th style="padding:6px 10px;text-align:right;">Simulators OK</th>'
         '<th style="padding:6px 10px;text-align:right;">Simulators failed</th>'
         '</tr>'
@@ -532,6 +742,10 @@ class BatchCompareOverlay(Visualization):
             'style="padding:6px 14px;font-size:13px;background:none;border:none;'
             'border-bottom:2px solid #1b6e3c;font-weight:600;cursor:pointer;">'
             'Overview</button>'
+            '<button class="batch-toptab" data-target="batch-crossengine" '
+            'style="padding:6px 14px;font-size:13px;background:none;border:none;'
+            'border-bottom:2px solid transparent;cursor:pointer;">'
+            'Cross-engine</button>'
             '<button class="batch-toptab" data-target="batch-detail" '
             'style="padding:6px 14px;font-size:13px;background:none;border:none;'
             'border-bottom:2px solid transparent;cursor:pointer;">'
@@ -547,6 +761,11 @@ class BatchCompareOverlay(Visualization):
             + _overview_table_html(overview_rows) +
             '</div>'
         )
+        crossengine_pane = (
+            '<div id="batch-crossengine" class="batch-toppane" style="display:none;">'
+            + _cross_engine_tab_html(comparisons, ids) +
+            '</div>'
+        )
         detail_pane = (
             '<div id="batch-detail" class="batch-toppane" style="display:none;">'
             '<div class="biomodel-list" style="'
@@ -560,7 +779,8 @@ class BatchCompareOverlay(Visualization):
             '</div>'
         )
         return {"html": (
-            f'<div>{title_html}{top_tabs}{overview_pane}{detail_pane}{diagnostics_pane}'
+            f'<div>{title_html}{top_tabs}{overview_pane}{crossengine_pane}'
+            f'{detail_pane}{diagnostics_pane}'
             f'<script>{get_plotlyjs()}</script>'
             f'<script>{_TOGGLE_JS}</script>'
             '</div>'

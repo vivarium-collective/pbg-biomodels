@@ -167,3 +167,47 @@ def test_overlay_with_no_results_returns_placeholder():
     )
     out = viz.update({"results": {}, "comparisons": {}})
     assert "No biomodels" in out["html"]
+
+
+def test_engine_analysis_splits_pbg_and_reference():
+    """_engine_analysis separates pbg↔pbg divergence from pbg↔reference self-match."""
+    from pbg_biomodels.visualizations import batch_compare_overlay as bco
+    # matrix: live engines copasi/tellurium/simbio + references for copasi/tellurium.
+    comparison = {
+        "engines": ["copasi", "tellurium", "simbio",
+                    "reference:copasi", "reference:tellurium", "reference:vcell"],
+        "matrix": {
+            "copasi":              {"tellurium": 0.02, "simbio": 0.30,
+                                    "reference:copasi": 0.001, "reference:tellurium": 0.05},
+            "tellurium":           {"copasi": 0.02, "simbio": 0.25,
+                                    "reference:tellurium": 0.002},
+            "simbio":              {"copasi": 0.30, "tellurium": 0.25},
+            "reference:copasi":    {"copasi": 0.001},
+            "reference:tellurium": {"tellurium": 0.002, "copasi": 0.05},
+            "reference:vcell":     {},
+        },
+    }
+    a = bco._engine_analysis(comparison)
+    # pbg↔pbg worst is copasi vs simbio (0.30) — references excluded.
+    assert a["pbg_pbg_max"] == 0.30
+    assert sorted(a["pbg_pbg_worst"]) == ["copasi", "simbio"]
+    # self-match only for engines having BOTH a live run and reference:<engine>.
+    assert a["self_match"] == {"copasi": 0.001, "tellurium": 0.002}
+    assert a["self_max"] == 0.002
+    assert "simbio" not in a["self_match"]  # no reference:simbio
+
+
+def test_cross_engine_tab_renders_rollups():
+    from pbg_biomodels.visualizations import batch_compare_overlay as bco
+    comparisons = {
+        "BIOMD1": {"job": {
+            "engines": ["copasi", "tellurium", "reference:copasi"],
+            "matrix": {"copasi": {"tellurium": 0.2, "reference:copasi": 0.001},
+                       "tellurium": {"copasi": 0.2},
+                       "reference:copasi": {"copasi": 0.001}},
+        }},
+    }
+    html = bco._cross_engine_tab_html(comparisons, ["BIOMD1"])
+    assert "self-consistency" in html
+    assert "within-pbg" in html
+    assert "copasi" in html

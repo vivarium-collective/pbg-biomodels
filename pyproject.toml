@@ -50,6 +50,11 @@ batch = ["pbest"]  # used by run_biomodels CLI / batch tooling
 # burden the base install / CI. Install with `pip install -e ".[amici]"` to
 # add it to the default simulator set.
 amici = ["pbg-amici"]
+# PySCeS as a comparison engine. Optional like amici: PySCeS reads its own PSC
+# format (SBML is converted via libSBML on first use), and it adds the heavier
+# pysces dependency. Install with `pip install -e ".[pysces]"` to add it to the
+# default simulator set.
+pysces = ["pbg-pysces"]
 
 [project.scripts]
 pbg-biomodels = "pbg_biomodels.cli:main"
@@ -60,6 +65,7 @@ pbg-tellurium = { path = "../pbg-tellurium", editable = true }
 pbg-copasi = { path = "../pbg-copasi", editable = true }
 pbg-simbio = { path = "../pbg-simbio", editable = true }
 pbg-amici = { path = "../pbg-amici", editable = true }
+pbg-pysces = { path = "../pbg-pysces", editable = true }
 
 [build-system]
 requires = ["hatchling"]
