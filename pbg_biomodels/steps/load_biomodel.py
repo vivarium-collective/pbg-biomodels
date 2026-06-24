@@ -43,7 +43,12 @@ class LoadBiomodelStep(Step):
         the bundle's ``run_biomodels`` uses, so the cache is shared.
     """
 
-    config_schema: ClassVar[Dict[str, str]] = {}
+    config_schema: ClassVar[Dict[str, Any]] = {
+        # When true, append a synthetic steady-state job to every model that
+        # doesn't already declare one in its SED-ML, so each model gets a
+        # steady-state comparison in addition to its time course.
+        "auto_steady_state": {"_type": "boolean", "_default": False},
+    }
 
     def inputs(self) -> Dict[str, str]:
         return {"biomodel_id": "string"}
@@ -82,6 +87,19 @@ class LoadBiomodelStep(Step):
         # Parse every SED-ML simulation for the new sedml_jobs output.
         sed_doc = read_sedml_doc(result.sedml_path)
         jobs = extract_all_simulations(sed_doc)
+
+        # Optionally guarantee a steady-state job: most BioModels SED-ML declare
+        # only a time course, so without this every model is UTC-only. The
+        # runner dispatches kind="steady_state" to each engine's SteadyStateStep.
+        if self.config.get("auto_steady_state") and not any(
+            j.get("kind") == "steady_state" for j in jobs
+        ):
+            jobs.append({
+                "name": "auto_steady_state",
+                "kind": "steady_state",
+                "time": None,
+                "n_points": None,
+            })
 
         # Back-compat outputs — populated from the first UTC job if any.
         first_utc = next((j for j in jobs if j["kind"] == "utc"), None)

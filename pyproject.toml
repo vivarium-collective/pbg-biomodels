@@ -55,6 +55,10 @@ amici = ["pbg-amici"]
 # pysces dependency. Install with `pip install -e ".[pysces]"` to add it to the
 # default simulator set.
 pysces = ["pbg-pysces"]
+# Scale-out: Ray fan-out runner (ray_runner) + two-tier parquet storage
+# (two_tier / lazy_viewer) for running the full BioModels set. Install with
+# `pip install -e ".[scale]"`.
+scale = ["ray", "pyarrow"]
 
 [project.scripts]
 pbg-biomodels = "pbg_biomodels.cli:main"
