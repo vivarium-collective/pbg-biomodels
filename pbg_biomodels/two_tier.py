@@ -1,0 +1,155 @@
+"""Two-tier storage for large-scale batch comparisons.
+
+The flat ``results[bid][job][engine]`` store embeds every time series inline,
+which is ~99% of the bytes and does not scale (1054 models ≈ 6 GB JSON, a
+~700 MB HTML that won't open). This module splits the store into:
+
+* a compact **index.json** — per (model, job): the pairwise comparison matrix,
+  bucket, and the pbg↔pbg / pbg↔reference analysis. ~tens of KB/model, so all
+  1054 models fit in ~70 MB. Drives the sortable overview + cross-engine tables.
+* per-model **series/<bid>.parquet** — the time series in tidy long form
+  (job, engine, variable, time, value), downsampled + float32, dictionary-
+  compressed. ~30-50 KB/model, lazy-fetched only when a model is opened.
+
+Both the offline converter (existing full stores) and the Ray runner write
+through ``write_model`` / ``finalize_index`` so the 6 GB monolith is never
+materialized.
+"""
+from __future__ import annotations
+
+import json
+from pathlib import Path
+from typing import Any, Dict, List, Optional
+
+import pyarrow as pa
+import pyarrow.parquet as pq
+
+
+def _thin(seq: List[float], max_points: int) -> List[float]:
+    n = len(seq)
+    if n <= max_points:
+        return seq
+    stride = n / max_points
+    return [seq[int(i * stride)] for i in range(max_points)]
+
+
+def series_table(model_results: Dict[str, Any], max_points: int = 200) -> pa.Table:
+    """Flatten one model's ``{job: {engine: {var: [...], time: [...]}}}`` to a
+    tidy Arrow table (job, engine, variable, time, value), downsampled + f32.
+    """
+    jobs: List[str] = []
+    engines: List[str] = []
+    variables: List[str] = []
+    times: List[float] = []
+    values: List[float] = []
+    nan = float("nan")
+    for job, engine_map in (model_results or {}).items():
+        for engine, leaf in (engine_map or {}).items():
+            if not leaf:
+                continue
+            # steady-state leaves omit "time"; mark their rows with NaN time so
+            # the reader can distinguish them from a time course on round-trip.
+            is_ss = "time" not in leaf
+            t = _thin([float(x) for x in (leaf.get("time") or [])], max_points)
+            for var, ys in leaf.items():
+                if var == "time" or not isinstance(ys, list):
+                    continue
+                yv = _thin([float(x) for x in ys], max_points)
+                if is_ss:
+                    tv = [nan] * len(yv)
+                    m = len(yv)
+                else:
+                    m = min(len(t), len(yv))
+                    tv = t[:m]
+                jobs.extend([job] * m)
+                engines.extend([engine] * m)
+                variables.extend([var] * m)
+                times.extend(tv[:m])
+                values.extend(yv[:m])
+    return pa.table({
+        # dictionary-encode the highly-repeated label columns.
+        "job": pa.array(jobs).dictionary_encode(),
+        "engine": pa.array(engines).dictionary_encode(),
+        "variable": pa.array(variables).dictionary_encode(),
+        "time": pa.array(times, type=pa.float32()),
+        "value": pa.array(values, type=pa.float32()),
+    })
+
+
+def write_model(
+    bid: str,
+    model_results: Dict[str, Any],
+    model_comparisons: Dict[str, Any],
+    out_dir: Path,
+    max_points: int = 200,
+) -> Dict[str, Any]:
+    """Write ``series/<bid>.parquet`` and return this model's index entry.
+
+    The index entry carries everything the overview + cross-engine tables need
+    (per-job comparison matrix, engines, ok/failed counts) — no time series.
+    """
+    series_dir = out_dir / "series"
+    series_dir.mkdir(parents=True, exist_ok=True)
+    table = series_table(model_results, max_points=max_points)
+    pq.write_table(table, series_dir / f"{bid}.parquet", compression="zstd")
+
+    jobs_entry: Dict[str, Any] = {}
+    for job, engine_map in (model_results or {}).items():
+        leaves = engine_map or {}
+        n_ok = sum(1 for v in leaves.values() if v)
+        n_failed = sum(1 for v in leaves.values() if not v)
+        comp = (model_comparisons or {}).get(job) or {}
+        jobs_entry[job] = {
+            "engines": comp.get("engines") or sorted(leaves.keys()),
+            "matrix": comp.get("matrix") or {},
+            "max_nrmse": comp.get("max_nrmse"),
+            "bucket": comp.get("bucket"),
+            "n_ok": n_ok,
+            "n_failed": n_failed,
+            # kind: "utc" if any leaf carries a time vector, else "steady_state".
+            "kind": _job_kind(leaves),
+        }
+    return {"id": bid, "jobs": jobs_entry, "has_series": table.num_rows > 0}
+
+
+def _job_kind(leaves: Dict[str, Any]) -> str:
+    for leaf in (leaves or {}).values():
+        if leaf and isinstance(leaf, dict) and leaf.get("time"):
+            return "utc"
+    return "steady_state" if leaves else "none"
+
+
+def finalize_index(
+    entries: List[Dict[str, Any]],
+    out_dir: Path,
+    meta: Optional[Dict[str, Any]] = None,
+    diagnostics: Optional[Dict[str, Any]] = None,
+) -> Path:
+    """Write the compact index.json for all models."""
+    index = {
+        "models": {e["id"]: {"jobs": e["jobs"], "has_series": e.get("has_series")}
+                   for e in entries if e},
+        "meta": meta or {},
+        "diagnostics": diagnostics or {},
+    }
+    out = out_dir / "index.json"
+    out.write_text(json.dumps(index), encoding="utf-8")
+    return out
+
+
+def convert_store(store_path: str, out_dir: str, max_points: int = 200) -> Dict[str, Any]:
+    """Offline: split an existing flat store JSON into the two-tier layout."""
+    store = json.loads(Path(store_path).read_text(encoding="utf-8"))
+    out = Path(out_dir)
+    out.mkdir(parents=True, exist_ok=True)
+    results = store.get("results") or {}
+    comparisons = store.get("comparisons") or {}
+    entries = [
+        write_model(bid, results.get(bid) or {}, comparisons.get(bid) or {}, out, max_points)
+        for bid in results
+    ]
+    diag = store.get("diagnostics") or {}
+    meta = {"n_models": len(entries), "ids": list(results.keys()),
+            "crashed_models": (diag.get("meta") or {}).get("crashed_models") or []}
+    finalize_index(entries, out, meta=meta, diagnostics=diag)
+    return {"n_models": len(entries), "out_dir": str(out)}

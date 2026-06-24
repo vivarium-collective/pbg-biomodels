@@ -99,6 +99,17 @@ VIZ_STEP_ADDRESS     = "local:pbg_biomodels.visualizations.batch_compare_overlay
                 "on disk for each model. Ignored unless reference_results_dir is set."
             ),
         },
+        "include_steady_state": {
+            "type": "boolean",
+            "default": False,
+            "description": (
+                "Also run a steady-state comparison for every model. Appends a "
+                "synthetic steady-state job (when the SED-ML declares none), "
+                "dispatched to each engine's SteadyStateStep. BioSimulators "
+                "reference data is time-course only, so steady-state jobs compare "
+                "live (pbg) engines among themselves."
+            ),
+        },
     },
     default_n_steps=1,
 )
@@ -111,6 +122,7 @@ def build_batch_compare_biomodels(
     simbio_atol: float = 1.0e-9,
     reference_results_dir: str = "",
     reference_simulators: List[str] | None = None,
+    include_steady_state: bool = False,
     with_emitter: bool = True,
     emitter_address: str = "local:RAMEmitter",
 ) -> Dict[str, Any]:
@@ -137,7 +149,7 @@ def build_batch_compare_biomodels(
         state[f"load_{bid}"] = {
             "_type":   "step",
             "address": LOAD_STEP_ADDRESS,
-            "config":  {},
+            "config":  {"auto_steady_state": include_steady_state},
             "inputs":  {"biomodel_id": [f"biomodel_id_{bid}"]},
             "outputs": {
                 "sbml_path":  ["models", bid, "sbml_path"],
