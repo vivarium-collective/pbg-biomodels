@@ -65,11 +65,24 @@ _SIMULATORS: Dict[str, SimulatorSpec] = {
         "process_config": lambda sbml: {"sbml_file": sbml},
         "species_out": "states",
     },
+    # PySCeS bridges directly to the upstream pbg-pysces one-shot Steps (no
+    # local adapter) — PyscesUTCStep / PyscesSteadyStateStep already speak the
+    # model_source/time/n_points → {result} contract. PySCeS reads its own PSC
+    # format, so SBML is converted (via libSBML) and cached on first use; like
+    # amici, pbg-pysces is an optional extra that joins the default "all" set
+    # only when installed.
+    "pysces": {
+        "utc_step": "local:pbg_pysces.processes.PyscesUTCStep",
+        "steady_state_step": "local:pbg_pysces.processes.PyscesSteadyStateStep",
+        "process": "local:PyscesUTCProcess",
+        "process_config": lambda sbml: {"model_source": sbml},
+        "species_out": "species_concentrations",
+    },
 }
 
 #: Optional engines: included in the default "all" set only when their wrapper
 #: package is importable. Always explicitly selectable by name regardless.
-_OPTIONAL_BACKENDS: Dict[str, str] = {"amici": "pbg_amici"}
+_OPTIONAL_BACKENDS: Dict[str, str] = {"amici": "pbg_amici", "pysces": "pbg_pysces"}
 
 
 def _simulator_available(name: str) -> bool:
@@ -119,6 +132,7 @@ _PROCESS_CLASSES = {
     "tellurium": ("pbg_tellurium.processes", "TelluriumProcess"),
     "simbio": ("pbg_simbio.processes", "SimbioUTCProcess"),
     "amici": ("pbg_amici.processes", "AmiciProcess"),
+    "pysces": ("pbg_pysces.processes", "PyscesUTCProcess"),
 }
 
 

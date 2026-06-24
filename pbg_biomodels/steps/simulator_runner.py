@@ -46,6 +46,9 @@ def _UTC_CLASS_FOR(simulator_name: str):
     if simulator_name == "amici":
         from pbg_amici.processes import AmiciUTCStep
         return AmiciUTCStep
+    if simulator_name == "pysces":
+        from pbg_pysces.processes import PyscesUTCStep
+        return PyscesUTCStep
     from pbg_biomodels.steps.simulators import (
         BiomodelsCopasiStep,
         BiomodelsSimbioStep,
@@ -67,6 +70,9 @@ def _SS_CLASS_FOR(simulator_name: str):
     if simulator_name == "amici":
         from pbg_amici.processes import AmiciSteadyStateStep
         return AmiciSteadyStateStep
+    if simulator_name == "pysces":
+        from pbg_pysces.processes import PyscesSteadyStateStep
+        return PyscesSteadyStateStep
     from pbg_biomodels.steps.simulators import (
         BiomodelsCopasiSteadyStateStep,
         BiomodelsSimbioSteadyStateStep,
