@@ -89,13 +89,11 @@ def compare_two_engines(
     else:
         mean_nrmse = None
 
-    if mean_nrmse is None:
-        bucket_id, bucket_label = NO_COMPARISON_BUCKET
-    else:
-        for bid, threshold, label in BUCKET_THRESHOLDS:
-            if mean_nrmse <= threshold:
-                bucket_id, bucket_label = bid, label
-                break
+    # NB: delegate to bucket_for, which has the final fallback. The inline loop
+    # used to omit it, so a NaN mean_nrmse (from series that diverge to inf/NaN,
+    # e.g. a non-convergent steady state) matched no threshold — `nan <= inf` is
+    # False — leaving bucket_id unbound and crashing the whole task.
+    bucket_id, bucket_label = bucket_for(mean_nrmse)
 
     return {
         "n_shared": n_shared,

@@ -111,12 +111,40 @@ def _overview_rows(index: Dict[str, Any]) -> str:
     return "".join(rows)
 
 
-def _page(index: Dict[str, Any]) -> str:
+def _page(index: Dict[str, Any], static: bool = False) -> str:
     meta = index.get("meta") or {}
     n = len(index.get("models") or {})
     crashed = meta.get("crashed_models") or []
     cross = bco._cross_engine_tab_html(_index_to_comparisons(index),
                                        list((index.get("models") or {}).keys()))
+    # Server mode hits /api/* endpoints; static mode fetches a pre-rendered
+    # figures/<bid>.json ({job: plotly_fig}) sitting next to index.html.
+    if static:
+        open_js = (
+            "function openModel(row,bid){var d=row.nextElementSibling;"
+            "var open=d.style.display!=='none';d.style.display=open?'none':'';"
+            "if(open)return;var box=document.getElementById('detail-'+bid);"
+            "if(box.dataset.loaded)return;box.textContent='loading…';"
+            "fetch('figures/'+bid+'.json').then(r=>r.json()).then(function(figs){"
+            "box.innerHTML='';box.dataset.loaded='1';"
+            "Object.keys(figs).forEach(function(job){var div=document.createElement('div');"
+            "div.id='plot-'+bid+'-'+job;box.appendChild(div);var fig=figs[job];"
+            "Plotly.newPlot(div.id,fig.data,fig.layout,{responsive:true,displaylogo:false});});"
+            "}).catch(function(){box.textContent='no series for this model';});}"
+        )
+    else:
+        open_js = (
+            "function openModel(row,bid){var d=row.nextElementSibling;"
+            "var open=d.style.display!=='none';d.style.display=open?'none':'';"
+            "if(open)return;var box=document.getElementById('detail-'+bid);"
+            "if(box.dataset.loaded)return;box.textContent='loading…';"
+            "fetch('/api/jobs/'+bid).then(r=>r.json()).then(function(jobs){"
+            "box.innerHTML='';box.dataset.loaded='1';"
+            "jobs.forEach(function(job){var div=document.createElement('div');"
+            "div.id='plot-'+bid+'-'+job;box.appendChild(div);"
+            "fetch('/api/figure/'+bid+'?job='+encodeURIComponent(job)).then(r=>r.json())"
+            ".then(function(fig){Plotly.newPlot(div.id,fig.data,fig.layout,{responsive:true,displaylogo:false});});});});}"
+        )
     return f"""<!doctype html><html><head><meta charset="utf-8">
 <title>BioModels comparison — {n} models</title>
 <style>
@@ -174,17 +202,7 @@ function sortBy(col,type){{var body=document.getElementById('ovbody');
   if(type==='pbg'||type==='self'){{return parseFloat(b.dataset[type])-parseFloat(a.dataset[type]);}}
   return a.children[col].textContent.localeCompare(b.children[col].textContent);}});
  rows.forEach(function(r){{body.appendChild(r);body.appendChild(r.nextElementSibling);}});}}
-function openModel(row,bid){{var d=row.nextElementSibling;
- var open=d.style.display!=='none';d.style.display=open?'none':'';
- if(open)return;
- var box=document.getElementById('detail-'+bid);
- if(box.dataset.loaded)return; box.textContent='loading…';
- fetch('/api/jobs/'+bid).then(r=>r.json()).then(function(jobs){{
-  box.innerHTML=''; box.dataset.loaded='1';
-  jobs.forEach(function(job){{var div=document.createElement('div');
-   div.id='plot-'+bid+'-'+job; box.appendChild(div);
-   fetch('/api/figure/'+bid+'?job='+encodeURIComponent(job)).then(r=>r.json())
-    .then(function(fig){{Plotly.newPlot(div.id,fig.data,fig.layout,{{responsive:true,displaylogo:false}});}});}});}});}}
+{open_js}
 applyFilter();
 </script></body></html>"""
 
@@ -232,11 +250,212 @@ def serve(out_dir: str, port: int = 8900) -> None:
     httpd.serve_forever()
 
 
+def export_static(out_dir: str, dest: str) -> dict:
+    """Render a fully static site (no server) from two-tier output.
+
+    Writes ``dest/index.html`` (overview + cross-engine tables, sortable +
+    kind-filterable) and one ``dest/figures/<bid>.json`` ({job: plotly_fig}) per
+    model. Pure static files — host on GitHub Pages / Cloudflare; the page
+    fetches a model's figure JSON on click. The huge per-model series never
+    inline into the page.
+    """
+    od = Path(out_dir)
+    dst = Path(dest)
+    (dst / "figures").mkdir(parents=True, exist_ok=True)
+    index = _load_index(od)
+    (dst / "index.html").write_text(_page(index, static=True), encoding="utf-8")
+    n_fig = 0
+    for bid, m in (index.get("models") or {}).items():
+        figs = {}
+        for job in (m.get("jobs") or {}):
+            try:
+                figs[job] = _figure_for(od, bid, job)
+            except Exception:
+                pass
+        (dst / "figures" / f"{bid}.json").write_text(json.dumps(figs), encoding="utf-8")
+        n_fig += len(figs)
+    return {"models": len(index.get("models") or {}), "figures": n_fig,
+            "dest": str(dst)}
+
+
+# --------------------------------------------------------------------------- #
+# Browser-parquet static export (GitHub Pages): index.html + series/*.parquet.  #
+# The page reads each model's parquet in-browser (hyparquet + zstd compressors) #
+# and builds the Plotly figure client-side — a JS port of the overlay builders. #
+# --------------------------------------------------------------------------- #
+
+_BROWSER_JS = r"""
+<script type="module">
+import { parquetReadObjects, asyncBufferFromUrl } from 'https://cdn.jsdelivr.net/npm/hyparquet@1.17.1/src/index.min.js';
+import { compressors } from 'https://cdn.jsdelivr.net/npm/hyparquet-compressors@1.1.1/src/index.min.js';
+const COLORS = __COLORS__;
+const cache = {};
+
+async function loadParquet(bid){
+  if(cache[bid]) return cache[bid];
+  const file = await asyncBufferFromUrl({ url: 'series/'+bid+'.parquet' });
+  const rows = await parquetReadObjects({ file, compressors });
+  const jobs = {}, meta = {};
+  for(const r of rows){
+    const job=r.job, eng=r.engine, v=r.variable;
+    (jobs[job]=jobs[job]||{}); (jobs[job][eng]=jobs[job][eng]||{});
+    const leaf=jobs[job][eng];
+    (leaf[v]=leaf[v]||[]).push(r.value);
+    const key=job+''+eng;
+    if(!meta[key]) meta[key]={first:v, t:[]};
+    if(meta[key].first===v && !Number.isNaN(r.time)) meta[key].t.push(r.time);
+  }
+  for(const key in meta){ const [job,eng]=key.split(''); const t=meta[key].t;
+    if(t.length) jobs[job][eng].time=t; }   // no time => steady-state
+  cache[bid]=jobs; return jobs;
+}
+const isUtc = leaf => 'time' in leaf;
+const obsOf = leaf => { const o={}; for(const k in leaf) if(k!=='time') o[k]=leaf[k]; return o; };
+
+function utcFigure(leaves){
+  const order=[], seen=new Set();
+  for(const e in leaves) for(const sp in obsOf(leaves[e])) if(!seen.has(sp)){seen.add(sp);order.push(sp);}
+  if(!order.length) return {data:[],layout:{title:'No observables'}};
+  const cols=3, rows=Math.ceil(order.length/cols);
+  const layout={grid:{rows,columns:cols,pattern:'independent'},height:220*rows+100,
+    legend:{orientation:'h',y:1.04,x:0},margin:{t:60,b:40,l:60,r:20}};
+  const traces=[], legseen=new Set();
+  order.forEach((sp,i)=>{ const idx=i+1, xr=idx===1?'x':'x'+idx, yr=idx===1?'y':'y'+idx;
+    layout['yaxis'+(idx===1?'':idx)]={title:{text:sp}};
+    layout['xaxis'+(idx===1?'':idx)]={title:{text:'time'}};
+    for(const e in leaves){ const leaf=leaves[e], y=obsOf(leaf)[sp], t=leaf.time;
+      if(!y||!t) continue;
+      traces.push({x:t,y:y,mode:'lines',name:e,legendgroup:e,
+        showlegend:!legseen.has(e),line:{color:COLORS[e]},xaxis:xr,yaxis:yr});
+      legseen.add(e); } });
+  return {data:traces,layout};
+}
+function ssFigure(leaves){
+  const order=[], seen=new Set(), scal={};
+  for(const e in leaves){ const o=obsOf(leaves[e]); scal[e]={};
+    for(const sp in o){ scal[e][sp]=o[sp][o[sp].length-1]; if(!seen.has(sp)){seen.add(sp);order.push(sp);} } }
+  if(!order.length) return {data:[],layout:{title:'No observables'}};
+  const traces=Object.keys(scal).map(e=>({type:'bar',name:e,x:order,
+    y:order.map(sp=>scal[e][sp]||0),marker:{color:COLORS[e]}}));
+  return {data:traces,layout:{barmode:'group',height:360}};
+}
+window.openModel=function(row,bid){
+  const d=row.nextElementSibling, open=d.style.display!=='none';
+  d.style.display=open?'none':''; if(open) return;
+  const box=document.getElementById('detail-'+bid);
+  if(box.dataset.loaded) return; box.textContent='loading…';
+  loadParquet(bid).then(jobs=>{ box.innerHTML=''; box.dataset.loaded='1';
+    Object.keys(jobs).forEach(job=>{ const div=document.createElement('div');
+      div.id='plot-'+bid+'-'+job; const h=document.createElement('div');
+      h.style.cssText='font-size:12px;color:#666;margin:6px 0;'; h.textContent=job; box.appendChild(h); box.appendChild(div);
+      const live={}; for(const e in jobs[job]) if(Object.keys(jobs[job][e]).length) live[e]=jobs[job][e];
+      const anyUtc=Object.values(live).some(isUtc);
+      const fig=anyUtc?utcFigure(live):ssFigure(live);
+      Plotly.newPlot(div.id,fig.data,fig.layout,{responsive:true,displaylogo:false}); }); })
+   .catch(e=>{ box.textContent='failed to load series: '+e; });
+};
+</script>
+"""
+
+
+_UTIL_JS = """
+function showTab(e,id){document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+ e.target.classList.add('active');document.querySelectorAll('.pane').forEach(p=>p.classList.remove('active'));
+ document.getElementById(id).classList.add('active');}
+function applyFilter(){var k=document.getElementById('kindFilter').value,c=0;
+ document.querySelectorAll('#ovbody .ov-row').forEach(function(r){var show=(k==='all'||r.dataset.kind===k);
+  r.style.display=show?'':'none';r.nextElementSibling.style.display='none';if(show)c++;});
+ document.getElementById('count').textContent=c+' rows';}
+function sortBy(col,type){var body=document.getElementById('ovbody');
+ var rows=Array.from(body.querySelectorAll('.ov-row'));
+ rows.sort(function(a,b){if(type==='pbg'||type==='self'){return parseFloat(b.dataset[type])-parseFloat(a.dataset[type]);}
+  return a.children[col].textContent.localeCompare(b.children[col].textContent);});
+ rows.forEach(function(r){body.appendChild(r);body.appendChild(r.nextElementSibling);});}
+"""
+
+
+def _browser_page(index: Dict[str, Any], color_map: Dict[str, str]) -> str:
+    n = len(index.get("models") or {})
+    crashed = (index.get("meta") or {}).get("crashed_models") or []
+    cross = bco._cross_engine_tab_html(_index_to_comparisons(index),
+                                       list((index.get("models") or {}).keys()))
+    title = (index.get("meta") or {}).get("title") or f"BioModels batch comparison — {n} models"
+    return ("<!doctype html><html><head><meta charset='utf-8'>"
+            f"<title>{title}</title>"
+            "<style>"
+            "body{font-family:-apple-system,sans-serif;margin:18px;color:#222;}"
+            "table{border-collapse:collapse;width:100%;font-size:13px;}"
+            "th,td{padding:6px 10px;text-align:left;border-bottom:1px solid #eef0f2;}"
+            "th{cursor:pointer;border-bottom:2px solid #d0d4d9;color:#555;font-size:12px;user-select:none;}"
+            "td.num,th.num{text-align:right;}"
+            ".dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px;}"
+            ".kind-tag{font-size:11px;padding:1px 6px;border-radius:8px;background:#eef;color:#446;}"
+            ".tab{padding:6px 14px;border:none;background:none;font-size:13px;cursor:pointer;border-bottom:2px solid transparent;}"
+            ".tab.active{border-bottom:2px solid #1b6e3c;font-weight:600;}"
+            ".pane{display:none;}.pane.active{display:block;}.detail{padding:8px 4px;}"
+            ".controls{margin:8px 0;font-size:13px;}"
+            "</style></head><body>"
+            f"<h3>{title}{' · '+str(len(crashed))+' crashed' if crashed else ''}</h3>"
+            "<div><button class='tab active' onclick=\"showTab(event,'overview')\">Overview</button>"
+            "<button class='tab' onclick=\"showTab(event,'cross')\">Cross-engine</button></div>"
+            "<div id='overview' class='pane active'>"
+            "<div class='controls'>Kind: <select id='kindFilter' onchange='applyFilter()'>"
+            "<option value='all'>all</option><option value='utc'>utc</option>"
+            "<option value='steady_state'>steady_state</option></select> <span id='count'></span></div>"
+            "<table><thead><tr>"
+            "<th onclick=\"sortBy(0,'s')\">Biomodel</th><th onclick=\"sortBy(1,'s')\">Job</th>"
+            "<th onclick=\"sortBy(2,'s')\">Kind</th><th>Status (pbg↔pbg)</th>"
+            "<th class='num' onclick=\"sortBy(4,'pbg')\">pbg↔pbg</th>"
+            "<th class='num' onclick=\"sortBy(5,'self')\">pbg↔ref</th>"
+            "<th class='num' onclick=\"sortBy(6,'s')\">OK</th>"
+            "<th class='num' onclick=\"sortBy(7,'s')\">failed</th>"
+            f"</tr></thead><tbody id='ovbody'>{_overview_rows(index)}</tbody></table></div>"
+            f"<div id='cross' class='pane'>{cross}</div>"
+            f"<script>{get_plotlyjs()}</script>"
+            f"<script>{_UTIL_JS}applyFilter();</script>"
+            + _BROWSER_JS.replace("__COLORS__", json.dumps(color_map))
+            + "</body></html>")
+
+
+def export_static_parquet(out_dir: str, dest: str) -> dict:
+    """Browser-parquet static site for GitHub Pages: index.html + series/*.parquet.
+
+    The page reads each model's parquet in the browser (hyparquet + zstd) and
+    renders figures client-side — no server, ~140 MB total (parquet unchanged).
+    """
+    import shutil
+    od = Path(out_dir)
+    dst = Path(dest)
+    dst.mkdir(parents=True, exist_ok=True)
+    index = _load_index(od)
+    engines = set()
+    for m in (index.get("models") or {}).values():
+        for j in (m.get("jobs") or {}).values():
+            engines.update(j.get("engines") or [])
+    color_map = bco._build_color_map(engines)
+    (dst / "index.html").write_text(_browser_page(index, color_map), encoding="utf-8")
+    shutil.copytree(od / "series", dst / "series", dirs_exist_ok=True)
+    return {"models": len(index.get("models") or {}), "dest": str(dst)}
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--out-dir", required=True)
     ap.add_argument("--port", type=int, default=8900)
+    ap.add_argument("--export-static", default="",
+                    help="render a static site to this dir instead of serving")
+    ap.add_argument("--export-browser", default="",
+                    help="render a browser-parquet static site (Pages) to this dir")
     a = ap.parse_args()
+    if a.export_browser:
+        info = export_static_parquet(a.out_dir, a.export_browser)
+        print(f"browser-parquet site: {info['models']} models -> {info['dest']}")
+        return 0
+    if a.export_static:
+        info = export_static(a.out_dir, a.export_static)
+        print(f"static site: {info['models']} models, {info['figures']} figures "
+              f"-> {info['dest']}")
+        return 0
     serve(a.out_dir, a.port)
     return 0
 
