@@ -8,10 +8,14 @@ version = "0.0.0"
 description = "Process-bigraph research workspace"
 requires-python = ">=3.12"
 dependencies = [
-    # Pinned: process-bigraph 1.4.17 removed `SQLiteEmitter`, which
-    # vivarium-dashboard's run_runner.py still imports — newer versions break
-    # composite runs in the dashboard. 1.4.12 is the known-good version.
-    "process-bigraph==1.4.12",
+    # Aligned on process-bigraph 1.5.0, which provides `process_bigraph.composite_spec`
+    # (pbg-superpowers imports it at top level — `from process_bigraph import composite_spec`
+    # in composite_generator.py / composite_discovery.py). The earlier 1.4.12 pin
+    # (kept because pb 1.4.17 relocated `SQLiteEmitter` out to pbg-emitters and the
+    # dashboard still imported it from `process_bigraph.emitter`) is now unsatisfiable
+    # against composite_spec. The dashboard's SQLiteEmitter import was migrated to
+    # pbg-emitters (vivarium-dashboard PR #420), so 1.5.0 now satisfies the whole graph.
+    "process-bigraph==1.5.0",
     "bigraph-schema",
     # Required by pbg-superpowers' readout_resolver / readout_validation /
     # study_evaluator subpackages (undeclared optional import upstream); without
@@ -64,6 +68,15 @@ scale = ["ray", "pyarrow"]
 pbg-biomodels = "pbg_biomodels.cli:main"
 
 [tool.uv.sources]
+# Canonical git source for pbg-basic-processes (not on PyPI). pbg-superpowers and
+# vivarium-dashboard each require it transitively but pin it in DIFFERENT forms —
+# vivarium-dashboard via a bare dep + its own [tool.uv.sources] (branch="main"),
+# pbg-simbio via a PEP 508 direct reference (... @ git+...@main). uv treats those
+# forms as conflicting URLs and refuses to resolve. Declaring the source here, in
+# the root project, is authoritative: uv unifies every pbg-basic-processes
+# requirement across the graph to this single spec. Keep it matching the upstream
+# branch="main" form.
+pbg-basic-processes = { git = "https://github.com/vivarium-collective/pbg-basic-processes.git", branch = "main" }
 vivarium-dashboard = { path = "../vivarium-dashboard", editable = true }
 pbg-tellurium = { path = "../pbg-tellurium", editable = true }
 pbg-copasi = { path = "../pbg-copasi", editable = true }
