@@ -64,6 +64,15 @@ scale = ["ray", "pyarrow"]
 pbg-biomodels = "pbg_biomodels.cli:main"
 
 [tool.uv.sources]
+# Canonical git source for pbg-basic-processes (not on PyPI). pbg-superpowers and
+# vivarium-dashboard each require it transitively but pin it in DIFFERENT forms —
+# vivarium-dashboard via a bare dep + its own [tool.uv.sources] (branch="main"),
+# pbg-simbio via a PEP 508 direct reference (... @ git+...@main). uv treats those
+# forms as conflicting URLs and refuses to resolve. Declaring the source here, in
+# the root project, is authoritative: uv unifies every pbg-basic-processes
+# requirement across the graph to this single spec. Keep it matching the upstream
+# branch="main" form.
+pbg-basic-processes = { git = "https://github.com/vivarium-collective/pbg-basic-processes.git", branch = "main" }
 vivarium-dashboard = { path = "../vivarium-dashboard", editable = true }
 pbg-tellurium = { path = "../pbg-tellurium", editable = true }
 pbg-copasi = { path = "../pbg-copasi", editable = true }
