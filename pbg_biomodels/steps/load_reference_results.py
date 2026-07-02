@@ -63,8 +63,11 @@ class LoadReferenceResultsStep(Step):
         for bid, model in (state.get("models") or {}).items():
             results[bid] = {}
             ref_grid[bid] = {}
-            job_key = self._reference_job_key(bid, model)
-            if job_key is None:
+            jobs = list((model or {}).get("sedml_jobs") or [])
+            scan_jobs = [j for j in jobs if j.get("kind") == "repeated_task"]
+            has_utc = any(j.get("kind") == "utc" for j in jobs)
+            job_key = self._reference_job_key(bid, model) if has_utc else None
+            if job_key is None and not scan_jobs:
                 continue
 
             engines = only or reference_results.discover_reference_engines(root, bid)
@@ -72,22 +75,36 @@ class LoadReferenceResultsStep(Step):
                 h5 = reference_results.resolve_engine_h5(root, bid, engine)
                 if h5 is None:
                     continue
-                leaf = reference_results.read_reference_leaf(h5)
-                if not leaf:
-                    warnings.warn(
-                        f"LoadReferenceResultsStep: {bid}/{engine} reports.h5 had "
-                        f"no UTC report; skipping",
-                        stacklevel=2,
-                    )
-                    continue
-                results[bid].setdefault(job_key, {})[f"reference:{engine}"] = leaf
-                ref_grid[bid][job_key] = len(leaf.get(TIME_KEY) or [])
-                provenance.setdefault(bid, {})[engine] = {
-                    "path": str(h5),
-                    "version": h5.parent.parent.parent.name
-                    if "results" in h5.parts else h5.parent.parent.name,
-                    "n_samples": len(leaf.get(TIME_KEY) or []),
-                }
+
+                # UTC reference (1:1 with the single UTC job).
+                if job_key is not None:
+                    leaf = reference_results.read_reference_leaf(h5)
+                    if not leaf:
+                        warnings.warn(
+                            f"LoadReferenceResultsStep: {bid}/{engine} reports.h5 "
+                            f"had no UTC report; skipping",
+                            stacklevel=2,
+                        )
+                    else:
+                        results[bid].setdefault(job_key, {})[
+                            f"reference:{engine}"] = leaf
+                        ref_grid[bid][job_key] = len(leaf.get(TIME_KEY) or [])
+                        provenance.setdefault(bid, {})[engine] = {
+                            "path": str(h5),
+                            "version": h5.parent.parent.parent.name
+                            if "results" in h5.parts else h5.parent.parent.name,
+                            "n_samples": len(leaf.get(TIME_KEY) or []),
+                        }
+
+                # Parameter-scan references (1:1 with each repeated_task job).
+                for sj in scan_jobs:
+                    sleaf = reference_results.read_reference_scan_leaf(
+                        h5, sj.get("scan_values"))
+                    # a scan leaf with only the axis carries no observables.
+                    if len(sleaf) <= 1:
+                        continue
+                    results[bid].setdefault(sj["name"], {})[
+                        f"reference:{engine}"] = sleaf
 
         return {"results": results, "ref_grid": ref_grid,
                 "diagnostics": {"reference": provenance}}

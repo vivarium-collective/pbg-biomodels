@@ -91,16 +91,18 @@ For each task where `task.getTypeCode()` is `SEDML_TASK_REPEATEDTASK`:
    `SedRange`):
    - `uniformRange` → expand `[start, end]` with `numberOfPoints` on the
      declared scale (linear/log) into an ordered value list.
-   - `vectorRange` → the explicit value list.
+   - `vectorRange` → the explicit value list (via `getValues()`).
    - `functionalRange` or a nested range reference → **skip** the task with a
      `UserWarning` (out of v1 scope).
-2. **setValue** — require exactly one `SedSetValue`. Resolve its `target`
-   (XPath into SBML, e.g.
-   `/sbml/model/listOfParameters/parameter[@id='k1']/@value`) to a
-   `(sbml_element_id, attribute)` pair via a small XPath resolver
-   (`_resolve_setvalue_target`). `>1` setValue, or an unresolvable/ non-constant
-   target (a `math` expression referencing the range) → **skip** with a
-   `UserWarning`.
+2. **setValue** — require exactly one `SedSetValue` whose `math` is the range
+   variable (identity — the parameter takes the range value at each point).
+   Resolve its `target` (XPath into SBML) to a `(sbml_element_id, attribute)`
+   pair via a small XPath resolver (`_resolve_setvalue_target`). Real SED-ML
+   targets frequently stop at the element
+   (`…/parameter[@id='epo_level']`, no trailing `/@value`); the attribute is then
+   `None` and resolved at mutation time to the element's **natural quantity**
+   (Parameter→value, Species→initial concentration/amount, Compartment→size).
+   `>1` setValue or non-identity math → **skip** with a `UserWarning`.
 3. **Subtask** — resolve the single `SedSubTask` → its referenced `SedTask` →
    that task's `SedSimulation`. Classify the subtask simulation as `utc` or
    `steady_state` using the same predicates as `extract_all_simulations`.
@@ -175,14 +177,18 @@ or 2-D `[n_dataset, n_scan]` for a steady-state subtask). Add:
   `time` (a generic axis column); the per-job `kind` in the index disambiguates.
   Generalize the `is_ss = "time" not in leaf` branch to use `axis_of` so a scan
   leaf's axis is emitted rather than NaN-filled.
-- `write_model` / `_job_kind` — record `kind: "repeated_task"` and the swept
-  `param_id` in the index job entry (for the x-axis label).
+- `write_model` / `_job_kind` — record `kind: "repeated_task"` in the index job
+  entry. (The swept `param_id` is *not* threaded into the index in v1: the
+  `results` leaf type is strictly `map[list[float]]`, so the label can't ride
+  along in the leaf, and `write_model` has no job spec. The viewer therefore
+  labels the scan x-axis generically as **"scan parameter"**; per-scan
+  `param_id` labeling is a follow-up.)
 - `lazy_viewer._parquet_leaves_aligned` — relabel the reconstituted axis by the
   job kind: `time` → `scan` for a `repeated_task` job so
   `result_leaf.is_scan` is true on round-trip.
 - `lazy_viewer._figure_for` — a `repeated_task` job reuses
-  `bco._utc_overlay_figure` with the x-axis title set to `param_id` (the swept
-  parameter), not "time".
+  `bco._utc_overlay_figure` with the x-axis title relabeled from "time" to
+  "scan parameter".
 - The viewer's kind filter gains a `repeated_task` option alongside `utc` and
   `steady_state` (both the server-rendered `<select>` and the client filter).
 

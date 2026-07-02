@@ -137,7 +137,9 @@ class BatchCompareStep(Step):
                 for sim_name, leaf in (sim_results_map or {}).items():
                     if not leaf:
                         continue  # failed/empty job — no engine slot
-                    if result_leaf.is_utc(leaf):
+                    # UTC and parameter-scan leaves both carry an ordered axis
+                    # (time / scan) and are scored by the same series metric.
+                    if result_leaf.is_utc(leaf) or result_leaf.is_scan(leaf):
                         utc_engines[sim_name] = result_leaf.to_numeric_result(leaf)
                     else:
                         ss_engines[sim_name] = result_leaf.steady_state_scalars(leaf)

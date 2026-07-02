@@ -43,16 +43,22 @@ def series_table(model_results: Dict[str, Any], max_points: int = 200) -> pa.Tab
     times: List[float] = []
     values: List[float] = []
     nan = float("nan")
+    from pbg_biomodels import result_leaf
+
     for job, engine_map in (model_results or {}).items():
         for engine, leaf in (engine_map or {}).items():
             if not leaf:
                 continue
-            # steady-state leaves omit "time"; mark their rows with NaN time so
-            # the reader can distinguish them from a time course on round-trip.
-            is_ss = "time" not in leaf
-            t = _thin([float(x) for x in (leaf.get("time") or [])], max_points)
+            # UTC leaves carry a "time" axis, parameter-scan leaves a "scan"
+            # axis; steady-state leaves have neither and are marked with NaN
+            # times so the reader can distinguish them on round-trip. Both
+            # ordered axes are written into the (generic) "time" parquet column;
+            # the per-job index kind relabels a scan axis back on read.
+            axis_name, axis_vals = result_leaf.axis_of(leaf)
+            is_ss = not axis_name
+            t = _thin([float(x) for x in axis_vals], max_points)
             for var, ys in leaf.items():
-                if var == "time" or not isinstance(ys, list):
+                if var in ("time", "scan") or not isinstance(ys, list):
                     continue
                 yv = _thin([float(x) for x in ys], max_points)
                 if is_ss:
@@ -113,10 +119,16 @@ def write_model(
 
 
 def _job_kind(leaves: Dict[str, Any]) -> str:
+    from pbg_biomodels import result_leaf
+    has_data = False
     for leaf in (leaves or {}).values():
-        if leaf and isinstance(leaf, dict) and leaf.get("time"):
-            return "utc"
-    return "steady_state" if leaves else "none"
+        if leaf and isinstance(leaf, dict):
+            has_data = True
+            if result_leaf.is_utc(leaf):
+                return "utc"
+            if result_leaf.is_scan(leaf):
+                return "repeated_task"
+    return "steady_state" if has_data else "none"
 
 
 def finalize_index(

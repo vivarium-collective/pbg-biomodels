@@ -235,6 +235,252 @@ def extract_all_simulations(sed_doc: libsedml.SedDocument) -> list:
     return jobs
 
 
+# ----------------------------
+# Repeated tasks (1-D parameter scans)
+# ----------------------------
+
+def _classify_simulation(sim: Any) -> Optional[dict]:
+    """``{kind, time, n_points}`` for a SED-ML simulation, or ``None``.
+
+    ``kind`` is ``"utc"`` or ``"steady_state"``; anything else -> ``None``.
+    Mirrors the predicates in :func:`extract_all_simulations`.
+    """
+    if sim is None:
+        return None
+    is_utc = False
+    is_ss = False
+    if hasattr(sim, "isSedUniformTimeCourse"):
+        try:
+            is_utc = bool(sim.isSedUniformTimeCourse())
+        except Exception:
+            is_utc = False
+    if hasattr(sim, "isSedSteadyState"):
+        try:
+            is_ss = bool(sim.isSedSteadyState())
+        except Exception:
+            is_ss = False
+    if is_utc:
+        return {
+            "kind": "utc",
+            "time": float(sim.getOutputEndTime() - sim.getOutputStartTime()),
+            "n_points": int(sim.getNumberOfPoints()),
+        }
+    if is_ss:
+        return {"kind": "steady_state", "time": None, "n_points": None}
+    return None
+
+
+def _range_values(rng: Any) -> Optional[List[float]]:
+    """Expand a 1-D SED-ML range to an ordered value list, or ``None``.
+
+    Supports ``uniformRange`` (linear/log) and ``vectorRange``. Returns
+    ``None`` for ``functionalRange`` or anything unsupported so the caller
+    skips the task.
+    """
+    if rng is None:
+        return None
+    tc = rng.getTypeCode()
+    if tc == libsedml.SEDML_RANGE_UNIFORMRANGE:
+        n = int(rng.getNumberOfPoints()) if rng.isSetNumberOfPoints() else 0
+        if n < 1:
+            return None
+        start, end = float(rng.getStart()), float(rng.getEnd())
+        if n == 1:
+            return [start]
+        kind = (rng.getType() or "linear").lower()
+        if kind in ("log", "log10"):
+            import math
+            if start <= 0 or end <= 0:
+                return None
+            lo, hi = math.log10(start), math.log10(end)
+            return [10 ** (lo + (hi - lo) * i / (n - 1)) for i in range(n)]
+        return [start + (end - start) * i / (n - 1) for i in range(n)]
+    if tc == libsedml.SEDML_RANGE_VECTORRANGE:
+        vals = list(rng.getValues() or [])
+        return [float(v) for v in vals] if vals else None
+    return None
+
+
+_ID_PRED_RE = re.compile(r"@id\s*=\s*['\"]([^'\"]+)['\"]")
+_ATTR_RE = re.compile(r"/@(\w+)\s*$")
+
+
+def _resolve_setvalue_target(target: str) -> Optional[tuple]:
+    """Parse an SBML XPath ``setValue`` target -> ``(element_id, attribute)``.
+
+    e.g. ``…/parameter[@id='k1']/@value`` -> ``("k1", "value")``. Many real
+    SED-ML targets stop at the element (``…/parameter[@id='k1']``) and leave the
+    attribute implicit; that returns ``("k1", None)`` and the setter resolves
+    the element's natural quantity (parameter value / species initial /
+    compartment size). Returns ``None`` only when no id-predicate is present.
+    """
+    if not target:
+        return None
+    ids = _ID_PRED_RE.findall(target)
+    if not ids:
+        return None
+    attr = _ATTR_RE.search(target)
+    return ids[-1], (attr.group(1) if attr else None)
+
+
+def extract_repeated_tasks(sed_doc: libsedml.SedDocument) -> list:
+    """Yield every supported 1-D parameter scan in the SED-ML.
+
+    Returns a list of ``{name, kind:"repeated_task", param_id, param_attr,
+    scan_values, subtask}`` dicts, where ``subtask`` is the
+    :func:`_classify_simulation` mapping of the repeated task's inner
+    simulation. Only single-range, single-``setValue`` (identity math),
+    single-subtask scans are supported; nested ranges, ``functionalRange``,
+    non-identity math, multiple task-changes/subtasks, or a non-UTC/SS subtask
+    are skipped with a ``UserWarning``.
+    """
+    import warnings
+
+    jobs = []
+    n_tasks = int(sed_doc.getNumTasks())
+    for i in range(n_tasks):
+        task = sed_doc.getTask(i)
+        if task is None or task.getTypeCode() != libsedml.SEDML_TASK_REPEATEDTASK:
+            continue
+        task_id = task.getId() or f"repeatedTask_{i}"
+
+        def _skip(msg: str) -> None:
+            warnings.warn(
+                f"extract_repeated_tasks: skipping {task_id!r} ({msg})",
+                stacklevel=2,
+            )
+
+        if task.getNumRanges() != 1:
+            _skip("nested or multiple ranges (1-D scans only)")
+            continue
+        if task.getNumSubTasks() != 1:
+            _skip("not exactly one subtask")
+            continue
+        if task.getNumTaskChanges() != 1:
+            _skip("not exactly one setValue")
+            continue
+
+        master_id = task.getRangeId()
+        rng = task.getRange(master_id) if master_id else task.getRange(0)
+        scan_values = _range_values(rng)
+        if not scan_values:
+            _skip("unsupported range (functionalRange or empty)")
+            continue
+
+        sv = task.getTaskChange(0)
+        if sv is None or sv.getTypeCode() != libsedml.SEDML_TASK_SETVALUE:
+            _skip("task change is not a setValue")
+            continue
+        rng_id = (rng.getId() or master_id or "").strip()
+        math_str = (
+            libsedml.formulaToString(sv.getMath()).strip()
+            if sv.isSetMath() else ""
+        )
+        if math_str != rng_id:
+            _skip(f"non-identity setValue math {math_str!r} (expected {rng_id!r})")
+            continue
+        target = _resolve_setvalue_target(sv.getTarget())
+        if target is None:
+            _skip(f"unresolvable setValue target {sv.getTarget()!r}")
+            continue
+        element_id, attribute = target
+
+        sub = task.getSubTask(0)
+        ref_task = sed_doc.getTask(sub.getTask()) if sub is not None else None
+        sim = (
+            sed_doc.getSimulation(ref_task.getSimulationReference())
+            if ref_task is not None else None
+        )
+        subtask = _classify_simulation(sim)
+        if subtask is None:
+            _skip("subtask simulation is not UTC or steady-state")
+            continue
+
+        jobs.append({
+            "name": task_id,
+            "kind": "repeated_task",
+            "param_id": element_id,
+            "param_attr": attribute,
+            "scan_values": scan_values,
+            "subtask": subtask,
+        })
+    return jobs
+
+
+_SBML_ATTR_SETTERS = {
+    "value": "setValue",
+    "size": "setSize",
+    "volume": "setSize",
+    "initialConcentration": "setInitialConcentration",
+    "initialAmount": "setInitialAmount",
+}
+
+
+def _set_natural_quantity(element: Any, value: float) -> bool:
+    """Set the element's primary quantity by SBML type; True on success.
+
+    Parameter -> value, Species -> initial concentration/amount, Compartment
+    -> size. Used when the setValue target names the element without an
+    explicit ``/@attribute``.
+    """
+    if isinstance(element, libsbml.Parameter):
+        element.setValue(value)
+        return True
+    if isinstance(element, libsbml.Species):
+        if element.getHasOnlySubstanceUnits():
+            element.setInitialAmount(value)
+        else:
+            element.setInitialConcentration(value)
+        return True
+    if isinstance(element, libsbml.Compartment):
+        element.setSize(value)
+        return True
+    if hasattr(element, "setValue"):  # generic fallback
+        element.setValue(value)
+        return True
+    return False
+
+
+def _set_sbml_attribute(element: Any, attribute: Optional[str],
+                        value: float) -> None:
+    setter = _SBML_ATTR_SETTERS.get(attribute) if attribute else None
+    if setter and hasattr(element, setter):
+        getattr(element, setter)(value)
+        return
+    if _set_natural_quantity(element, value):
+        return
+    raise ValueError(
+        f"_set_sbml_attribute: cannot set {attribute!r} on "
+        f"{type(element).__name__}"
+    )
+
+
+def mutate_sbml(model_source: str, element_id: str, attribute: Optional[str],
+                value: float) -> str:
+    """Write an SBML file identical to ``model_source`` but with element
+    ``element_id``'s ``attribute`` set to ``value``; return its path.
+
+    Applies a parameter-scan ``setValue`` upstream of the simulator wrappers,
+    so every engine runs the perturbed model uniformly. ``model_source`` may be
+    an SBML file path or a raw SBML string.
+    """
+    if os.path.exists(model_source):
+        doc = libsbml.readSBMLFromFile(model_source)
+    else:
+        doc = libsbml.readSBMLFromString(model_source)
+    model = doc.getModel()
+    if model is None:
+        raise ValueError(f"mutate_sbml: no SBML model in {model_source!r}")
+    element = model.getElementBySId(element_id)
+    if element is None:
+        raise ValueError(f"mutate_sbml: no SBML element with id {element_id!r}")
+    _set_sbml_attribute(element, attribute, float(value))
+    fd, out_path = tempfile.mkstemp(suffix=".xml", prefix=f"scan_{element_id}_")
+    os.close(fd)
+    libsbml.writeSBMLToFile(doc, out_path)
+    return out_path
+
+
 def resolve_sbml_source_from_sedml(
     sed_doc: libsedml.SedDocument,
     sedml_dir: str,
