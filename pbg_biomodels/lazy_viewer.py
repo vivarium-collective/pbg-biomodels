@@ -377,14 +377,15 @@ def _page(index: Dict[str, Any], static: bool = False) -> str:
   &nbsp;<span id="count"></span></div>
  <table id="ovtable"><thead><tr>
   <th onclick="sortBy(0,'s')">Biomodel</th><th onclick="sortBy(1,'s')">Job</th>
-  <th onclick="sortBy(2,'s')">Kind</th><th>nRMSE (pbg↔pbg)</th>
-  <th class="num" onclick="sortBy(4,'pbg')">pbg↔pbg</th>
-  <th class="num" onclick="sortBy(5,'self')">pbg↔ref</th>
-  <th>Closeness</th>
-  <th class="num" onclick="sortBy(7,'clpbg')">cl pbg↔pbg</th>
-  <th class="num" onclick="sortBy(8,'clself')">cl pbg↔ref</th>
-  <th class="num" onclick="sortBy(9,'s')">OK</th>
-  <th class="num" onclick="sortBy(10,'s')">failed</th>
+  <th onclick="sortBy(2,'s')">Kind</th>
+  <th onclick="sortBy(3,'d:pbg')">nRMSE (pbg↔pbg)</th>
+  <th class="num" onclick="sortBy(4,'d:pbg')">pbg↔pbg</th>
+  <th class="num" onclick="sortBy(5,'d:self')">pbg↔ref</th>
+  <th onclick="sortBy(6,'d:clpbg')">Closeness</th>
+  <th class="num" onclick="sortBy(7,'d:clpbg')">cl pbg↔pbg</th>
+  <th class="num" onclick="sortBy(8,'d:clself')">cl pbg↔ref</th>
+  <th class="num" onclick="sortBy(9,'n')">OK</th>
+  <th class="num" onclick="sortBy(10,'n')">failed</th>
  </tr></thead><tbody id="ovbody">{_overview_rows(index)}</tbody></table>
 </div>
 <div id="summary" class="pane">{_summary_panel(index)}</div>
@@ -406,12 +407,29 @@ function applyFilter(){{var k=document.getElementById('kindFilter').value,c=0;
   r.nextElementSibling.style.display='none';
   if(show)c++;}});
  document.getElementById('count').textContent=c+' rows';}}
-function sortBy(col,type){{var body=document.getElementById('ovbody');
+var _sortState={{col:-1,dir:1}};
+function _sortVal(r,col,spec){{
+ if(spec.slice(0,2)==='d:'){{var v=parseFloat(r.dataset[spec.slice(2)]);return (isNaN(v)||v<0)?null:v;}}
+ if(spec==='n'){{var t=r.children[col].textContent.trim();if(t===''||t==='—')return null;var v=parseFloat(t);return isNaN(v)?null:v;}}
+ return r.children[col].textContent.toLowerCase();}}
+function sortBy(col,spec){{
+ var isStr=(spec==='s');
+ // new column: strings ascending, numbers descending (worst first); else toggle.
+ var dir=(_sortState.col===col)?-_sortState.dir:(isStr?1:-1);
+ _sortState={{col:col,dir:dir}};
+ var body=document.getElementById('ovbody');
  var rows=Array.from(body.querySelectorAll('.ov-row'));
  rows.sort(function(a,b){{
-  if(type==='pbg'||type==='self'||type==='clpbg'||type==='clself'){{return parseFloat(b.dataset[type])-parseFloat(a.dataset[type]);}}
-  return a.children[col].textContent.localeCompare(b.children[col].textContent);}});
- rows.forEach(function(r){{body.appendChild(r);body.appendChild(r.nextElementSibling);}});}}
+  var av=_sortVal(a,col,spec),bv=_sortVal(b,col,spec);
+  if(isStr){{return dir*(av<bv?-1:av>bv?1:0);}}
+  if(av===null&&bv===null)return 0;
+  if(av===null)return 1;   // missing (—) always sorts last
+  if(bv===null)return -1;
+  return dir*(av-bv);}});
+ rows.forEach(function(r){{body.appendChild(r);body.appendChild(r.nextElementSibling);}});
+ document.querySelectorAll('#ovtable thead th').forEach(function(th,i){{
+  if(th.dataset.base===undefined)th.dataset.base=th.textContent;
+  th.textContent=th.dataset.base+(i===col?(dir>0?' ▲':' ▼'):'');}});}}
 {open_js}
 applyFilter();
 </script></body></html>"""

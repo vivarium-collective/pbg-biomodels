@@ -26,3 +26,13 @@ def test_page_has_closeness_columns():
     html = _page(_INDEX)
     assert "Close (≤1)" in html             # closeness bucket label rendered
     assert "cl pbg↔pbg" in html             # closeness column header
+
+
+def test_every_overview_column_is_sortable():
+    html = _page(_INDEX)
+    # all 11 overview columns (0..10) must have a sortBy click handler
+    for col in range(11):
+        assert f"sortBy({col}," in html, f"column {col} not sortable"
+    # numeric metric columns sort by their data attribute; counts sort numeric
+    assert "sortBy(4,'d:pbg')" in html
+    assert "sortBy(9,'n')" in html and "sortBy(10,'n')" in html
