@@ -27,3 +27,19 @@ def test_summary_execution_and_agreement():
 def test_summary_panel_and_page_render():
     assert "Execution" in _summary_panel(_INDEX)
     assert "summary" in _page(_INDEX)       # the new tab/pane id
+
+
+def test_execution_counts_distinct_models_not_job_rows():
+    # copasi appears in TWO jobs of one model -> counts once, not twice.
+    idx = {"models": {"M1": {"jobs": {
+        "utc1": {"engines": ["copasi"], "bucket": "good", "closeness_bucket": "close"},
+        "ss1": {"engines": ["copasi"], "bucket": "good", "closeness_bucket": "close"},
+    }}}, "meta": {}}
+    s = _summary_stats(idx)
+    assert s["engines"]["copasi"]["ran"] == 1     # distinct model, not 2 job-rows
+    assert s["provenance"] is False               # no runs -> salvaged
+
+
+def test_provenance_flag_true_when_runs_present():
+    s = _summary_stats(_INDEX)
+    assert s["provenance"] is True                 # M1 carries runs

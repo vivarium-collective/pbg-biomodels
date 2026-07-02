@@ -57,13 +57,43 @@ def _parquet_leaves_aligned(out_dir: Path, bid: str) -> Dict[str, Dict[str, Dict
     return jobs
 
 
+# Cap the small-multiples overlay so a many-observable model doesn't render
+# thousands of Plotly traces (slow to build server-side AND to draw in-browser).
+_MAX_OBSERVABLES = 24
+
+
+def _cap_leaves(leaves: Dict[str, Any], n: int):
+    """Trim each leaf to the first ``n`` observables (shared union order).
+
+    Returns ``(capped_leaves, shown, total)``. Bounds figure size for models
+    with hundreds of observables; the full series remain in the parquet.
+    """
+    from pbg_biomodels import result_leaf
+    order: List[str] = []
+    seen: set = set()
+    for leaf in leaves.values():
+        for k in result_leaf.observables_of(leaf):
+            if k not in seen:
+                seen.add(k)
+                order.append(k)
+    if len(order) <= n:
+        return leaves, len(order), len(order)
+    keep = set(order[:n])
+    capped: Dict[str, Any] = {}
+    for name, leaf in leaves.items():
+        ax, _ = result_leaf.axis_of(leaf)
+        capped[name] = {k: v for k, v in leaf.items() if k == ax or k in keep}
+    return capped, n, len(order)
+
+
 def _figure_for(out_dir: Path, bid: str, job: str,
                 kind: str = "") -> Dict[str, Any]:
     """Build the Plotly figure for one (model, job), reusing the overlay code.
 
     A ``repeated_task`` job is a parameter scan: its axis (stored in the generic
     ``time`` parquet column) is the swept parameter, not time, so the overlay
-    figure is reused and its x-axis relabeled to "scan parameter".
+    figure is reused and its x-axis relabeled to "scan parameter". The overlay
+    is capped at ``_MAX_OBSERVABLES`` subplots to keep big models responsive.
     """
     from pbg_biomodels import result_leaf
     leaves = _parquet_leaves_aligned(out_dir, bid).get(job, {})
@@ -71,9 +101,13 @@ def _figure_for(out_dir: Path, bid: str, job: str,
     color_map = bco._build_color_map(set(live.keys()))
     utc = {n: leaf for n, leaf in live.items() if result_leaf.is_utc(leaf)}
     if utc:
-        fig = bco._utc_overlay_figure(utc, color_map)
+        capped, shown, total = _cap_leaves(utc, _MAX_OBSERVABLES)
+        fig = bco._utc_overlay_figure(capped, color_map)
         if kind == "repeated_task":
             _relabel_scan_axis(fig)
+        if shown < total:
+            fig.setdefault("layout", {})["title"] = {
+                "text": f"showing {shown} of {total} observables"}
         return fig
     return bco._ss_bar_figure(live, color_map)
 
@@ -155,41 +189,55 @@ def _run_table(index: Dict[str, Any], bid: str) -> str:
 
 
 def _summary_stats(index: Dict[str, Any]) -> Dict[str, Any]:
-    """Aggregate execution (per engine) + agreement (per metric bucket) across
-    all models/jobs. Uses per-engine ``runs`` when present; otherwise infers
-    executed = engine appears in a job's ``engines`` list (salvaged indexes)."""
-    engines: Dict[str, Dict[str, int]] = {}
+    """Aggregate execution (per engine) + agreement (per metric bucket).
+
+    Execution is counted as **distinct models** per engine (deduped across a
+    model's jobs, so an engine that runs both the UTC and steady-state job of
+    one model counts once). With per-engine ``runs`` present, ok vs failed is
+    exact; on a salvaged index (no ``runs``) only "produced output" is known —
+    ``provenance`` is False and ``failed`` stays 0 (unknowable)."""
+    ran: Dict[str, set] = {}
+    failed: Dict[str, set] = {}
     agreement: Dict[str, Dict[str, int]] = {"nrmse": {}, "closeness": {}}
+    has_provenance = False
 
     def bump(d, k):
         d[k] = d.get(k, 0) + 1
 
-    def eng(name):
-        return engines.setdefault(name, {"ran": 0, "failed": 0, "absent": 0})
-
     for bid, m in (index.get("models") or {}).items():
         runs = m.get("runs") or {}
+        if runs:
+            has_provenance = True
         for job, j in (m.get("jobs") or {}).items():
             bump(agreement["nrmse"], j.get("bucket") or "none")
             bump(agreement["closeness"], j.get("closeness_bucket") or "none")
             job_runs = runs.get(job) or {}
             if job_runs:
                 for name, rec in job_runs.items():
-                    if (rec.get("status") or "") == "ok":
-                        eng(name)["ran"] += 1
-                    else:
-                        eng(name)["failed"] += 1
-            else:  # salvaged: no per-engine status — infer executed
+                    tgt = ran if (rec.get("status") or "") == "ok" else failed
+                    tgt.setdefault(name, set()).add(bid)
+            else:  # salvaged: no per-engine status — infer produced-output
                 for name in j.get("engines") or []:
-                    eng(name)["ran"] += 1
-    return {"engines": engines, "agreement": agreement}
+                    ran.setdefault(name, set()).add(bid)
+
+    names = sorted(set(ran) | set(failed))
+    engines = {n: {"ran": len(ran.get(n, ())), "failed": len(failed.get(n, ()))}
+               for n in names}
+    return {"engines": engines, "agreement": agreement,
+            "provenance": has_provenance}
 
 
 def _summary_panel(index: Dict[str, Any]) -> str:
     s = _summary_stats(index)
+    prov = s["provenance"]
+    ran_header = "models ok" if prov else "models w/ output"
+    note = "" if prov else (
+        "<div class='small'>This dataset has no per-engine run provenance — "
+        "counts are distinct models that produced output; failures are unknown. "
+        "Re-run to capture per-engine status/errors.</div>")
     erows = "".join(
         f"<tr><td>{e}</td><td class='num'>{v['ran']}</td>"
-        f"<td class='num'>{v['failed']}</td></tr>"
+        f"<td class='num'>{v['failed'] if prov else '—'}</td></tr>"
         for e, v in sorted(s["engines"].items()))
 
     def buckets(name):
@@ -198,8 +246,8 @@ def _summary_panel(index: Dict[str, Any]) -> str:
             for k, n in sorted(s["agreement"][name].items()))
 
     return (
-        "<h4>Execution (per engine)</h4>"
-        "<table><thead><tr><th>Engine</th><th class='num'>ran</th>"
+        "<h4>Execution (per engine)</h4>" + note +
+        f"<table><thead><tr><th>Engine</th><th class='num'>{ran_header}</th>"
         "<th class='num'>failed</th></tr></thead>"
         f"<tbody>{erows}</tbody></table>"
         "<h4>Agreement — nRMSE</h4>"
@@ -371,6 +419,7 @@ applyFilter();
 
 def make_handler(out_dir: Path):
     index = _load_index(out_dir)
+    fig_cache: Dict[tuple, str] = {}  # (bid, job) -> figure JSON (built once)
 
     class H(BaseHTTPRequestHandler):
         def log_message(self, *a):  # quiet
@@ -401,10 +450,13 @@ def make_handler(out_dir: Path):
                 if p.startswith("/api/figure/"):
                     bid = p.rsplit("/", 1)[-1]
                     job = (parse_qs(u.query).get("job") or [""])[0]
-                    kind = (((index.get("models") or {}).get(bid) or {})
-                            .get("jobs") or {}).get(job, {}).get("kind") or ""
-                    return self._send(json.dumps(
-                        _figure_for(out_dir, bid, job, kind)))
+                    cached = fig_cache.get((bid, job))
+                    if cached is None:
+                        kind = (((index.get("models") or {}).get(bid) or {})
+                                .get("jobs") or {}).get(job, {}).get("kind") or ""
+                        cached = json.dumps(_figure_for(out_dir, bid, job, kind))
+                        fig_cache[(bid, job)] = cached
+                    return self._send(cached)
                 self.send_error(404)
             except Exception as e:  # don't kill the server on a bad model
                 self.send_error(500, str(e))
