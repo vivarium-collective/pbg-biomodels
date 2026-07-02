@@ -110,6 +110,10 @@ def write_model(
             "matrix": comp.get("matrix") or {},
             "max_nrmse": comp.get("max_nrmse"),
             "bucket": comp.get("bucket"),
+            # Second (co-equal) metric: BioSimulations closeness score.
+            "max_score": comp.get("max_score"),
+            "closeness_bucket": comp.get("closeness_bucket"),
+            "matrix_closeness": comp.get("matrix_closeness") or {},
             "n_ok": n_ok,
             "n_failed": n_failed,
             # kind: "utc" if any leaf carries a time vector, else "steady_state".
@@ -139,8 +143,16 @@ def finalize_index(
 ) -> Path:
     """Write the compact index.json for all models."""
     index = {
-        "models": {e["id"]: {"jobs": e["jobs"], "has_series": e.get("has_series")}
-                   for e in entries if e},
+        "models": {
+            e["id"]: {
+                "jobs": e["jobs"],
+                "has_series": e.get("has_series"),
+                # Preserve per-engine run provenance (status/error/runtime) when
+                # present; the viewer's execution drill-down reads it.
+                **({"runs": e["runs"]} if e.get("runs") else {}),
+            }
+            for e in entries if e
+        },
         "meta": meta or {},
         "diagnostics": diagnostics or {},
     }

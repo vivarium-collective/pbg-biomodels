@@ -57,13 +57,43 @@ def _parquet_leaves_aligned(out_dir: Path, bid: str) -> Dict[str, Dict[str, Dict
     return jobs
 
 
+# Cap the small-multiples overlay so a many-observable model doesn't render
+# thousands of Plotly traces (slow to build server-side AND to draw in-browser).
+_MAX_OBSERVABLES = 24
+
+
+def _cap_leaves(leaves: Dict[str, Any], n: int):
+    """Trim each leaf to the first ``n`` observables (shared union order).
+
+    Returns ``(capped_leaves, shown, total)``. Bounds figure size for models
+    with hundreds of observables; the full series remain in the parquet.
+    """
+    from pbg_biomodels import result_leaf
+    order: List[str] = []
+    seen: set = set()
+    for leaf in leaves.values():
+        for k in result_leaf.observables_of(leaf):
+            if k not in seen:
+                seen.add(k)
+                order.append(k)
+    if len(order) <= n:
+        return leaves, len(order), len(order)
+    keep = set(order[:n])
+    capped: Dict[str, Any] = {}
+    for name, leaf in leaves.items():
+        ax, _ = result_leaf.axis_of(leaf)
+        capped[name] = {k: v for k, v in leaf.items() if k == ax or k in keep}
+    return capped, n, len(order)
+
+
 def _figure_for(out_dir: Path, bid: str, job: str,
                 kind: str = "") -> Dict[str, Any]:
     """Build the Plotly figure for one (model, job), reusing the overlay code.
 
     A ``repeated_task`` job is a parameter scan: its axis (stored in the generic
     ``time`` parquet column) is the swept parameter, not time, so the overlay
-    figure is reused and its x-axis relabeled to "scan parameter".
+    figure is reused and its x-axis relabeled to "scan parameter". The overlay
+    is capped at ``_MAX_OBSERVABLES`` subplots to keep big models responsive.
     """
     from pbg_biomodels import result_leaf
     leaves = _parquet_leaves_aligned(out_dir, bid).get(job, {})
@@ -71,9 +101,13 @@ def _figure_for(out_dir: Path, bid: str, job: str,
     color_map = bco._build_color_map(set(live.keys()))
     utc = {n: leaf for n, leaf in live.items() if result_leaf.is_utc(leaf)}
     if utc:
-        fig = bco._utc_overlay_figure(utc, color_map)
+        capped, shown, total = _cap_leaves(utc, _MAX_OBSERVABLES)
+        fig = bco._utc_overlay_figure(capped, color_map)
         if kind == "repeated_task":
             _relabel_scan_axis(fig)
+        if shown < total:
+            fig.setdefault("layout", {})["title"] = {
+                "text": f"showing {shown} of {total} observables"}
         return fig
     return bco._ss_bar_figure(live, color_map)
 
@@ -100,6 +134,128 @@ def _index_to_comparisons(index: Dict[str, Any]) -> Dict[str, Dict[str, Any]]:
     return out
 
 
+_CLOSENESS_LABELS = {"close": "Close (≤1)", "not_close": "Not close (>1)",
+                     "error": "Error", "none": "—"}
+
+
+def _engine_analysis_closeness(job_entry: Dict[str, Any]) -> Dict[str, Any]:
+    """pbg↔pbg and pbg↔own-reference worst CLOSENESS score for one job,
+    mirroring ``bco._engine_analysis`` but reading ``matrix_closeness``."""
+    return bco._engine_analysis({
+        "engines": job_entry.get("engines") or [],
+        "matrix": job_entry.get("matrix_closeness") or {},
+    })
+
+
+def _run_table(index: Dict[str, Any], bid: str) -> str:
+    """Per-engine execution + agreement table for one model, across its jobs.
+
+    Execution: ✓ ran / ✗ <status> <error> / – absent (from ``runs``; when no
+    provenance, engines listed in the job are shown as executed). The job's
+    worst nRMSE and closeness are shown as the agreement summary line.
+    """
+    import html as _html
+
+    m = (index.get("models") or {}).get(bid) or {}
+    runs = m.get("runs") or {}
+    out: List[str] = []
+    for job, j in (m.get("jobs") or {}).items():
+        listed = j.get("engines") or []
+        job_runs = runs.get(job) or {}
+        engs = sorted(set(listed) | set(job_runs.keys()))
+        rows = []
+        for e in engs:
+            rec = job_runs.get(e)
+            if rec is None:
+                cell = ("<span class='ok'>✓ ran</span>" if e in listed
+                        else "<span class='muted'>– absent</span>")
+            elif (rec.get("status") or "") == "ok":
+                cell = "<span class='ok'>✓ ran</span>"
+            else:
+                err = _html.escape(rec.get("error") or "")
+                cell = (f"<span class='bad'>✗ {_html.escape(rec.get('status','failed'))}"
+                        f"</span> <span class='small'>{err}</span>")
+            rows.append(f"<tr><td>{_html.escape(e)}</td><td>{cell}</td></tr>")
+        nr = j.get("max_nrmse")
+        cl = j.get("max_score")
+        nr_s = f"{nr:.4g}" if isinstance(nr, (int, float)) else "—"
+        cl_s = f"{cl:.4g}" if isinstance(cl, (int, float)) else "—"
+        out.append(
+            f"<h4>{_html.escape(job)}</h4>"
+            f"<div class='small'>worst nRMSE {nr_s} · worst closeness {cl_s}</div>"
+            "<table><thead><tr><th>Engine</th><th>Execution</th></tr></thead>"
+            f"<tbody>{''.join(rows)}</tbody></table>")
+    return "".join(out) or "<div class='small'>no jobs</div>"
+
+
+def _summary_stats(index: Dict[str, Any]) -> Dict[str, Any]:
+    """Aggregate execution (per engine) + agreement (per metric bucket).
+
+    Execution is counted as **distinct models** per engine (deduped across a
+    model's jobs, so an engine that runs both the UTC and steady-state job of
+    one model counts once). With per-engine ``runs`` present, ok vs failed is
+    exact; on a salvaged index (no ``runs``) only "produced output" is known —
+    ``provenance`` is False and ``failed`` stays 0 (unknowable)."""
+    ran: Dict[str, set] = {}
+    failed: Dict[str, set] = {}
+    agreement: Dict[str, Dict[str, int]] = {"nrmse": {}, "closeness": {}}
+    has_provenance = False
+
+    def bump(d, k):
+        d[k] = d.get(k, 0) + 1
+
+    for bid, m in (index.get("models") or {}).items():
+        runs = m.get("runs") or {}
+        if runs:
+            has_provenance = True
+        for job, j in (m.get("jobs") or {}).items():
+            bump(agreement["nrmse"], j.get("bucket") or "none")
+            bump(agreement["closeness"], j.get("closeness_bucket") or "none")
+            job_runs = runs.get(job) or {}
+            if job_runs:
+                for name, rec in job_runs.items():
+                    tgt = ran if (rec.get("status") or "") == "ok" else failed
+                    tgt.setdefault(name, set()).add(bid)
+            else:  # salvaged: no per-engine status — infer produced-output
+                for name in j.get("engines") or []:
+                    ran.setdefault(name, set()).add(bid)
+
+    names = sorted(set(ran) | set(failed))
+    engines = {n: {"ran": len(ran.get(n, ())), "failed": len(failed.get(n, ()))}
+               for n in names}
+    return {"engines": engines, "agreement": agreement,
+            "provenance": has_provenance}
+
+
+def _summary_panel(index: Dict[str, Any]) -> str:
+    s = _summary_stats(index)
+    prov = s["provenance"]
+    ran_header = "models ok" if prov else "models w/ output"
+    note = "" if prov else (
+        "<div class='small'>This dataset has no per-engine run provenance — "
+        "counts are distinct models that produced output; failures are unknown. "
+        "Re-run to capture per-engine status/errors.</div>")
+    erows = "".join(
+        f"<tr><td>{e}</td><td class='num'>{v['ran']}</td>"
+        f"<td class='num'>{v['failed'] if prov else '—'}</td></tr>"
+        for e, v in sorted(s["engines"].items()))
+
+    def buckets(name):
+        return "".join(
+            f"<tr><td>{_CLOSENESS_LABELS.get(k, k)}</td><td class='num'>{n}</td></tr>"
+            for k, n in sorted(s["agreement"][name].items()))
+
+    return (
+        "<h4>Execution (per engine)</h4>" + note +
+        f"<table><thead><tr><th>Engine</th><th class='num'>{ran_header}</th>"
+        "<th class='num'>failed</th></tr></thead>"
+        f"<tbody>{erows}</tbody></table>"
+        "<h4>Agreement — nRMSE</h4>"
+        f"<table><tbody>{buckets('nrmse')}</tbody></table>"
+        "<h4>Agreement — closeness</h4>"
+        f"<table><tbody>{buckets('closeness')}</tbody></table>")
+
+
 def _overview_rows(index: Dict[str, Any]) -> str:
     rows: List[str] = []
     for bid, m in (index.get("models") or {}).items():
@@ -111,22 +267,37 @@ def _overview_rows(index: Dict[str, Any]) -> str:
             color = bco._BUCKET_COLOR.get(bucket, "#5d6573")
             kind = j.get("kind") or "utc"
 
+            ac = _engine_analysis_closeness(j)
+            cl_pbg, cl_self = ac["pbg_pbg_max"], ac["self_max"]
+            cl_label = _CLOSENESS_LABELS.get(j.get("closeness_bucket") or "none", "—")
+
             def num(v):
                 return f"{v:.4g}" if isinstance(v, (int, float)) else ""
             pbg_s = num(pbg) or "—"
             self_s = num(self_n) or "—"
+            cl_pbg_s = num(cl_pbg) or "—"
+            cl_self_s = num(cl_self) or "—"
+            has_fail = int(j.get("n_failed", 0)) > 0
+            diverged = (isinstance(pbg, (int, float)) and pbg > 0.10) or \
+                (isinstance(cl_pbg, (int, float)) and cl_pbg > 1.0)
             rows.append(
                 f'<tr class="ov-row" data-kind="{kind}" '
                 f'data-pbg="{pbg if isinstance(pbg,(int,float)) else -1}" '
                 f'data-self="{self_n if isinstance(self_n,(int,float)) else -1}" '
+                f'data-clpbg="{cl_pbg if isinstance(cl_pbg,(int,float)) else -1}" '
+                f'data-clself="{cl_self if isinstance(cl_self,(int,float)) else -1}" '
+                f'data-fail="{1 if has_fail else 0}" '
+                f'data-diverged="{1 if diverged else 0}" '
                 f'onclick="openModel(this,\'{bid}\')" style="cursor:pointer;">'
                 f'<td>{bid}</td><td>{job}</td>'
                 f'<td><span class="kind-tag">{kind}</span></td>'
                 f'<td><span class="dot" style="background:{color}"></span>{label}</td>'
                 f'<td class="num">{pbg_s}</td><td class="num">{self_s}</td>'
+                f'<td>{cl_label}</td>'
+                f'<td class="num">{cl_pbg_s}</td><td class="num">{cl_self_s}</td>'
                 f'<td class="num">{j.get("n_ok",0)}</td>'
                 f'<td class="num">{j.get("n_failed",0)}</td></tr>'
-                f'<tr class="detail-row" style="display:none;"><td colspan="8">'
+                f'<tr class="detail-row" style="display:none;"><td colspan="11">'
                 f'<div class="detail" id="detail-{bid}"></div></td></tr>'
             )
     return "".join(rows)
@@ -148,6 +319,8 @@ def _page(index: Dict[str, Any], static: bool = False) -> str:
             "if(box.dataset.loaded)return;box.textContent='loading…';"
             "fetch('figures/'+bid+'.json').then(r=>r.json()).then(function(figs){"
             "box.innerHTML='';box.dataset.loaded='1';"
+            "fetch('runs/'+bid+'.html').then(r=>r.text()).then(function(h){"
+            "var t=document.createElement('div');t.innerHTML=h;box.insertBefore(t,box.firstChild);}).catch(function(){});"
             "Object.keys(figs).forEach(function(job){var div=document.createElement('div');"
             "div.id='plot-'+bid+'-'+job;box.appendChild(div);var fig=figs[job];"
             "Plotly.newPlot(div.id,fig.data,fig.layout,{responsive:true,displaylogo:false});});"
@@ -161,6 +334,8 @@ def _page(index: Dict[str, Any], static: bool = False) -> str:
             "if(box.dataset.loaded)return;box.textContent='loading…';"
             "fetch('/api/jobs/'+bid).then(r=>r.json()).then(function(jobs){"
             "box.innerHTML='';box.dataset.loaded='1';"
+            "fetch('/api/runs/'+bid).then(r=>r.text()).then(function(h){"
+            "var t=document.createElement('div');t.innerHTML=h;box.insertBefore(t,box.firstChild);}).catch(function(){});"
             "jobs.forEach(function(job){var div=document.createElement('div');"
             "div.id='plot-'+bid+'-'+job;box.appendChild(div);"
             "fetch('/api/figure/'+bid+'?job='+encodeURIComponent(job)).then(r=>r.json())"
@@ -181,10 +356,13 @@ def _page(index: Dict[str, Any], static: bool = False) -> str:
  .pane{{display:none;}} .pane.active{{display:block;}}
  .detail{{padding:8px 4px;}}
  .controls{{margin:8px 0;font-size:13px;}}
+ .ok{{color:#2e7d32;}} .bad{{color:#c62828;}} .muted{{color:#9aa0a6;}}
+ .small{{color:#666;font-size:12px;}}
 </style></head><body>
 <h3>BioModels batch comparison — {n} models{' · '+str(len(crashed))+' crashed' if crashed else ''}</h3>
 <div>
  <button class="tab active" onclick="showTab(event,'overview')">Overview</button>
+ <button class="tab" onclick="showTab(event,'summary')">Summary</button>
  <button class="tab" onclick="showTab(event,'cross')">Cross-engine</button>
 </div>
 <div id="overview" class="pane active">
@@ -194,16 +372,22 @@ def _page(index: Dict[str, Any], static: bool = False) -> str:
    <option value="steady_state">steady_state</option>
    <option value="repeated_task">repeated_task</option>
   </select>
+  &nbsp;<label><input type="checkbox" id="failFilter" onchange="applyFilter()"> only failures</label>
+  &nbsp;<label><input type="checkbox" id="divFilter" onchange="applyFilter()"> only diverged</label>
   &nbsp;<span id="count"></span></div>
  <table id="ovtable"><thead><tr>
   <th onclick="sortBy(0,'s')">Biomodel</th><th onclick="sortBy(1,'s')">Job</th>
-  <th onclick="sortBy(2,'s')">Kind</th><th>Status (pbg↔pbg)</th>
+  <th onclick="sortBy(2,'s')">Kind</th><th>nRMSE (pbg↔pbg)</th>
   <th class="num" onclick="sortBy(4,'pbg')">pbg↔pbg</th>
   <th class="num" onclick="sortBy(5,'self')">pbg↔ref</th>
-  <th class="num" onclick="sortBy(6,'s')">OK</th>
-  <th class="num" onclick="sortBy(7,'s')">failed</th>
+  <th>Closeness</th>
+  <th class="num" onclick="sortBy(7,'clpbg')">cl pbg↔pbg</th>
+  <th class="num" onclick="sortBy(8,'clself')">cl pbg↔ref</th>
+  <th class="num" onclick="sortBy(9,'s')">OK</th>
+  <th class="num" onclick="sortBy(10,'s')">failed</th>
  </tr></thead><tbody id="ovbody">{_overview_rows(index)}</tbody></table>
 </div>
+<div id="summary" class="pane">{_summary_panel(index)}</div>
 <div id="cross" class="pane">{cross}</div>
 <script>{get_plotlyjs()}</script>
 <script>
@@ -212,8 +396,12 @@ function showTab(e,id){{document.querySelectorAll('.tab').forEach(t=>t.classList
  document.querySelectorAll('.pane').forEach(p=>p.classList.remove('active'));
  document.getElementById(id).classList.add('active');}}
 function applyFilter(){{var k=document.getElementById('kindFilter').value,c=0;
+ var onlyFail=document.getElementById('failFilter').checked;
+ var onlyDiv=document.getElementById('divFilter').checked;
  document.querySelectorAll('#ovbody .ov-row').forEach(function(r){{
   var show=(k==='all'||r.dataset.kind===k);
+  if(onlyFail) show=show&&r.dataset.fail==='1';
+  if(onlyDiv) show=show&&r.dataset.diverged==='1';
   r.style.display=show?'':'none';
   r.nextElementSibling.style.display='none';
   if(show)c++;}});
@@ -221,7 +409,7 @@ function applyFilter(){{var k=document.getElementById('kindFilter').value,c=0;
 function sortBy(col,type){{var body=document.getElementById('ovbody');
  var rows=Array.from(body.querySelectorAll('.ov-row'));
  rows.sort(function(a,b){{
-  if(type==='pbg'||type==='self'){{return parseFloat(b.dataset[type])-parseFloat(a.dataset[type]);}}
+  if(type==='pbg'||type==='self'||type==='clpbg'||type==='clself'){{return parseFloat(b.dataset[type])-parseFloat(a.dataset[type]);}}
   return a.children[col].textContent.localeCompare(b.children[col].textContent);}});
  rows.forEach(function(r){{body.appendChild(r);body.appendChild(r.nextElementSibling);}});}}
 {open_js}
@@ -231,6 +419,7 @@ applyFilter();
 
 def make_handler(out_dir: Path):
     index = _load_index(out_dir)
+    fig_cache: Dict[tuple, str] = {}  # (bid, job) -> figure JSON (built once)
 
     class H(BaseHTTPRequestHandler):
         def log_message(self, *a):  # quiet
@@ -254,13 +443,20 @@ def make_handler(out_dir: Path):
                     bid = p.rsplit("/", 1)[-1]
                     jobs = list(((index.get("models") or {}).get(bid) or {}).get("jobs") or {})
                     return self._send(json.dumps(jobs))
+                if p.startswith("/api/runs/"):
+                    bid = p.rsplit("/", 1)[-1]
+                    return self._send(_run_table(index, bid),
+                                      "text/html; charset=utf-8")
                 if p.startswith("/api/figure/"):
                     bid = p.rsplit("/", 1)[-1]
                     job = (parse_qs(u.query).get("job") or [""])[0]
-                    kind = (((index.get("models") or {}).get(bid) or {})
-                            .get("jobs") or {}).get(job, {}).get("kind") or ""
-                    return self._send(json.dumps(
-                        _figure_for(out_dir, bid, job, kind)))
+                    cached = fig_cache.get((bid, job))
+                    if cached is None:
+                        kind = (((index.get("models") or {}).get(bid) or {})
+                                .get("jobs") or {}).get(job, {}).get("kind") or ""
+                        cached = json.dumps(_figure_for(out_dir, bid, job, kind))
+                        fig_cache[(bid, job)] = cached
+                    return self._send(cached)
                 self.send_error(404)
             except Exception as e:  # don't kill the server on a bad model
                 self.send_error(500, str(e))
@@ -287,6 +483,7 @@ def export_static(out_dir: str, dest: str) -> dict:
     od = Path(out_dir)
     dst = Path(dest)
     (dst / "figures").mkdir(parents=True, exist_ok=True)
+    (dst / "runs").mkdir(parents=True, exist_ok=True)
     index = _load_index(od)
     (dst / "index.html").write_text(_page(index, static=True), encoding="utf-8")
     n_fig = 0
@@ -298,6 +495,8 @@ def export_static(out_dir: str, dest: str) -> dict:
             except Exception:
                 pass
         (dst / "figures" / f"{bid}.json").write_text(json.dumps(figs), encoding="utf-8")
+        # per-engine execution + agreement table (drill-down), fetched on click
+        (dst / "runs" / f"{bid}.html").write_text(_run_table(index, bid), encoding="utf-8")
         n_fig += len(figs)
     return {"models": len(index.get("models") or {}), "figures": n_fig,
             "dest": str(dst)}
