@@ -3,6 +3,10 @@ provenance in index.json (finalize_index no longer drops `runs`).
 """
 import json
 
+import pytest
+
+pytest.importorskip("pyarrow")  # two_tier is optional (no parquet in base CI)
+
 from pbg_biomodels.two_tier import write_model, finalize_index
 
 
