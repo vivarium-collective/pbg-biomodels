@@ -113,6 +113,60 @@ def _engine_analysis_closeness(job_entry: Dict[str, Any]) -> Dict[str, Any]:
     })
 
 
+def _summary_stats(index: Dict[str, Any]) -> Dict[str, Any]:
+    """Aggregate execution (per engine) + agreement (per metric bucket) across
+    all models/jobs. Uses per-engine ``runs`` when present; otherwise infers
+    executed = engine appears in a job's ``engines`` list (salvaged indexes)."""
+    engines: Dict[str, Dict[str, int]] = {}
+    agreement: Dict[str, Dict[str, int]] = {"nrmse": {}, "closeness": {}}
+
+    def bump(d, k):
+        d[k] = d.get(k, 0) + 1
+
+    def eng(name):
+        return engines.setdefault(name, {"ran": 0, "failed": 0, "absent": 0})
+
+    for bid, m in (index.get("models") or {}).items():
+        runs = m.get("runs") or {}
+        for job, j in (m.get("jobs") or {}).items():
+            bump(agreement["nrmse"], j.get("bucket") or "none")
+            bump(agreement["closeness"], j.get("closeness_bucket") or "none")
+            job_runs = runs.get(job) or {}
+            if job_runs:
+                for name, rec in job_runs.items():
+                    if (rec.get("status") or "") == "ok":
+                        eng(name)["ran"] += 1
+                    else:
+                        eng(name)["failed"] += 1
+            else:  # salvaged: no per-engine status — infer executed
+                for name in j.get("engines") or []:
+                    eng(name)["ran"] += 1
+    return {"engines": engines, "agreement": agreement}
+
+
+def _summary_panel(index: Dict[str, Any]) -> str:
+    s = _summary_stats(index)
+    erows = "".join(
+        f"<tr><td>{e}</td><td class='num'>{v['ran']}</td>"
+        f"<td class='num'>{v['failed']}</td></tr>"
+        for e, v in sorted(s["engines"].items()))
+
+    def buckets(name):
+        return "".join(
+            f"<tr><td>{_CLOSENESS_LABELS.get(k, k)}</td><td class='num'>{n}</td></tr>"
+            for k, n in sorted(s["agreement"][name].items()))
+
+    return (
+        "<h4>Execution (per engine)</h4>"
+        "<table><thead><tr><th>Engine</th><th class='num'>ran</th>"
+        "<th class='num'>failed</th></tr></thead>"
+        f"<tbody>{erows}</tbody></table>"
+        "<h4>Agreement — nRMSE</h4>"
+        f"<table><tbody>{buckets('nrmse')}</tbody></table>"
+        "<h4>Agreement — closeness</h4>"
+        f"<table><tbody>{buckets('closeness')}</tbody></table>")
+
+
 def _overview_rows(index: Dict[str, Any]) -> str:
     rows: List[str] = []
     for bid, m in (index.get("models") or {}).items():
@@ -213,6 +267,7 @@ def _page(index: Dict[str, Any], static: bool = False) -> str:
 <h3>BioModels batch comparison — {n} models{' · '+str(len(crashed))+' crashed' if crashed else ''}</h3>
 <div>
  <button class="tab active" onclick="showTab(event,'overview')">Overview</button>
+ <button class="tab" onclick="showTab(event,'summary')">Summary</button>
  <button class="tab" onclick="showTab(event,'cross')">Cross-engine</button>
 </div>
 <div id="overview" class="pane active">
@@ -237,6 +292,7 @@ def _page(index: Dict[str, Any], static: bool = False) -> str:
   <th class="num" onclick="sortBy(10,'s')">failed</th>
  </tr></thead><tbody id="ovbody">{_overview_rows(index)}</tbody></table>
 </div>
+<div id="summary" class="pane">{_summary_panel(index)}</div>
 <div id="cross" class="pane">{cross}</div>
 <script>{get_plotlyjs()}</script>
 <script>
