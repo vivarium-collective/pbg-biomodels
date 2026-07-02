@@ -426,7 +426,7 @@ function sortBy(col,spec){{
   if(av===null)return 1;   // missing (—) always sorts last
   if(bv===null)return -1;
   return dir*(av-bv);}});
- rows.forEach(function(r){{body.appendChild(r);body.appendChild(r.nextElementSibling);}});
+ rows.forEach(function(r){{var d=r.nextElementSibling;body.appendChild(r);if(d)body.appendChild(d);}});
  document.querySelectorAll('#ovtable thead th').forEach(function(th,i){{
   if(th.dataset.base===undefined)th.dataset.base=th.textContent;
   th.textContent=th.dataset.base+(i===col?(dir>0?' ▲':' ▼'):'');}});}}
@@ -612,7 +612,7 @@ function sortBy(col,type){var body=document.getElementById('ovbody');
  var rows=Array.from(body.querySelectorAll('.ov-row'));
  rows.sort(function(a,b){if(type==='pbg'||type==='self'){return parseFloat(b.dataset[type])-parseFloat(a.dataset[type]);}
   return a.children[col].textContent.localeCompare(b.children[col].textContent);});
- rows.forEach(function(r){body.appendChild(r);body.appendChild(r.nextElementSibling);});}
+ rows.forEach(function(r){var d=r.nextElementSibling;body.appendChild(r);if(d)body.appendChild(d);});}
 """
 
 

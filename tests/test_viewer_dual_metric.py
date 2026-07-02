@@ -36,3 +36,12 @@ def test_every_overview_column_is_sortable():
     # numeric metric columns sort by their data attribute; counts sort numeric
     assert "sortBy(4,'d:pbg')" in html
     assert "sortBy(9,'n')" in html and "sortBy(10,'n')" in html
+
+
+def test_sort_captures_detail_row_before_moving():
+    # regression: appending the row first makes r.nextElementSibling null, so
+    # appendChild(null) throws and the whole sort silently aborts. The detail
+    # sibling must be captured BEFORE the row is re-appended.
+    html = _page(_INDEX)
+    assert "body.appendChild(r.nextElementSibling)" not in html
+    assert "var d=r.nextElementSibling;body.appendChild(r);if(d)body.appendChild(d);" in html
