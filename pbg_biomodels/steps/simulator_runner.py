@@ -20,6 +20,7 @@ other jobs continue.
 """
 from __future__ import annotations
 
+import os
 import time
 import warnings
 from typing import Any, ClassVar, Dict
@@ -112,6 +113,35 @@ def _ss_to_results(payload: Dict[str, Any]) -> Dict[str, Any]:
     """
     result = (payload or {}).get("result") or {}
     return {sp: [float(v)] for sp, v in (result.get("observables") or {}).items()}
+
+
+def _scan_point_scalars(subkind: str, sbml_src: str, subtask: Dict[str, Any],
+                        n_points: int, utc_cls, ss_cls, rtol, atol,
+                        core) -> Dict[str, float]:
+    """Run one scan point and reduce it to ``{observable -> scalar}``.
+
+    A UTC subtask reduces to the **endpoint** (last output row); a
+    steady-state subtask reduces to its steady-state observables.
+    """
+    if subkind == "utc":
+        payload = utc_cls(core=core).update({
+            "model_source": sbml_src,
+            "time":         float((subtask or {}).get("time") or 0.0),
+            "n_points":     n_points,
+            "rtol":         rtol,
+            "atol":         atol,
+        })
+        result = (payload or {}).get("result") or {}
+        cols = result.get("columns") or []
+        values = result.get("values") or []
+        if not values:
+            return {c: float("nan") for c in cols}
+        last = values[-1]
+        return {c: float(last[j]) for j, c in enumerate(cols)}
+    # steady-state subtask
+    payload = ss_cls(core=core).update({"model_source": sbml_src})
+    result = (payload or {}).get("result") or {}
+    return {c: float(v) for c, v in (result.get("observables") or {}).items()}
 
 
 def effective_n_points(job: Dict[str, Any], ref_n_points: Any) -> int:
@@ -223,6 +253,55 @@ class SimulatorRunnerStep(Step):
                         inner = ss_cls(core=getattr(self, "core", None))
                         payload = inner.update({"model_source": sbml_path})
                         leaf = _ss_to_results(payload)
+                    elif kind == "repeated_task":
+                        from pbg_biomodels.run_biomodels import mutate_sbml
+                        subtask = job.get("subtask") or {}
+                        subkind = subtask.get("kind") or "utc"
+                        scan_values = [float(v) for v in (job.get("scan_values") or [])]
+                        sub_n_points = effective_n_points(
+                            subtask, ref_for_bid.get(job_name))
+                        # One perturbed model per scan point; reduce to a scalar
+                        # per observable. A point that fails contributes NaN.
+                        scalars_per_point = []
+                        for v in scan_values:
+                            try:
+                                mutated = mutate_sbml(
+                                    sbml_path, job["param_id"],
+                                    job["param_attr"], v)
+                            except Exception as exc:  # bad target/model
+                                warnings.warn(
+                                    f"SimulatorRunnerStep[{name}]: {bid}/"
+                                    f"{job_name} scan@{v} mutate failed: {exc}",
+                                    stacklevel=2,
+                                )
+                                scalars_per_point.append({})
+                                continue
+                            try:
+                                scalars_per_point.append(_scan_point_scalars(
+                                    subkind, mutated, subtask, sub_n_points,
+                                    utc_cls, ss_cls, rtol, atol,
+                                    getattr(self, "core", None)))
+                            except Exception as exc:
+                                scalars_per_point.append({})
+                                warnings.warn(
+                                    f"SimulatorRunnerStep[{name}]: {bid}/"
+                                    f"{job_name} scan@{v} failed: {exc}",
+                                    stacklevel=2,
+                                )
+                            finally:
+                                try:
+                                    os.remove(mutated)
+                                except OSError:
+                                    pass
+                        all_obs = sorted(
+                            {c for s in scalars_per_point for c in s})
+                        leaf = {"scan": scan_values}
+                        for c in all_obs:
+                            leaf[c] = [float(s.get(c, float("nan")))
+                                       for s in scalars_per_point]
+                        if not all_obs:
+                            status = "failed"
+                            error = "all scan points failed"
                     else:
                         status, error = "unknown_kind", f"unknown job kind {kind!r}"
                         warnings.warn(

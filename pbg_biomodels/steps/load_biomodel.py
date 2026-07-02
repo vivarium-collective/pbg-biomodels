@@ -70,6 +70,7 @@ class LoadBiomodelStep(Step):
 
         from pbg_biomodels.run_biomodels import (
             extract_all_simulations,
+            extract_repeated_tasks,
             load_biomodel,
             read_sedml_doc,
         )
@@ -84,9 +85,11 @@ class LoadBiomodelStep(Step):
         meta = biomodels.get_metadata(biomodel_id)
         result = load_biomodel(biomodel_id, meta)
 
-        # Parse every SED-ML simulation for the new sedml_jobs output.
+        # Parse every SED-ML simulation for the new sedml_jobs output, plus
+        # any 1-D parameter scans (repeatedTask) as `repeated_task` jobs.
         sed_doc = read_sedml_doc(result.sedml_path)
         jobs = extract_all_simulations(sed_doc)
+        jobs.extend(extract_repeated_tasks(sed_doc))
 
         # Optionally guarantee a steady-state job: most BioModels SED-ML declare
         # only a time course, so without this every model is UTC-only. The

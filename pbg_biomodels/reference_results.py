@@ -18,7 +18,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
-from pbg_biomodels.result_leaf import TIME_KEY
+from pbg_biomodels.result_leaf import SCAN_KEY, TIME_KEY
 
 # Case-insensitive label that marks the sample-time row inside a SED-ML report.
 _TIME_LABEL = "time"
@@ -125,3 +125,82 @@ def _find_utc_report(group) -> Optional[Any]:
         if _TIME_LABEL in labels:
             return item
     return None
+
+
+def _find_scan_report(group) -> Optional[Any]:
+    """First SedReport dataset of rank >= 3 (a repeatedTask / scan report).
+
+    BioSimulators writes a repeatedTask report as
+    ``[n_dataset, *scan_dims, n_timepoint]`` — rank >= 3 (a plain UTC report is
+    rank 2). Depth-first, mirroring :func:`_find_utc_report`.
+    """
+    import h5py
+
+    for key in group:
+        item = group[key]
+        if isinstance(item, h5py.Group):
+            found = _find_scan_report(item)
+            if found is not None:
+                return found
+            continue
+        if _decode(item.attrs.get("_type", "")) != "SedReport":
+            continue
+        if getattr(item, "ndim", 0) >= 3 and "sedmlDataSetLabels" in item.attrs:
+            return item
+    return None
+
+
+def read_reference_scan_leaf(h5_path: str | Path,
+                             scan_values: Optional[List[float]] = None
+                             ) -> Dict[str, List[float]]:
+    """Reduce a BioSimulators repeatedTask report to a response-curve leaf.
+
+    The report is shaped ``[n_dataset, *scan_dims, n_timepoint]``. Each
+    observable is reduced to its **endpoint** (last timepoint) at every scan
+    point — mirroring the live-engine reduction — and the scan dims are
+    flattened to a single ordered axis. Returns a scan leaf
+    ``{"scan": [...], "<observable>": [...]}`` where the ``scan`` axis is
+    ``scan_values`` (aligned 1:1 by index; both sides come from the same SED-ML
+    range) when supplied, else ``[0, 1, ..., n-1]``. Returns ``{}`` when no
+    scan report is present or the shape is unusable.
+    """
+    import h5py
+
+    if str(h5_path).lower().endswith(".zip"):
+        import io
+        import zipfile
+
+        with zipfile.ZipFile(h5_path) as z:
+            raw = z.read(_ZIP_REPORT_MEMBER)
+        with h5py.File(io.BytesIO(raw), "r") as f:
+            return _scan_leaf_from_h5(f, scan_values)
+
+    with h5py.File(h5_path, "r") as f:
+        return _scan_leaf_from_h5(f, scan_values)
+
+
+def _scan_leaf_from_h5(f, scan_values: Optional[List[float]]) -> Dict[str, List[float]]:
+    report = _find_scan_report(f)
+    if report is None:
+        return {}
+    data = report[()]
+    if getattr(data, "ndim", 0) < 3:
+        return {}
+    labels = [_decode(v) for v in report.attrs["sedmlDataSetLabels"]]
+    # Drop the time axis (last) by taking the endpoint, then flatten scan dims:
+    # [n_label, *scan_dims, n_time] -> [n_label, n_scan].
+    endpoint = data[..., -1]
+    n_label = endpoint.shape[0]
+    flat = endpoint.reshape(n_label, -1)
+    n_scan = flat.shape[1]
+
+    axis = [float(x) for x in (list(scan_values or [])[:n_scan])]
+    if len(axis) < n_scan:  # pad with indices when scan_values is short/absent
+        axis += [float(i) for i in range(len(axis), n_scan)]
+
+    leaf: Dict[str, List[float]] = {SCAN_KEY: axis}
+    for i, label in enumerate(labels):
+        if i >= n_label or label.lower() == _TIME_LABEL:
+            continue
+        leaf[label] = [float(x) for x in flat[i].tolist()]
+    return leaf

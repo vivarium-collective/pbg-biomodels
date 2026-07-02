@@ -57,16 +57,37 @@ def _parquet_leaves_aligned(out_dir: Path, bid: str) -> Dict[str, Dict[str, Dict
     return jobs
 
 
-def _figure_for(out_dir: Path, bid: str, job: str) -> Dict[str, Any]:
-    """Build the Plotly figure for one (model, job), reusing the overlay code."""
+def _figure_for(out_dir: Path, bid: str, job: str,
+                kind: str = "") -> Dict[str, Any]:
+    """Build the Plotly figure for one (model, job), reusing the overlay code.
+
+    A ``repeated_task`` job is a parameter scan: its axis (stored in the generic
+    ``time`` parquet column) is the swept parameter, not time, so the overlay
+    figure is reused and its x-axis relabeled to "scan parameter".
+    """
     from pbg_biomodels import result_leaf
     leaves = _parquet_leaves_aligned(out_dir, bid).get(job, {})
     live = {n: leaf for n, leaf in leaves.items() if leaf}
     color_map = bco._build_color_map(set(live.keys()))
     utc = {n: leaf for n, leaf in live.items() if result_leaf.is_utc(leaf)}
     if utc:
-        return bco._utc_overlay_figure(utc, color_map)
+        fig = bco._utc_overlay_figure(utc, color_map)
+        if kind == "repeated_task":
+            _relabel_scan_axis(fig)
+        return fig
     return bco._ss_bar_figure(live, color_map)
+
+
+def _relabel_scan_axis(fig: Dict[str, Any]) -> None:
+    """Rename every x-axis title from "time" to "scan parameter" in-place."""
+    layout = fig.get("layout") or {}
+    for key, axis in layout.items():
+        if key.startswith("xaxis") and isinstance(axis, dict):
+            title = axis.get("title")
+            if isinstance(title, dict) and title.get("text") == "time":
+                title["text"] = "scan parameter"
+            elif title == "time":
+                axis["title"] = "scan parameter"
 
 
 def _index_to_comparisons(index: Dict[str, Any]) -> Dict[str, Dict[str, Any]]:
@@ -171,6 +192,7 @@ def _page(index: Dict[str, Any], static: bool = False) -> str:
   <select id="kindFilter" onchange="applyFilter()">
    <option value="all">all</option><option value="utc">utc</option>
    <option value="steady_state">steady_state</option>
+   <option value="repeated_task">repeated_task</option>
   </select>
   &nbsp;<span id="count"></span></div>
  <table id="ovtable"><thead><tr>
@@ -235,7 +257,10 @@ def make_handler(out_dir: Path):
                 if p.startswith("/api/figure/"):
                     bid = p.rsplit("/", 1)[-1]
                     job = (parse_qs(u.query).get("job") or [""])[0]
-                    return self._send(json.dumps(_figure_for(out_dir, bid, job)))
+                    kind = (((index.get("models") or {}).get(bid) or {})
+                            .get("jobs") or {}).get(job, {}).get("kind") or ""
+                    return self._send(json.dumps(
+                        _figure_for(out_dir, bid, job, kind)))
                 self.send_error(404)
             except Exception as e:  # don't kill the server on a bad model
                 self.send_error(500, str(e))
@@ -267,9 +292,9 @@ def export_static(out_dir: str, dest: str) -> dict:
     n_fig = 0
     for bid, m in (index.get("models") or {}).items():
         figs = {}
-        for job in (m.get("jobs") or {}):
+        for job, j in (m.get("jobs") or {}).items():
             try:
-                figs[job] = _figure_for(od, bid, job)
+                figs[job] = _figure_for(od, bid, job, j.get("kind") or "")
             except Exception:
                 pass
         (dst / "figures" / f"{bid}.json").write_text(json.dumps(figs), encoding="utf-8")
