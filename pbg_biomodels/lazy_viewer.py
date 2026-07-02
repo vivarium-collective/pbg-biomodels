@@ -113,6 +113,47 @@ def _engine_analysis_closeness(job_entry: Dict[str, Any]) -> Dict[str, Any]:
     })
 
 
+def _run_table(index: Dict[str, Any], bid: str) -> str:
+    """Per-engine execution + agreement table for one model, across its jobs.
+
+    Execution: ✓ ran / ✗ <status> <error> / – absent (from ``runs``; when no
+    provenance, engines listed in the job are shown as executed). The job's
+    worst nRMSE and closeness are shown as the agreement summary line.
+    """
+    import html as _html
+
+    m = (index.get("models") or {}).get(bid) or {}
+    runs = m.get("runs") or {}
+    out: List[str] = []
+    for job, j in (m.get("jobs") or {}).items():
+        listed = j.get("engines") or []
+        job_runs = runs.get(job) or {}
+        engs = sorted(set(listed) | set(job_runs.keys()))
+        rows = []
+        for e in engs:
+            rec = job_runs.get(e)
+            if rec is None:
+                cell = ("<span class='ok'>✓ ran</span>" if e in listed
+                        else "<span class='muted'>– absent</span>")
+            elif (rec.get("status") or "") == "ok":
+                cell = "<span class='ok'>✓ ran</span>"
+            else:
+                err = _html.escape(rec.get("error") or "")
+                cell = (f"<span class='bad'>✗ {_html.escape(rec.get('status','failed'))}"
+                        f"</span> <span class='small'>{err}</span>")
+            rows.append(f"<tr><td>{_html.escape(e)}</td><td>{cell}</td></tr>")
+        nr = j.get("max_nrmse")
+        cl = j.get("max_score")
+        nr_s = f"{nr:.4g}" if isinstance(nr, (int, float)) else "—"
+        cl_s = f"{cl:.4g}" if isinstance(cl, (int, float)) else "—"
+        out.append(
+            f"<h4>{_html.escape(job)}</h4>"
+            f"<div class='small'>worst nRMSE {nr_s} · worst closeness {cl_s}</div>"
+            "<table><thead><tr><th>Engine</th><th>Execution</th></tr></thead>"
+            f"<tbody>{''.join(rows)}</tbody></table>")
+    return "".join(out) or "<div class='small'>no jobs</div>"
+
+
 def _summary_stats(index: Dict[str, Any]) -> Dict[str, Any]:
     """Aggregate execution (per engine) + agreement (per metric bucket) across
     all models/jobs. Uses per-engine ``runs`` when present; otherwise infers
@@ -230,6 +271,8 @@ def _page(index: Dict[str, Any], static: bool = False) -> str:
             "if(box.dataset.loaded)return;box.textContent='loading…';"
             "fetch('figures/'+bid+'.json').then(r=>r.json()).then(function(figs){"
             "box.innerHTML='';box.dataset.loaded='1';"
+            "fetch('runs/'+bid+'.html').then(r=>r.text()).then(function(h){"
+            "var t=document.createElement('div');t.innerHTML=h;box.insertBefore(t,box.firstChild);}).catch(function(){});"
             "Object.keys(figs).forEach(function(job){var div=document.createElement('div');"
             "div.id='plot-'+bid+'-'+job;box.appendChild(div);var fig=figs[job];"
             "Plotly.newPlot(div.id,fig.data,fig.layout,{responsive:true,displaylogo:false});});"
@@ -243,6 +286,8 @@ def _page(index: Dict[str, Any], static: bool = False) -> str:
             "if(box.dataset.loaded)return;box.textContent='loading…';"
             "fetch('/api/jobs/'+bid).then(r=>r.json()).then(function(jobs){"
             "box.innerHTML='';box.dataset.loaded='1';"
+            "fetch('/api/runs/'+bid).then(r=>r.text()).then(function(h){"
+            "var t=document.createElement('div');t.innerHTML=h;box.insertBefore(t,box.firstChild);}).catch(function(){});"
             "jobs.forEach(function(job){var div=document.createElement('div');"
             "div.id='plot-'+bid+'-'+job;box.appendChild(div);"
             "fetch('/api/figure/'+bid+'?job='+encodeURIComponent(job)).then(r=>r.json())"
@@ -263,6 +308,8 @@ def _page(index: Dict[str, Any], static: bool = False) -> str:
  .pane{{display:none;}} .pane.active{{display:block;}}
  .detail{{padding:8px 4px;}}
  .controls{{margin:8px 0;font-size:13px;}}
+ .ok{{color:#2e7d32;}} .bad{{color:#c62828;}} .muted{{color:#9aa0a6;}}
+ .small{{color:#666;font-size:12px;}}
 </style></head><body>
 <h3>BioModels batch comparison — {n} models{' · '+str(len(crashed))+' crashed' if crashed else ''}</h3>
 <div>
@@ -347,6 +394,10 @@ def make_handler(out_dir: Path):
                     bid = p.rsplit("/", 1)[-1]
                     jobs = list(((index.get("models") or {}).get(bid) or {}).get("jobs") or {})
                     return self._send(json.dumps(jobs))
+                if p.startswith("/api/runs/"):
+                    bid = p.rsplit("/", 1)[-1]
+                    return self._send(_run_table(index, bid),
+                                      "text/html; charset=utf-8")
                 if p.startswith("/api/figure/"):
                     bid = p.rsplit("/", 1)[-1]
                     job = (parse_qs(u.query).get("job") or [""])[0]
@@ -380,6 +431,7 @@ def export_static(out_dir: str, dest: str) -> dict:
     od = Path(out_dir)
     dst = Path(dest)
     (dst / "figures").mkdir(parents=True, exist_ok=True)
+    (dst / "runs").mkdir(parents=True, exist_ok=True)
     index = _load_index(od)
     (dst / "index.html").write_text(_page(index, static=True), encoding="utf-8")
     n_fig = 0
@@ -391,6 +443,8 @@ def export_static(out_dir: str, dest: str) -> dict:
             except Exception:
                 pass
         (dst / "figures" / f"{bid}.json").write_text(json.dumps(figs), encoding="utf-8")
+        # per-engine execution + agreement table (drill-down), fetched on click
+        (dst / "runs" / f"{bid}.html").write_text(_run_table(index, bid), encoding="utf-8")
         n_fig += len(figs)
     return {"models": len(index.get("models") or {}), "figures": n_fig,
             "dest": str(dst)}
