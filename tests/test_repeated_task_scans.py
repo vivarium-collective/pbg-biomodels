@@ -358,6 +358,7 @@ def test_runner_scan_reduces_to_response_curve(monkeypatch, tmp_path):
 # --------------------------------------------------------------------------
 
 def test_two_tier_persists_scan_and_viewer_relabels(tmp_path):
+    pytest.importorskip("pyarrow")  # two_tier is optional (no parquet in base CI)
     from pbg_biomodels.two_tier import write_model
     from pbg_biomodels import lazy_viewer
 
