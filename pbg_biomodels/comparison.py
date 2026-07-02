@@ -89,6 +89,26 @@ def compare_two_engines(
     else:
         mean_nrmse = None
 
+    # Closeness (BioSimulations allclose-style), max over shared species; the
+    # pair is `close` only if every shared species is close.
+    pair_close, pair_score, have_pair = True, 0.0, False
+    for sp in species:
+        ys: Dict[str, List[float]] = {}
+        for eng_name, payload in engines.items():
+            if not payload:
+                continue
+            cols = payload.get("columns", [])
+            if sp in cols:
+                j = cols.index(sp)
+                ys[eng_name] = [row[j] for row in payload.get("values", [])]
+        if len(ys) < 2:
+            continue
+        have_pair = True
+        keys = sorted(ys)
+        c, s = closeness_score(ys[keys[0]], ys[keys[1]])
+        pair_close = pair_close and c
+        pair_score = max(pair_score, s)
+
     # NB: delegate to bucket_for, which has the final fallback. The inline loop
     # used to omit it, so a NaN mean_nrmse (from series that diverge to inf/NaN,
     # e.g. a non-convergent steady state) matched no threshold — `nan <= inf` is
@@ -102,6 +122,8 @@ def compare_two_engines(
         "mean_nrmse": mean_nrmse,
         "bucket": bucket_id,
         "bucket_label": bucket_label,
+        "closeness_score": pair_score if have_pair else None,
+        "closeness_close": bool(pair_close) if have_pair else False,
     }
 
 
@@ -153,6 +175,32 @@ def closeness_bucket_for(score: Optional[float]) -> tuple:
     if score <= 1.0:
         return "close", "Close (≤1)"
     return "not_close", "Not close (>1)"
+
+
+def _closeness_rollup(pairs: Dict[str, Any], present: List[str]) -> Dict[str, Any]:
+    """Build the closeness matrix + worst-pair summary from per-pair results.
+
+    Shared by the UTC and steady-state ``compare_n_engines`` variants (each
+    pair result carries ``closeness_score`` from ``compare_two_engines*``).
+    """
+    matrix = {a: {b: None for b in present} for a in present}
+    max_score: Optional[float] = None
+    worst: Optional[List[str]] = None
+    for i, a in enumerate(present):
+        for b in present[i + 1:]:
+            cs = (pairs.get(f"{a}__{b}") or {}).get("closeness_score")
+            matrix[a][b] = cs
+            matrix[b][a] = cs
+            if cs is not None and (max_score is None or cs > max_score):
+                max_score, worst = cs, [a, b]
+    bucket_id, bucket_label = closeness_bucket_for(max_score)
+    return {
+        "matrix_closeness":      matrix,
+        "max_score":             max_score,
+        "worst_pair_closeness":  worst,
+        "closeness_bucket":      bucket_id,
+        "closeness_bucket_label": bucket_label,
+    }
 
 
 def compare_n_engines(engines: Dict[str, Optional[Dict[str, Any]]]) -> Dict[str, Any]:
@@ -207,6 +255,7 @@ def compare_n_engines(engines: Dict[str, Optional[Dict[str, Any]]]) -> Dict[str,
         "worst_pair": worst_pair,
         "bucket": bucket_id,
         "bucket_label": bucket_label,
+        **_closeness_rollup(pairs, present),
     }
 
 
@@ -238,6 +287,13 @@ def compare_two_engines_steady_state(
     else:
         mean_nrmse = None
 
+    # Closeness over shared scalars (each a length-1 series); max over shared.
+    pair_close, pair_score = True, 0.0
+    for sp in shared:
+        c, s = closeness_score([a[sp]], [b[sp]])
+        pair_close = pair_close and c
+        pair_score = max(pair_score, s)
+
     bucket_id, bucket_label = bucket_for(mean_nrmse)
     return {
         "n_shared":         len(shared),
@@ -246,6 +302,8 @@ def compare_two_engines_steady_state(
         "mean_nrmse":       mean_nrmse,
         "bucket":           bucket_id,
         "bucket_label":     bucket_label,
+        "closeness_score":  pair_score if shared else None,
+        "closeness_close":  bool(pair_close) if shared else False,
     }
 
 
@@ -288,4 +346,5 @@ def compare_n_engines_steady_state(
         "worst_pair":   worst_pair,
         "bucket":       bucket_id,
         "bucket_label": bucket_label,
+        **_closeness_rollup(pairs, present),
     }
