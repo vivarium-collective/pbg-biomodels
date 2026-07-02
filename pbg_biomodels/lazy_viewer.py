@@ -100,6 +100,19 @@ def _index_to_comparisons(index: Dict[str, Any]) -> Dict[str, Dict[str, Any]]:
     return out
 
 
+_CLOSENESS_LABELS = {"close": "Close (≤1)", "not_close": "Not close (>1)",
+                     "error": "Error", "none": "—"}
+
+
+def _engine_analysis_closeness(job_entry: Dict[str, Any]) -> Dict[str, Any]:
+    """pbg↔pbg and pbg↔own-reference worst CLOSENESS score for one job,
+    mirroring ``bco._engine_analysis`` but reading ``matrix_closeness``."""
+    return bco._engine_analysis({
+        "engines": job_entry.get("engines") or [],
+        "matrix": job_entry.get("matrix_closeness") or {},
+    })
+
+
 def _overview_rows(index: Dict[str, Any]) -> str:
     rows: List[str] = []
     for bid, m in (index.get("models") or {}).items():
@@ -111,22 +124,37 @@ def _overview_rows(index: Dict[str, Any]) -> str:
             color = bco._BUCKET_COLOR.get(bucket, "#5d6573")
             kind = j.get("kind") or "utc"
 
+            ac = _engine_analysis_closeness(j)
+            cl_pbg, cl_self = ac["pbg_pbg_max"], ac["self_max"]
+            cl_label = _CLOSENESS_LABELS.get(j.get("closeness_bucket") or "none", "—")
+
             def num(v):
                 return f"{v:.4g}" if isinstance(v, (int, float)) else ""
             pbg_s = num(pbg) or "—"
             self_s = num(self_n) or "—"
+            cl_pbg_s = num(cl_pbg) or "—"
+            cl_self_s = num(cl_self) or "—"
+            has_fail = int(j.get("n_failed", 0)) > 0
+            diverged = (isinstance(pbg, (int, float)) and pbg > 0.10) or \
+                (isinstance(cl_pbg, (int, float)) and cl_pbg > 1.0)
             rows.append(
                 f'<tr class="ov-row" data-kind="{kind}" '
                 f'data-pbg="{pbg if isinstance(pbg,(int,float)) else -1}" '
                 f'data-self="{self_n if isinstance(self_n,(int,float)) else -1}" '
+                f'data-clpbg="{cl_pbg if isinstance(cl_pbg,(int,float)) else -1}" '
+                f'data-clself="{cl_self if isinstance(cl_self,(int,float)) else -1}" '
+                f'data-fail="{1 if has_fail else 0}" '
+                f'data-diverged="{1 if diverged else 0}" '
                 f'onclick="openModel(this,\'{bid}\')" style="cursor:pointer;">'
                 f'<td>{bid}</td><td>{job}</td>'
                 f'<td><span class="kind-tag">{kind}</span></td>'
                 f'<td><span class="dot" style="background:{color}"></span>{label}</td>'
                 f'<td class="num">{pbg_s}</td><td class="num">{self_s}</td>'
+                f'<td>{cl_label}</td>'
+                f'<td class="num">{cl_pbg_s}</td><td class="num">{cl_self_s}</td>'
                 f'<td class="num">{j.get("n_ok",0)}</td>'
                 f'<td class="num">{j.get("n_failed",0)}</td></tr>'
-                f'<tr class="detail-row" style="display:none;"><td colspan="8">'
+                f'<tr class="detail-row" style="display:none;"><td colspan="11">'
                 f'<div class="detail" id="detail-{bid}"></div></td></tr>'
             )
     return "".join(rows)
@@ -194,14 +222,19 @@ def _page(index: Dict[str, Any], static: bool = False) -> str:
    <option value="steady_state">steady_state</option>
    <option value="repeated_task">repeated_task</option>
   </select>
+  &nbsp;<label><input type="checkbox" id="failFilter" onchange="applyFilter()"> only failures</label>
+  &nbsp;<label><input type="checkbox" id="divFilter" onchange="applyFilter()"> only diverged</label>
   &nbsp;<span id="count"></span></div>
  <table id="ovtable"><thead><tr>
   <th onclick="sortBy(0,'s')">Biomodel</th><th onclick="sortBy(1,'s')">Job</th>
-  <th onclick="sortBy(2,'s')">Kind</th><th>Status (pbg↔pbg)</th>
+  <th onclick="sortBy(2,'s')">Kind</th><th>nRMSE (pbg↔pbg)</th>
   <th class="num" onclick="sortBy(4,'pbg')">pbg↔pbg</th>
   <th class="num" onclick="sortBy(5,'self')">pbg↔ref</th>
-  <th class="num" onclick="sortBy(6,'s')">OK</th>
-  <th class="num" onclick="sortBy(7,'s')">failed</th>
+  <th>Closeness</th>
+  <th class="num" onclick="sortBy(7,'clpbg')">cl pbg↔pbg</th>
+  <th class="num" onclick="sortBy(8,'clself')">cl pbg↔ref</th>
+  <th class="num" onclick="sortBy(9,'s')">OK</th>
+  <th class="num" onclick="sortBy(10,'s')">failed</th>
  </tr></thead><tbody id="ovbody">{_overview_rows(index)}</tbody></table>
 </div>
 <div id="cross" class="pane">{cross}</div>
@@ -212,8 +245,12 @@ function showTab(e,id){{document.querySelectorAll('.tab').forEach(t=>t.classList
  document.querySelectorAll('.pane').forEach(p=>p.classList.remove('active'));
  document.getElementById(id).classList.add('active');}}
 function applyFilter(){{var k=document.getElementById('kindFilter').value,c=0;
+ var onlyFail=document.getElementById('failFilter').checked;
+ var onlyDiv=document.getElementById('divFilter').checked;
  document.querySelectorAll('#ovbody .ov-row').forEach(function(r){{
   var show=(k==='all'||r.dataset.kind===k);
+  if(onlyFail) show=show&&r.dataset.fail==='1';
+  if(onlyDiv) show=show&&r.dataset.diverged==='1';
   r.style.display=show?'':'none';
   r.nextElementSibling.style.display='none';
   if(show)c++;}});
@@ -221,7 +258,7 @@ function applyFilter(){{var k=document.getElementById('kindFilter').value,c=0;
 function sortBy(col,type){{var body=document.getElementById('ovbody');
  var rows=Array.from(body.querySelectorAll('.ov-row'));
  rows.sort(function(a,b){{
-  if(type==='pbg'||type==='self'){{return parseFloat(b.dataset[type])-parseFloat(a.dataset[type]);}}
+  if(type==='pbg'||type==='self'||type==='clpbg'||type==='clself'){{return parseFloat(b.dataset[type])-parseFloat(a.dataset[type]);}}
   return a.children[col].textContent.localeCompare(b.children[col].textContent);}});
  rows.forEach(function(r){{body.appendChild(r);body.appendChild(r.nextElementSibling);}});}}
 {open_js}
