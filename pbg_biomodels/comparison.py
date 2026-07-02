@@ -115,6 +115,46 @@ def bucket_for(mean_nrmse: Optional[float]) -> tuple:
     return BUCKET_THRESHOLDS[-1][0], BUCKET_THRESHOLDS[-1][2]
 
 
+def closeness_score(y1, y2):
+    """BioSimulations allclose-style score for two aligned value series.
+
+    Faithful to biosimulations_runutils ``hdf5_compare.compare_arrays``:
+    ``atol = max(1e-3, 1e-5*max|a|, 1e-5*max|b|)``, ``rtol = 1e-4``,
+    ``score = max(|a-b| / (atol + rtol*|b|))``; ``close = score <= 1``.
+    Returns ``(close: bool, score: float)``. NaN in either series ->
+    ``(False, 1e10)``; arithmetic blow-up -> ``(False, 1e12)``.
+    """
+    a = [float(x) for x in y1]
+    b = [float(x) for x in y2]
+    n = min(len(a), len(b))
+    if n == 0:
+        return True, 0.0
+    a, b = a[:n], b[:n]
+    if any(math.isnan(x) for x in a) or any(math.isnan(x) for x in b):
+        return False, 1e10
+    atol = max(1e-3, max(abs(x) for x in a) * 1e-5, max(abs(x) for x in b) * 1e-5)
+    rtol = 1e-4
+    try:
+        score = max(abs(a[i] - b[i]) / (atol + rtol * abs(b[i])) for i in range(n))
+    except (ZeroDivisionError, OverflowError, ValueError):
+        return False, 1e12
+    return score <= 1.0, score
+
+
+CLOSENESS_ERROR_FLOOR = 1e10
+
+
+def closeness_bucket_for(score: Optional[float]) -> tuple:
+    """Map a closeness score to a ``(bucket_id, label)`` pair."""
+    if score is None:
+        return NO_COMPARISON_BUCKET
+    if score >= CLOSENESS_ERROR_FLOOR:
+        return "error", "Error"
+    if score <= 1.0:
+        return "close", "Close (≤1)"
+    return "not_close", "Not close (>1)"
+
+
 def compare_n_engines(engines: Dict[str, Optional[Dict[str, Any]]]) -> Dict[str, Any]:
     """All-pairs comparison across N named engines (simulators + references).
 
