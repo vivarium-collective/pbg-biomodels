@@ -246,6 +246,8 @@ def _summary_panel(index: Dict[str, Any]) -> str:
             for k, n in sorted(s["agreement"][name].items()))
 
     return (
+        "<h4>Dataset overview</h4>" +
+        _dataset_overview_html(index, _diagnostics_stats(index)) +
         "<h4>Execution (per engine)</h4>" + note +
         f"<table><thead><tr><th>Engine</th><th class='num'>{ran_header}</th>"
         "<th class='num'>failed</th></tr></thead>"
@@ -254,6 +256,216 @@ def _summary_panel(index: Dict[str, Any]) -> str:
         f"<table><tbody>{buckets('nrmse')}</tbody></table>"
         "<h4>Agreement — closeness</h4>"
         f"<table><tbody>{buckets('closeness')}</tbody></table>")
+
+
+def _diagnostics_stats(index: Dict[str, Any]) -> Dict[str, Any]:
+    """Derived diagnostics, computed from the index alone (no run provenance
+    needed): a dataset overview, per-engine coverage split by task kind with
+    reference pairing, and a divergence roster (jobs where the pbg engines
+    disagree on either metric)."""
+    models = index.get("models") or {}
+    cov: Dict[str, Dict[str, set]] = {}      # engine -> {kind|"any" -> set(bid)}
+    ref_paired: Dict[str, set] = {}          # live engine -> set(bid) w/ reference:eng
+    kinds: Dict[str, int] = {"utc": 0, "steady_state": 0, "repeated_task": 0}
+    n_jobs = 0
+    ref_models: set = set()
+    diverged: List[Dict[str, Any]] = []
+    for bid, m in models.items():
+        for job, j in (m.get("jobs") or {}).items():
+            n_jobs += 1
+            kind = j.get("kind") or "utc"
+            kinds[kind] = kinds.get(kind, 0) + 1
+            engines = j.get("engines") or []
+            live = [e for e in engines if not bco._is_reference(e)]
+            if any(bco._is_reference(e) for e in engines):
+                ref_models.add(bid)
+            for e in engines:
+                c = cov.setdefault(e, {"any": set()})
+                c.setdefault(kind, set()).add(bid)
+                c["any"].add(bid)
+            for e in live:
+                if f"reference:{e}" in engines:
+                    ref_paired.setdefault(e, set()).add(bid)
+            a = bco._engine_analysis({"engines": engines, "matrix": j.get("matrix") or {}})
+            ac = _engine_analysis_closeness(j)
+            pbg, clp = a["pbg_pbg_max"], ac["pbg_pbg_max"]
+            is_div = (isinstance(pbg, (int, float)) and pbg > 0.10) or \
+                     (isinstance(clp, (int, float)) and clp > 1.0)
+            if is_div:
+                diverged.append({
+                    "bid": bid, "job": job, "kind": kind,
+                    "nrmse": pbg if isinstance(pbg, (int, float)) else None,
+                    "closeness": clp if isinstance(clp, (int, float)) else None,
+                    "n_live": len(live)})
+    diverged.sort(key=lambda d: (d["nrmse"] if d["nrmse"] is not None else -1.0),
+                  reverse=True)
+    return {"cov": cov, "ref_paired": ref_paired, "kinds": kinds,
+            "n_jobs": n_jobs, "n_models": len(models),
+            "ref_models": len(ref_models), "diverged": diverged}
+
+
+def _dataset_overview_html(index: Dict[str, Any], s: Dict[str, Any]) -> str:
+    k = s["kinds"]
+    cells = [
+        ("Models", s["n_models"]),
+        ("Comparison jobs", s["n_jobs"]),
+        ("· UTC", k.get("utc", 0)),
+        ("· steady-state", k.get("steady_state", 0)),
+        ("· repeated-task", k.get("repeated_task", 0)),
+        ("Models with a reference", s["ref_models"]),
+        ("Diverged jobs", len(s["diverged"])),
+    ]
+    tds = "".join(
+        f"<div style='min-width:130px'><div class='small'>{lab}</div>"
+        f"<div style='font-size:20px;font-weight:600'>{val}</div></div>"
+        for lab, val in cells)
+    return ("<div style='display:flex;flex-wrap:wrap;gap:18px;margin:6px 0 14px'>"
+            f"{tds}</div>")
+
+
+def _engine_coverage_html(s: Dict[str, Any]) -> str:
+    cov, ref_paired = s["cov"], s["ref_paired"]
+    rows = []
+    for e in sorted(cov):
+        c = cov[e]
+        is_ref = bco._is_reference(e)
+        rp = "—" if is_ref else str(len(ref_paired.get(e, ())))
+        rows.append(
+            "<tr><td>{e}</td><td class='num'>{a}</td><td class='num'>{u}</td>"
+            "<td class='num'>{ss}</td><td class='num'>{rt}</td>"
+            "<td class='num'>{rp}</td></tr>".format(
+                e=e, a=len(c.get("any", ())), u=len(c.get("utc", ())),
+                ss=len(c.get("steady_state", ())), rt=len(c.get("repeated_task", ())),
+                rp=rp))
+    return ("<table><thead><tr><th>Engine</th><th class='num'>models</th>"
+            "<th class='num'>utc</th><th class='num'>steady_state</th>"
+            "<th class='num'>repeated_task</th><th class='num'>ref-paired</th>"
+            "</tr></thead><tbody>" + "".join(rows) + "</tbody></table>")
+
+
+def _divergence_roster_html(s: Dict[str, Any], limit: int = 50) -> str:
+    div = s["diverged"]
+    rows = []
+    for d in div[:limit]:
+        nr = f"{d['nrmse']:.4g}" if d["nrmse"] is not None else "—"
+        cl = f"{d['closeness']:.4g}" if d["closeness"] is not None else "—"
+        nc = "#b3261e" if (d["nrmse"] or 0) > 0.10 else "#444"
+        cc = "#b3261e" if (d["closeness"] or 0) > 1.0 else "#444"
+        rows.append(
+            f"<tr><td>{d['bid']}</td><td>{d['job']}</td>"
+            f"<td><span class='kind-tag'>{d['kind']}</span></td>"
+            f"<td class='num' style='color:{nc}'>{nr}</td>"
+            f"<td class='num' style='color:{cc}'>{cl}</td>"
+            f"<td class='num'>{d['n_live']}</td></tr>")
+    body = "".join(rows) or ("<tr><td colspan='6' class='muted' "
+                             "style='padding:10px'>No diverging jobs.</td></tr>")
+    more = (f"<div class='small'>Showing worst {limit} of {len(div)} diverged "
+            f"jobs (nRMSE&gt;10% or closeness&gt;1).</div>"
+            if len(div) > limit else "")
+    return (more + "<table><thead><tr><th>Biomodel</th><th>Job</th><th>Kind</th>"
+            "<th class='num'>nRMSE (pbg↔pbg)</th>"
+            "<th class='num'>closeness (pbg↔pbg)</th>"
+            "<th class='num'>live engines</th></tr></thead><tbody>"
+            + body + "</tbody></table>")
+
+
+def _runtime_provenance_html(index: Dict[str, Any]) -> str:
+    """Per-(model, job, engine) runtime + status + error, when the batch was run
+    with provenance capture. Salvaged/back-filled datasets have none, so this
+    renders a note pointing at a fresh run."""
+    diag = index.get("diagnostics") or {}
+    runs = diag.get("runs") or {}
+    if not runs:
+        # fall back to per-model index-level runs if present
+        runs = {bid: (m.get("runs") or {})
+                for bid, m in (index.get("models") or {}).items()
+                if m.get("runs")}
+    if not runs:
+        return ("<div class='muted' style='padding:8px 0'>No per-run provenance "
+                "in this dataset — runtimes, exit status, and simulator error "
+                "messages are captured only on a fresh batch run "
+                "(this index was salvaged/back-filled from parquet series).</div>")
+    rows = []
+    for bid in sorted(runs):
+        for job, simmap in (runs[bid] or {}).items():
+            for sim, rec in (simmap or {}).items():
+                rt = rec.get("runtime_s")
+                rt_s = f"{rt:.4f}" if isinstance(rt, (int, float)) else "—"
+                status = rec.get("status") or "—"
+                sc = "ok" if status == "ok" else "bad"
+                err = rec.get("error") or ""
+                err_h = f"<div class='small bad'>{err}</div>" if err else ""
+                rows.append(f"<tr><td>{bid}</td><td>{job}</td><td>{sim}</td>"
+                            f"<td class='num'>{rt_s}</td>"
+                            f"<td class='{sc}'>{status}{err_h}</td></tr>")
+    return ("<table><thead><tr><th>Biomodel</th><th>Job</th><th>Simulator</th>"
+            "<th class='num'>Runtime (s)</th><th>Status</th></tr></thead><tbody>"
+            + "".join(rows) + "</tbody></table>")
+
+
+def _diagnostics_panel(index: Dict[str, Any]) -> str:
+    meta = index.get("meta") or {}
+    s = _diagnostics_stats(index)
+    src_bits = []
+    if meta.get("salvaged_from_parquet"):
+        src_bits.append("series salvaged from parquet")
+    if meta.get("metrics_backfilled_from_parquet"):
+        src_bits.append("metrics back-filled from parquet")
+    prov = "; ".join(src_bits) or "native batch run"
+    return (
+        "<h4>Dataset</h4>"
+        f"<div class='small'>Provenance: {prov}.</div>"
+        + _dataset_overview_html(index, s) +
+        "<h4>Engine coverage</h4>"
+        "<div class='small'>Distinct models each engine produced output for, "
+        "split by task kind. <b>ref-paired</b> = models where the engine also has "
+        "a BioSimulators reference to compare against.</div>"
+        + _engine_coverage_html(s) +
+        "<h4>Divergence roster</h4>"
+        + _divergence_roster_html(s) +
+        "<h4>Per-simulation runtime &amp; errors</h4>"
+        + _runtime_provenance_html(index))
+
+
+def _cross_closeness_html(index: Dict[str, Any]) -> str:
+    """Closeness counterpart to bco's cross-engine tab: within-pbg median
+    pairwise closeness score matrix (score ≤ 1 means the curves are close)."""
+    import statistics
+    pair_vals: Dict[tuple, List[float]] = {}
+    live: set = set()
+    for m in (index.get("models") or {}).values():
+        for j in (m.get("jobs") or {}).values():
+            mc = j.get("matrix_closeness") or {}
+            engs = [e for e in (j.get("engines") or []) if not bco._is_reference(e)]
+            live.update(engs)
+            for i, x in enumerate(engs):
+                for y in engs[i + 1:]:
+                    v = (mc.get(x) or {}).get(y)
+                    if v is not None:
+                        pair_vals.setdefault(tuple(sorted((x, y))), []).append(v)
+    order = sorted(live)
+    if not order:
+        return ""
+    head = "<tr><th></th>" + "".join(f"<th class='num'>{e}</th>" for e in order) + "</tr>"
+    rows = []
+    for a in order:
+        cells = [f"<td style='font-weight:600'>{a}</td>"]
+        for b in order:
+            if a == b:
+                cells.append("<td class='num muted'>·</td>")
+                continue
+            vals = pair_vals.get(tuple(sorted((a, b))))
+            med = statistics.median(vals) if vals else None
+            col = "#444" if med is None else ("#b3261e" if med > 1.0 else "#1b6e3c")
+            txt = "—" if med is None else f"{med:.4g}"
+            cells.append(f"<td class='num' style='color:{col}'>{txt}</td>")
+        rows.append("<tr>" + "".join(cells) + "</tr>")
+    return ("<h4>Within-pbg closeness (median pairwise score)</h4>"
+            "<div class='small'>Median BioSimulations closeness score between "
+            "each pair of live engines; ≤1 (green) means their curves agree "
+            "within tolerance.</div>"
+            "<table><thead>" + head + "</thead><tbody>"
+            + "".join(rows) + "</tbody></table>")
 
 
 def _overview_rows(index: Dict[str, Any]) -> str:
@@ -307,8 +519,10 @@ def _page(index: Dict[str, Any], static: bool = False) -> str:
     meta = index.get("meta") or {}
     n = len(index.get("models") or {})
     crashed = meta.get("crashed_models") or []
-    cross = bco._cross_engine_tab_html(_index_to_comparisons(index),
-                                       list((index.get("models") or {}).keys()))
+    cross = (bco._cross_engine_tab_html(_index_to_comparisons(index),
+                                        list((index.get("models") or {}).keys()))
+             + _cross_closeness_html(index))
+    diagnostics = _diagnostics_panel(index)
     # Server mode hits /api/* endpoints; static mode fetches a pre-rendered
     # figures/<bid>.json ({job: plotly_fig}) sitting next to index.html.
     if static:
@@ -364,6 +578,7 @@ def _page(index: Dict[str, Any], static: bool = False) -> str:
  <button class="tab active" onclick="showTab(event,'overview')">Overview</button>
  <button class="tab" onclick="showTab(event,'summary')">Summary</button>
  <button class="tab" onclick="showTab(event,'cross')">Cross-engine</button>
+ <button class="tab" onclick="showTab(event,'diagnostics')">Diagnostics</button>
 </div>
 <div id="overview" class="pane active">
  <div class="controls">Kind:
@@ -390,6 +605,7 @@ def _page(index: Dict[str, Any], static: bool = False) -> str:
 </div>
 <div id="summary" class="pane">{_summary_panel(index)}</div>
 <div id="cross" class="pane">{cross}</div>
+<div id="diagnostics" class="pane">{diagnostics}</div>
 <script>{get_plotlyjs()}</script>
 <script>
 function showTab(e,id){{document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
