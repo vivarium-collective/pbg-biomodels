@@ -6,7 +6,7 @@ BatchCompareOverlay viz step.
 import pytest
 
 import pbg_biomodels.composites.batch_compare_biomodels  # noqa: F401
-from pbg_superpowers.composite_generator import _REGISTRY, build_generator
+from viva_superpowers.composite_generator import _REGISTRY, build_generator
 
 
 def _entry():

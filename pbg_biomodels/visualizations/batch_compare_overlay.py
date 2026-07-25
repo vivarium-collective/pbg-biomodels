@@ -26,7 +26,7 @@ from plotly.offline import get_plotlyjs
 
 from pbg_biomodels import result_leaf
 from pbg_biomodels.comparison import bucket_for
-from pbg_superpowers.visualization import Visualization
+from viva_superpowers.visualization import Visualization
 
 
 # nRMSE at/below which two engines are treated as agreeing (matches the "good"

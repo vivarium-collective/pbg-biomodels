@@ -68,7 +68,7 @@ def test_reference_engines_join_results_and_comparison(tmp_path, monkeypatch):
 
     from pbg_biomodels import register_types
     from pbg_biomodels.core import build_core
-    from pbg_superpowers.composite_generator import _REGISTRY, build_generator
+    from viva_superpowers.composite_generator import _REGISTRY, build_generator
     import pbg_biomodels.composites.batch_compare_biomodels  # noqa: F401
     import pbg_biomodels.steps.simulator_runner as runner_mod
 

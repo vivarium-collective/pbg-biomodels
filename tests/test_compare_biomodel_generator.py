@@ -3,9 +3,9 @@ fans out per-biomodel branches for arbitrary id lists."""
 import pytest
 
 # Import side-effect: fires the @composite_generator decorator and registers
-# the entry in pbg_superpowers.composite_generator._REGISTRY.
+# the entry in viva_superpowers.composite_generator._REGISTRY.
 import pbg_biomodels.composites.compare_biomodel  # noqa: F401
-from pbg_superpowers.composite_generator import _REGISTRY, build_generator
+from viva_superpowers.composite_generator import _REGISTRY, build_generator
 
 
 def _entry():

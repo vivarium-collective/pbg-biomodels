@@ -15,7 +15,7 @@ from __future__ import annotations
 
 from typing import Any, Dict, Optional, Tuple
 
-from pbg_superpowers.composite_generator import composite_generator
+from viva_superpowers.composite_generator import composite_generator
 
 from pbg_biomodels.simulators import (
     process_address,

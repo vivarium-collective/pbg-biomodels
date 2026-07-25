@@ -85,7 +85,7 @@ def test_end_to_end_populates_results_and_comparisons(monkeypatch):
 
     from pbg_biomodels import register_types
     from pbg_biomodels.core import build_core
-    from pbg_superpowers.composite_generator import _REGISTRY, build_generator
+    from viva_superpowers.composite_generator import _REGISTRY, build_generator
     import pbg_biomodels.composites.batch_compare_biomodels  # noqa: F401
     import pbg_biomodels.steps.simulator_runner as runner_mod
 

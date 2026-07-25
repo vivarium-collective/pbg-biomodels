@@ -24,7 +24,7 @@ from __future__ import annotations
 
 from typing import Any, Dict, List
 
-from pbg_superpowers.composite_generator import composite_generator
+from viva_superpowers.composite_generator import composite_generator
 
 
 LOAD_STEP_ADDRESS = "local:pbg_biomodels.steps.load_biomodel.LoadBiomodelStep"

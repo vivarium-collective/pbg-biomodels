@@ -25,7 +25,7 @@ from typing import Any, Dict, List
 
 from plotly.offline import get_plotlyjs
 
-from pbg_superpowers.visualization import Visualization
+from viva_superpowers.visualization import Visualization
 
 
 _BUCKET_COLOR = {
