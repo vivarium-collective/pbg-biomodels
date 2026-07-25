@@ -33,7 +33,7 @@ def _run_model_store(bid: str, sims: List[str], ref_dir: str,
     from process_bigraph import Composite, gather_emitter_results
     from pbg_biomodels import register_types
     from pbg_biomodels.core import build_core
-    from pbg_superpowers.composite_generator import _REGISTRY, build_generator
+    from viva_superpowers.composite_generator import _REGISTRY, build_generator
     import pbg_biomodels.composites.batch_compare_biomodels  # noqa: F401
 
     core = register_types(build_core())

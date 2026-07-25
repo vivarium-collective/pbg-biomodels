@@ -22,7 +22,7 @@ from __future__ import annotations
 
 from typing import Any, Dict, List
 
-from pbg_superpowers.composite_generator import composite_generator
+from viva_superpowers.composite_generator import composite_generator
 
 from pbg_biomodels.simulators import resolve_simulators
 
