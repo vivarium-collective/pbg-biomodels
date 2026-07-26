@@ -31,6 +31,9 @@ dependencies = [
     # Reads BioSimulators SED-ML reference results (reports.h5) for the
     # batch-compare composite's optional `reference_results_dir` input.
     "h5py",
+    # Reads/writes the committed corpus_comparison parquet dataset via the
+    # pbg_biomodels.corpus_results reader (pandas needs a parquet engine).
+    "pyarrow",
     # Web-based workspace dashboard (server + templates + assets + lib helpers).
     # Extracted from pbg-template as of v0.5.0; provides the `vivarium-workbench
     # serve` CLI invoked by scripts/serve.sh. (Dist renamed from vivarium-dashboard;

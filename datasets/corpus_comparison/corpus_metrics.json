@@ -1,0 +1,6822 @@
+{
+  "BIOMD0000000001": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 5.563067316520711e-07,
+        "n_shared": 12
+      }
+    }
+  },
+  "BIOMD0000000002": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 4.871798109622822e-06,
+        "n_shared": 13
+      }
+    }
+  },
+  "BIOMD0000000003": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 2.6386087586617264e-07,
+        "n_shared": 3
+      }
+    }
+  },
+  "BIOMD0000000004": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 2.0106209943407224e-07,
+        "n_shared": 5
+      }
+    }
+  },
+  "BIOMD0000000006": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.99018859423879e-07,
+        "n_shared": 2
+      }
+    }
+  },
+  "BIOMD0000000008": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.550136542627575e-06,
+        "n_shared": 5
+      }
+    }
+  },
+  "BIOMD0000000009": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 8.133926238973099e-08,
+        "n_shared": 26
+      }
+    }
+  },
+  "BIOMD0000000010": {
+    "sim0": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 8.876831692363079e-07,
+        "n_shared": 8
+      }
+    },
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.5070413774094197e-06,
+        "n_shared": 8
+      }
+    }
+  },
+  "BIOMD0000000011": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 8.73462055412257e-06,
+        "n_shared": 22
+      }
+    }
+  },
+  "BIOMD0000000012": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.6254114934863034e-06,
+        "n_shared": 6
+      }
+    }
+  },
+  "BIOMD0000000013": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.1051094994738517e-07,
+        "n_shared": 18
+      }
+    }
+  },
+  "BIOMD0000000014": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 2.658388672021924e-07,
+        "n_shared": 86
+      }
+    }
+  },
+  "BIOMD0000000015": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 6.662228668337928e-08,
+        "n_shared": 16
+      }
+    }
+  },
+  "BIOMD0000000016": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 4.434390473766869e-07,
+        "n_shared": 6
+      }
+    }
+  },
+  "BIOMD0000000017": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.996705115028054e-07,
+        "n_shared": 11
+      }
+    }
+  },
+  "BIOMD0000000018": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 4.932223963645781e-07,
+        "n_shared": 20
+      }
+    }
+  },
+  "BIOMD0000000021": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 3.094392567541529e-06,
+        "n_shared": 10
+      }
+    }
+  },
+  "BIOMD0000000022": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 5.48890783613522e-07,
+        "n_shared": 10
+      }
+    }
+  },
+  "BIOMD0000000023": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.2458410617283795e-06,
+        "n_shared": 5
+      }
+    }
+  },
+  "BIOMD0000000026": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 2.508013063279445e-07,
+        "n_shared": 11
+      }
+    }
+  },
+  "BIOMD0000000027": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 2.512484081852794e-07,
+        "n_shared": 3
+      }
+    }
+  },
+  "BIOMD0000000028": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 2.4762402266693915e-07,
+        "n_shared": 16
+      }
+    }
+  },
+  "BIOMD0000000029": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 7.401026449136694e-08,
+        "n_shared": 4
+      }
+    }
+  },
+  "BIOMD0000000030": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 3.054701095344414e-07,
+        "n_shared": 18
+      }
+    }
+  },
+  "BIOMD0000000031": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 2.05987182546179e-07,
+        "n_shared": 3
+      }
+    }
+  },
+  "BIOMD0000000032": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.2115143108933953e-07,
+        "n_shared": 36
+      }
+    }
+  },
+  "BIOMD0000000033": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 8.25801090382279e-08,
+        "n_shared": 28
+      }
+    }
+  },
+  "BIOMD0000000035": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 5.222345470701461e-07,
+        "n_shared": 9
+      }
+    }
+  },
+  "BIOMD0000000036": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 8.768958769492541e-06,
+        "n_shared": 2
+      }
+    }
+  },
+  "BIOMD0000000037": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 5.714768538579562e-07,
+        "n_shared": 11
+      }
+    }
+  },
+  "BIOMD0000000038": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 0.0,
+        "n_shared": 13
+      }
+    }
+  },
+  "BIOMD0000000039": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 3.33181885164182e-05,
+        "n_shared": 5
+      }
+    }
+  },
+  "BIOMD0000000040": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.0968960076187837e-06,
+        "n_shared": 3
+      }
+    }
+  },
+  "BIOMD0000000041": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 2.590838625707381e-07,
+        "n_shared": 10
+      }
+    }
+  },
+  "BIOMD0000000043": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 0.0006157578184062454,
+        "n_shared": 5
+      }
+    }
+  },
+  "BIOMD0000000044": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 0.0023351550870103466,
+        "n_shared": 4
+      }
+    }
+  },
+  "BIOMD0000000045": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 3.413901062018448e-07,
+        "n_shared": 4
+      }
+    }
+  },
+  "BIOMD0000000046": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 2.9521707915734425e-06,
+        "n_shared": 12
+      }
+    }
+  },
+  "BIOMD0000000047": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.6268308374017793e-05,
+        "n_shared": 3
+      }
+    }
+  },
+  "BIOMD0000000048": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.1309924292863948e-07,
+        "n_shared": 23
+      }
+    }
+  },
+  "BIOMD0000000049": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 2.671401588583652e-05,
+        "n_shared": 92
+      }
+    }
+  },
+  "BIOMD0000000050": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.8133870287840354e-07,
+        "n_shared": 14
+      }
+    }
+  },
+  "BIOMD0000000051": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 5.647910143417391e-07,
+        "n_shared": 18
+      }
+    }
+  },
+  "BIOMD0000000052": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.8859585746187752e-07,
+        "n_shared": 11
+      }
+    }
+  },
+  "BIOMD0000000053": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.5668147926979232e-06,
+        "n_shared": 6
+      }
+    }
+  },
+  "BIOMD0000000054": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 2.7154243763645094e-06,
+        "n_shared": 3
+      }
+    }
+  },
+  "BIOMD0000000055": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 2.4876460103952613e-07,
+        "n_shared": 13
+      }
+    }
+  },
+  "BIOMD0000000056": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 2.5182786403845956e-07,
+        "n_shared": 50
+      }
+    }
+  },
+  "BIOMD0000000057": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 9.669894491192292e-08,
+        "n_shared": 6
+      }
+    }
+  },
+  "BIOMD0000000058": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 5.795314422826846e-06,
+        "n_shared": 4
+      }
+    }
+  },
+  "BIOMD0000000060": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 7.434114512961422e-07,
+        "n_shared": 4
+      }
+    }
+  },
+  "BIOMD0000000061": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 3.043154032393723e-05,
+        "n_shared": 22
+      }
+    }
+  },
+  "BIOMD0000000062": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.7952567632920505e-07,
+        "n_shared": 3
+      }
+    }
+  },
+  "BIOMD0000000063": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 2.056246148366435e-07,
+        "n_shared": 5
+      }
+    }
+  },
+  "BIOMD0000000065": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.4177144215872853e-06,
+        "n_shared": 8
+      }
+    }
+  },
+  "BIOMD0000000066": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 2.209728629477559e-07,
+        "n_shared": 11
+      }
+    }
+  },
+  "BIOMD0000000067": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 4.775725772385228e-07,
+        "n_shared": 7
+      }
+    }
+  },
+  "BIOMD0000000068": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.1898419114940312e-06,
+        "n_shared": 1
+      }
+    }
+  },
+  "BIOMD0000000069": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.9529018593931716e-06,
+        "n_shared": 10
+      }
+    }
+  },
+  "BIOMD0000000070": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.1962863689378527e-07,
+        "n_shared": 40
+      }
+    }
+  },
+  "BIOMD0000000071": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 3.000949235020764e-07,
+        "n_shared": 23
+      }
+    }
+  },
+  "BIOMD0000000072": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 3.2442149839957003e-07,
+        "n_shared": 7
+      }
+    }
+  },
+  "BIOMD0000000073": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.1374361737499307e-06,
+        "n_shared": 16
+      }
+    }
+  },
+  "BIOMD0000000074": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.1791027167123579e-07,
+        "n_shared": 19
+      }
+    }
+  },
+  "BIOMD0000000075": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 2.506449368734658e-06,
+        "n_shared": 10
+      }
+    }
+  },
+  "BIOMD0000000076": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 6.287846792447844e-07,
+        "n_shared": 1
+      }
+    }
+  },
+  "BIOMD0000000077": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 2.0622589525869903e-07,
+        "n_shared": 8
+      }
+    }
+  },
+  "BIOMD0000000078": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 5.982813089422994e-07,
+        "n_shared": 16
+      }
+    }
+  },
+  "BIOMD0000000079": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 7.258317717515776e-06,
+        "n_shared": 3
+      }
+    }
+  },
+  "BIOMD0000000080": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 5.648545095486004e-06,
+        "n_shared": 10
+      }
+    }
+  },
+  "BIOMD0000000081": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 3.25943154974457e-07,
+        "n_shared": 21
+      }
+    }
+  },
+  "BIOMD0000000082": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 0.007994600657699668,
+        "n_shared": 10
+      }
+    }
+  },
+  "BIOMD0000000083": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 2.1989061292846052e-07,
+        "n_shared": 19
+      }
+    }
+  },
+  "BIOMD0000000084": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.3368594017460794e-06,
+        "n_shared": 8
+      }
+    }
+  },
+  "BIOMD0000000085": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 0.0010191167180220943,
+        "n_shared": 17
+      }
+    }
+  },
+  "BIOMD0000000086": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 4.3198185261440915e-05,
+        "n_shared": 17
+      }
+    }
+  },
+  "BIOMD0000000087": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 2.2477501294013496e-07,
+        "n_shared": 53
+      }
+    }
+  },
+  "BIOMD0000000088": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 5.499859719887213e-07,
+        "n_shared": 97
+      }
+    }
+  },
+  "BIOMD0000000089": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.931191928747739e-07,
+        "n_shared": 16
+      }
+    }
+  },
+  "BIOMD0000000090": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 7.05490676992087e-07,
+        "n_shared": 13
+      }
+    }
+  },
+  "BIOMD0000000091": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 2.2436867095967302e-06,
+        "n_shared": 15
+      }
+    }
+  },
+  "BIOMD0000000092": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 2.0578181497094282e-05,
+        "n_shared": 4
+      }
+    }
+  },
+  "BIOMD0000000093": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 8.113893244788117e-06,
+        "n_shared": 33
+      }
+    }
+  },
+  "BIOMD0000000094": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 3.1169232865781277e-06,
+        "n_shared": 33
+      }
+    }
+  },
+  "BIOMD0000000095": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 9.634290121871858e-07,
+        "n_shared": 19
+      }
+    }
+  },
+  "BIOMD0000000096": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.6037894010209943e-06,
+        "n_shared": 19
+      }
+    }
+  },
+  "BIOMD0000000097": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 6.730287568831833e-07,
+        "n_shared": 19
+      }
+    }
+  },
+  "BIOMD0000000098": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 8.320561209916123e-05,
+        "n_shared": 2
+      }
+    }
+  },
+  "BIOMD0000000099": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 3.128975723799358e-06,
+        "n_shared": 7
+      }
+    }
+  },
+  "BIOMD0000000100": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 6.0844465022925915e-06,
+        "n_shared": 4
+      }
+    }
+  },
+  "BIOMD0000000101": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 5.258114187378668e-07,
+        "n_shared": 6
+      }
+    }
+  },
+  "BIOMD0000000102": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.382876830190916e-07,
+        "n_shared": 13
+      }
+    }
+  },
+  "BIOMD0000000103": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.7036037315774726e-07,
+        "n_shared": 17
+      }
+    }
+  },
+  "BIOMD0000000104": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 7.797763583849291e-07,
+        "n_shared": 5
+      }
+    }
+  },
+  "BIOMD0000000105": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 0.00011722583731229715,
+        "n_shared": 33
+      }
+    }
+  },
+  "BIOMD0000000106": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 4.867470906130131e-07,
+        "n_shared": 19
+      }
+    }
+  },
+  "BIOMD0000000107": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.4229458487910274e-06,
+        "n_shared": 9
+      }
+    }
+  },
+  "BIOMD0000000108": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 6.229159574275097e-05,
+        "n_shared": 7
+      }
+    }
+  },
+  "BIOMD0000000109": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 3.401740146910749e-07,
+        "n_shared": 57
+      }
+    }
+  },
+  "BIOMD0000000110": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 3.976194835032388e-06,
+        "n_shared": 14
+      }
+    }
+  },
+  "BIOMD0000000111": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 6.022261223551002e-07,
+        "n_shared": 10
+      }
+    }
+  },
+  "BIOMD0000000112": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 2.168597896278645e-07,
+        "n_shared": 10
+      }
+    }
+  },
+  "BIOMD0000000113": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.9644475240825365e-05,
+        "n_shared": 3
+      }
+    }
+  },
+  "BIOMD0000000114": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 5.599944285890638e-07,
+        "n_shared": 2
+      }
+    }
+  },
+  "BIOMD0000000115": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 4.7954270080570456e-06,
+        "n_shared": 2
+      }
+    }
+  },
+  "BIOMD0000000116": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 6.855271806842436e-08,
+        "n_shared": 6
+      }
+    }
+  },
+  "BIOMD0000000117": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 0.0002736945466205599,
+        "n_shared": 2
+      }
+    }
+  },
+  "BIOMD0000000119": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 5.498439718384683e-07,
+        "n_shared": 9
+      }
+    }
+  },
+  "BIOMD0000000120": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 2.8410153558800023e-06,
+        "n_shared": 5
+      }
+    }
+  },
+  "BIOMD0000000121": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 2.914857184315806e-07,
+        "n_shared": 6
+      }
+    }
+  },
+  "BIOMD0000000122": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 4.2192884769877414e-07,
+        "n_shared": 12
+      }
+    }
+  },
+  "BIOMD0000000123": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 3.398045432047659e-07,
+        "n_shared": 14
+      }
+    }
+  },
+  "BIOMD0000000125": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.0702348572062837e-06,
+        "n_shared": 4
+      }
+    }
+  },
+  "BIOMD0000000126": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 9.312598492796851e-08,
+        "n_shared": 9
+      }
+    }
+  },
+  "BIOMD0000000128": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 2.492718419644696e-06,
+        "n_shared": 7
+      }
+    }
+  },
+  "BIOMD0000000138": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 2.2255823629539825e-07,
+        "n_shared": 4
+      }
+    }
+  },
+  "BIOMD0000000139": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 6.003075640348666e-07,
+        "n_shared": 25
+      }
+    }
+  },
+  "BIOMD0000000140": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 3.562420130494033e-07,
+        "n_shared": 25
+      }
+    }
+  },
+  "BIOMD0000000144": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 7.771856005090275e-07,
+        "n_shared": 17
+      }
+    }
+  },
+  "BIOMD0000000146": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 9.307342875719975e-07,
+        "n_shared": 33
+      }
+    }
+  },
+  "BIOMD0000000147": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 3.209676674507552e-07,
+        "n_shared": 24
+      }
+    }
+  },
+  "BIOMD0000000148": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.3521374245431414e-06,
+        "n_shared": 5
+      }
+    }
+  },
+  "BIOMD0000000149": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 2.7450497519551063e-07,
+        "n_shared": 28
+      }
+    }
+  },
+  "BIOMD0000000150": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 4.935036130371094e-06,
+        "n_shared": 4
+      }
+    }
+  },
+  "BIOMD0000000151": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 3.6836432325213556e-05,
+        "n_shared": 66
+      }
+    }
+  },
+  "BIOMD0000000152": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.694971453880717e-05,
+        "n_shared": 63
+      }
+    }
+  },
+  "BIOMD0000000153": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.2772492213710326e-05,
+        "n_shared": 74
+      }
+    }
+  },
+  "BIOMD0000000156": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 5.148417314321047e-06,
+        "n_shared": 3
+      }
+    }
+  },
+  "BIOMD0000000157": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 2.2210363491447533e-06,
+        "n_shared": 3
+      }
+    }
+  },
+  "BIOMD0000000158": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 9.148821618316435e-06,
+        "n_shared": 3
+      }
+    }
+  },
+  "BIOMD0000000159": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 2.7112695125255087e-06,
+        "n_shared": 3
+      }
+    }
+  },
+  "BIOMD0000000160": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 3.7898085033638837e-07,
+        "n_shared": 19
+      }
+    }
+  },
+  "BIOMD0000000161": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 8.822717971579573e-07,
+        "n_shared": 42
+      }
+    }
+  },
+  "BIOMD0000000162": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "large",
+        "mean_nrmse": 0.11007122055230466,
+        "n_shared": 24
+      }
+    }
+  },
+  "BIOMD0000000163": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 5.11033230129742e-07,
+        "n_shared": 16
+      }
+    }
+  },
+  "BIOMD0000000164": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 4.422881454171477e-07,
+        "n_shared": 23
+      }
+    }
+  },
+  "BIOMD0000000165": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "borderline",
+        "mean_nrmse": 0.05205381958480482,
+        "n_shared": 35
+      }
+    }
+  },
+  "BIOMD0000000166": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 4.368307027806767e-05,
+        "n_shared": 3
+      }
+    }
+  },
+  "BIOMD0000000167": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 9.684405692933138e-07,
+        "n_shared": 7
+      }
+    }
+  },
+  "BIOMD0000000168": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 5.845591773416238e-07,
+        "n_shared": 7
+      }
+    }
+  },
+  "BIOMD0000000169": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 2.9918509396557913e-07,
+        "n_shared": 11
+      }
+    }
+  },
+  "BIOMD0000000170": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.1066207612100599e-06,
+        "n_shared": 7
+      }
+    }
+  },
+  "BIOMD0000000171": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 3.356771321584027e-07,
+        "n_shared": 10
+      }
+    }
+  },
+  "BIOMD0000000172": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 2.2061433743271866e-07,
+        "n_shared": 17
+      }
+    }
+  },
+  "BIOMD0000000173": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 7.444688040907263e-07,
+        "n_shared": 23
+      }
+    }
+  },
+  "BIOMD0000000174": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 3.065753337906721e-07,
+        "n_shared": 4
+      }
+    }
+  },
+  "BIOMD0000000175": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 3.613426287622778e-07,
+        "n_shared": 118
+      }
+    }
+  },
+  "BIOMD0000000176": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 4.65745969995954e-07,
+        "n_shared": 17
+      }
+    }
+  },
+  "BIOMD0000000177": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 3.876651560780949e-07,
+        "n_shared": 18
+      }
+    }
+  },
+  "BIOMD0000000178": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 2.793613068420956e-07,
+        "n_shared": 5
+      }
+    }
+  },
+  "BIOMD0000000181": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 4.803884651190083e-07,
+        "n_shared": 6
+      }
+    }
+  },
+  "BIOMD0000000182": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 3.667239138419018e-07,
+        "n_shared": 32
+      }
+    }
+  },
+  "BIOMD0000000183": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "borderline",
+        "mean_nrmse": 0.023063043809573854,
+        "n_shared": 67
+      }
+    }
+  },
+  "BIOMD0000000184": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 7.496996822065896e-07,
+        "n_shared": 3
+      }
+    }
+  },
+  "BIOMD0000000185": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 9.014801059344965e-07,
+        "n_shared": 8
+      }
+    }
+  },
+  "BIOMD0000000186": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 2.936502871263512e-05,
+        "n_shared": 11
+      }
+    }
+  },
+  "BIOMD0000000187": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 2.936502871263512e-05,
+        "n_shared": 11
+      }
+    }
+  },
+  "BIOMD0000000188": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 2.706957375834308e-07,
+        "n_shared": 18
+      }
+    }
+  },
+  "BIOMD0000000189": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.661270475237483e-07,
+        "n_shared": 16
+      }
+    }
+  },
+  "BIOMD0000000190": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 5.053097127720004e-07,
+        "n_shared": 11
+      }
+    }
+  },
+  "BIOMD0000000191": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 4.609016735356931e-07,
+        "n_shared": 2
+      }
+    }
+  },
+  "BIOMD0000000192": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 2.4546240239752697e-07,
+        "n_shared": 10
+      }
+    }
+  },
+  "BIOMD0000000193": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 7.26299673217714e-05,
+        "n_shared": 8
+      }
+    }
+  },
+  "BIOMD0000000194": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 2.6099276377508866e-05,
+        "n_shared": 5
+      }
+    }
+  },
+  "BIOMD0000000195": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 5.368353841923197e-07,
+        "n_shared": 11
+      }
+    }
+  },
+  "BIOMD0000000197": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.0725822568465562e-06,
+        "n_shared": 5
+      }
+    }
+  },
+  "BIOMD0000000198": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 5.416234887722911e-07,
+        "n_shared": 11
+      }
+    }
+  },
+  "BIOMD0000000199": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 2.465987076064496e-07,
+        "n_shared": 9
+      }
+    }
+  },
+  "BIOMD0000000200": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 3.9021455030919456e-05,
+        "n_shared": 20
+      }
+    }
+  },
+  "BIOMD0000000201": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 7.520233517742894e-07,
+        "n_shared": 16
+      }
+    }
+  },
+  "BIOMD0000000202": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.0688811689370604e-06,
+        "n_shared": 10
+      }
+    }
+  },
+  "BIOMD0000000203": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 3.4127475771234813e-07,
+        "n_shared": 5
+      }
+    }
+  },
+  "BIOMD0000000204": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 3.9981364643162043e-07,
+        "n_shared": 5
+      }
+    }
+  },
+  "BIOMD0000000205": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 5.703117588121169e-07,
+        "n_shared": 194
+      }
+    }
+  },
+  "BIOMD0000000209": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.1949470287163492e-06,
+        "n_shared": 6
+      }
+    }
+  },
+  "BIOMD0000000210": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 5.308791130864959e-07,
+        "n_shared": 6
+      }
+    }
+  },
+  "BIOMD0000000211": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 2.858319507215393e-07,
+        "n_shared": 24
+      }
+    }
+  },
+  "BIOMD0000000212": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 3.638046644016612e-07,
+        "n_shared": 7
+      }
+    }
+  },
+  "BIOMD0000000213": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 5.233016823300536e-08,
+        "n_shared": 6
+      }
+    }
+  },
+  "BIOMD0000000214": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 2.5613670865187585e-06,
+        "n_shared": 16
+      }
+    }
+  },
+  "BIOMD0000000215": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 2.7739623198143465e-07,
+        "n_shared": 6
+      }
+    }
+  },
+  "BIOMD0000000216": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 6.385015032329475e-07,
+        "n_shared": 5
+      }
+    }
+  },
+  "BIOMD0000000217": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 7.16864897445048e-07,
+        "n_shared": 12
+      }
+    }
+  },
+  "BIOMD0000000218": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 4.3432664940900114e-08,
+        "n_shared": 9
+      }
+    }
+  },
+  "BIOMD0000000219": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 2.0175055678406602e-07,
+        "n_shared": 9
+      }
+    }
+  },
+  "BIOMD0000000220": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 0.0008758812147784568,
+        "n_shared": 58
+      }
+    }
+  },
+  "BIOMD0000000221": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.0971891475302118e-07,
+        "n_shared": 8
+      }
+    }
+  },
+  "BIOMD0000000222": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 2.3915134696810416e-07,
+        "n_shared": 8
+      }
+    }
+  },
+  "BIOMD0000000223": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "borderline",
+        "mean_nrmse": 0.03000227819157736,
+        "n_shared": 81
+      }
+    }
+  },
+  "BIOMD0000000224": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 2.3380817327239132e-06,
+        "n_shared": 4
+      }
+    }
+  },
+  "BIOMD0000000225": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.4631353713881009e-06,
+        "n_shared": 2
+      }
+    }
+  },
+  "BIOMD0000000228": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 9.720220284329855e-07,
+        "n_shared": 9
+      }
+    }
+  },
+  "BIOMD0000000229": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 2.587075009456066e-06,
+        "n_shared": 7
+      }
+    }
+  },
+  "BIOMD0000000230": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 4.864941464788889e-07,
+        "n_shared": 24
+      }
+    }
+  },
+  "BIOMD0000000231": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.7087324356064444e-07,
+        "n_shared": 5
+      }
+    }
+  },
+  "BIOMD0000000233": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 8.12971986513333e-06,
+        "n_shared": 2
+      }
+    }
+  },
+  "BIOMD0000000236": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.7456185415642915e-06,
+        "n_shared": 3
+      }
+    }
+  },
+  "BIOMD0000000237": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 3.0877229642066154e-07,
+        "n_shared": 24
+      }
+    }
+  },
+  "BIOMD0000000240": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.3771655846493186e-07,
+        "n_shared": 6
+      }
+    }
+  },
+  "BIOMD0000000242": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.6861985404956397e-06,
+        "n_shared": 6
+      }
+    }
+  },
+  "BIOMD0000000243": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 2.5761623473205643e-07,
+        "n_shared": 23
+      }
+    }
+  },
+  "BIOMD0000000244": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 7.077189374025975e-08,
+        "n_shared": 47
+      }
+    }
+  },
+  "BIOMD0000000245": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.2680448618893363e-07,
+        "n_shared": 8
+      }
+    }
+  },
+  "BIOMD0000000247": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 5.765007034335862e-07,
+        "n_shared": 24
+      }
+    }
+  },
+  "BIOMD0000000248": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "large",
+        "mean_nrmse": 0.11898020148990614,
+        "n_shared": 8
+      }
+    }
+  },
+  "BIOMD0000000251": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 3.0342303451526327e-07,
+        "n_shared": 9
+      }
+    }
+  },
+  "BIOMD0000000253": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 9.960661029008201e-07,
+        "n_shared": 3
+      }
+    }
+  },
+  "BIOMD0000000256": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 2.623527719210752e-07,
+        "n_shared": 27
+      }
+    }
+  },
+  "BIOMD0000000257": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 2.550793162390861e-07,
+        "n_shared": 8
+      }
+    }
+  },
+  "BIOMD0000000258": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.8553559933931023e-06,
+        "n_shared": 3
+      }
+    }
+  },
+  "BIOMD0000000259": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 9.176683845216863e-08,
+        "n_shared": 17
+      }
+    }
+  },
+  "BIOMD0000000260": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.4585267448595187e-07,
+        "n_shared": 17
+      }
+    }
+  },
+  "BIOMD0000000261": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.4222342077041604e-07,
+        "n_shared": 17
+      }
+    }
+  },
+  "BIOMD0000000262": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 3.3955229147038596e-06,
+        "n_shared": 9
+      }
+    }
+  },
+  "BIOMD0000000263": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 2.8461307975461705e-07,
+        "n_shared": 9
+      }
+    }
+  },
+  "BIOMD0000000264": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 2.456840747356683e-07,
+        "n_shared": 11
+      }
+    }
+  },
+  "BIOMD0000000265": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 2.9145350439507716e-06,
+        "n_shared": 23
+      }
+    }
+  },
+  "BIOMD0000000267": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 2.0732342070695384e-07,
+        "n_shared": 4
+      }
+    }
+  },
+  "BIOMD0000000268": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 3.6095388094425746e-07,
+        "n_shared": 34
+      }
+    }
+  },
+  "BIOMD0000000269": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 6.272027488309727e-07,
+        "n_shared": 9
+      }
+    }
+  },
+  "BIOMD0000000270": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.38351889039595e-07,
+        "n_shared": 32
+      }
+    }
+  },
+  "BIOMD0000000271": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 2.926091826357772e-07,
+        "n_shared": 6
+      }
+    }
+  },
+  "BIOMD0000000272": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.4401897142547472e-07,
+        "n_shared": 6
+      }
+    }
+  },
+  "BIOMD0000000273": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 2.2962831626604972e-07,
+        "n_shared": 19
+      }
+    }
+  },
+  "BIOMD0000000275": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 7.5363568793401095e-06,
+        "n_shared": 5
+      }
+    }
+  },
+  "BIOMD0000000281": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 5.129503564381311e-07,
+        "n_shared": 32
+      }
+    }
+  },
+  "BIOMD0000000282": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 3.041526675526398e-07,
+        "n_shared": 5
+      }
+    }
+  },
+  "BIOMD0000000283": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 3.783389647159957e-07,
+        "n_shared": 4
+      }
+    }
+  },
+  "BIOMD0000000284": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 4.613730377014497e-07,
+        "n_shared": 6
+      }
+    }
+  },
+  "BIOMD0000000285": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "large",
+        "mean_nrmse": 0.31216642425142965,
+        "n_shared": 25
+      }
+    }
+  },
+  "BIOMD0000000286": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.535041626942888e-07,
+        "n_shared": 49
+      }
+    }
+  },
+  "BIOMD0000000287": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 0.0002718710523855952,
+        "n_shared": 19
+      }
+    }
+  },
+  "BIOMD0000000289": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 3.0193342515832003e-07,
+        "n_shared": 4
+      }
+    }
+  },
+  "BIOMD0000000290": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 2.9230507619863504e-06,
+        "n_shared": 4
+      }
+    }
+  },
+  "BIOMD0000000292": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.2767560894115653e-06,
+        "n_shared": 3
+      }
+    }
+  },
+  "BIOMD0000000293": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.907760577691531e-06,
+        "n_shared": 130
+      }
+    }
+  },
+  "BIOMD0000000294": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 8.234512454910833e-07,
+        "n_shared": 10
+      }
+    }
+  },
+  "BIOMD0000000295": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.951602325225459e-06,
+        "n_shared": 5
+      }
+    }
+  },
+  "BIOMD0000000296": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.7115854089374961e-06,
+        "n_shared": 4
+      }
+    }
+  },
+  "BIOMD0000000297": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 7.063461228122323e-07,
+        "n_shared": 19
+      }
+    }
+  },
+  "BIOMD0000000300": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 6.387945355407318e-07,
+        "n_shared": 3
+      }
+    }
+  },
+  "BIOMD0000000301": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 8.656224376205649e-07,
+        "n_shared": 8
+      }
+    }
+  },
+  "BIOMD0000000303": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "large",
+        "mean_nrmse": 0.10710316631559076,
+        "n_shared": 41
+      }
+    }
+  },
+  "BIOMD0000000305": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 7.480075931368218e-08,
+        "n_shared": 6
+      }
+    }
+  },
+  "BIOMD0000000306": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "none",
+        "mean_nrmse": null,
+        "n_shared": 2
+      }
+    }
+  },
+  "BIOMD0000000307": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "none",
+        "mean_nrmse": null,
+        "n_shared": 2
+      }
+    }
+  },
+  "BIOMD0000000308": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "none",
+        "mean_nrmse": null,
+        "n_shared": 3
+      }
+    }
+  },
+  "BIOMD0000000309": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 3.563070653995041e-06,
+        "n_shared": 1
+      }
+    }
+  },
+  "BIOMD0000000310": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "none",
+        "mean_nrmse": null,
+        "n_shared": 1
+      }
+    }
+  },
+  "BIOMD0000000311": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "none",
+        "mean_nrmse": null,
+        "n_shared": 1
+      }
+    }
+  },
+  "BIOMD0000000312": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.2366158623212973e-06,
+        "n_shared": 2
+      }
+    }
+  },
+  "BIOMD0000000313": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 2.90626177094919e-07,
+        "n_shared": 14
+      }
+    }
+  },
+  "BIOMD0000000314": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 4.7340790305518474e-07,
+        "n_shared": 10
+      }
+    }
+  },
+  "BIOMD0000000315": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 3.604672182633458e-07,
+        "n_shared": 19
+      }
+    }
+  },
+  "BIOMD0000000316": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "large",
+        "mean_nrmse": 0.2625180047815022,
+        "n_shared": 2
+      }
+    }
+  },
+  "BIOMD0000000317": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.6748029500007068e-06,
+        "n_shared": 4
+      }
+    }
+  },
+  "BIOMD0000000318": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 4.2877374629544655e-07,
+        "n_shared": 7
+      }
+    }
+  },
+  "BIOMD0000000319": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 6.650698240850257e-07,
+        "n_shared": 3
+      }
+    }
+  },
+  "BIOMD0000000320": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.0657733501432506e-07,
+        "n_shared": 9
+      }
+    }
+  },
+  "BIOMD0000000321": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 3.4056799144017904e-07,
+        "n_shared": 3
+      }
+    }
+  },
+  "BIOMD0000000322": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 3.9909280652688755e-07,
+        "n_shared": 4
+      }
+    }
+  },
+  "BIOMD0000000323": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.0508533233816694e-05,
+        "n_shared": 3
+      }
+    }
+  },
+  "BIOMD0000000325": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 4.972060208630924e-08,
+        "n_shared": 5
+      }
+    }
+  },
+  "BIOMD0000000326": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 3.363884412778313e-07,
+        "n_shared": 71
+      }
+    }
+  },
+  "BIOMD0000000328": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 5.5525923319042155e-08,
+        "n_shared": 18
+      }
+    }
+  },
+  "BIOMD0000000329": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 7.294228937496201e-06,
+        "n_shared": 3
+      }
+    }
+  },
+  "BIOMD0000000332": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 4.467601942530231e-05,
+        "n_shared": 77
+      }
+    }
+  },
+  "BIOMD0000000333": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 2.1944890665584144e-05,
+        "n_shared": 54
+      }
+    }
+  },
+  "BIOMD0000000334": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.4657995194571471e-05,
+        "n_shared": 73
+      }
+    }
+  },
+  "BIOMD0000000335": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 0.0027818259875771376,
+        "n_shared": 34
+      }
+    }
+  },
+  "BIOMD0000000337": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 3.352761018815561e-09,
+        "n_shared": 3
+      }
+    }
+  },
+  "BIOMD0000000340": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "large",
+        "mean_nrmse": 0.12038248555137912,
+        "n_shared": 53
+      }
+    }
+  },
+  "BIOMD0000000342": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "large",
+        "mean_nrmse": 0.5274783730417781,
+        "n_shared": 19
+      }
+    }
+  },
+  "BIOMD0000000344": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 6.779347905747478e-07,
+        "n_shared": 49
+      }
+    }
+  },
+  "BIOMD0000000347": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 0.009840034418057992,
+        "n_shared": 25
+      }
+    }
+  },
+  "BIOMD0000000350": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 5.672869796652532e-07,
+        "n_shared": 14
+      }
+    }
+  },
+  "BIOMD0000000351": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 4.183333139084697e-07,
+        "n_shared": 6
+      }
+    }
+  },
+  "BIOMD0000000352": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 3.7294119042748485e-07,
+        "n_shared": 6
+      }
+    }
+  },
+  "BIOMD0000000354": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 3.7344140971776033e-06,
+        "n_shared": 5
+      }
+    }
+  },
+  "BIOMD0000000355": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 2.734430822383016e-06,
+        "n_shared": 8
+      }
+    }
+  },
+  "BIOMD0000000357": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.723697751100483e-07,
+        "n_shared": 9
+      }
+    }
+  },
+  "BIOMD0000000358": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 7.861933371043209e-08,
+        "n_shared": 11
+      }
+    }
+  },
+  "BIOMD0000000359": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 5.492284515038171e-08,
+        "n_shared": 9
+      }
+    }
+  },
+  "BIOMD0000000360": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 8.081719598479147e-07,
+        "n_shared": 9
+      }
+    }
+  },
+  "BIOMD0000000361": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.5020956602942855e-07,
+        "n_shared": 8
+      }
+    }
+  },
+  "BIOMD0000000362": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 2.636882917420809e-06,
+        "n_shared": 34
+      }
+    }
+  },
+  "BIOMD0000000363": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 4.0779993295702007e-07,
+        "n_shared": 4
+      }
+    }
+  },
+  "BIOMD0000000364": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.283778549346782e-06,
+        "n_shared": 13
+      }
+    }
+  },
+  "BIOMD0000000365": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 6.624290815654361e-05,
+        "n_shared": 30
+      }
+    }
+  },
+  "BIOMD0000000366": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 7.280518311799986e-07,
+        "n_shared": 11
+      }
+    }
+  },
+  "BIOMD0000000383": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 8.553283105932974e-07,
+        "n_shared": 2
+      }
+    }
+  },
+  "BIOMD0000000384": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.0971596652436744e-06,
+        "n_shared": 2
+      }
+    }
+  },
+  "BIOMD0000000385": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 4.492197120308273e-07,
+        "n_shared": 2
+      }
+    }
+  },
+  "BIOMD0000000386": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.2010162716532346e-06,
+        "n_shared": 2
+      }
+    }
+  },
+  "BIOMD0000000387": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 9.65231577025755e-07,
+        "n_shared": 2
+      }
+    }
+  },
+  "BIOMD0000000388": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 5.613798135236692e-07,
+        "n_shared": 5
+      }
+    }
+  },
+  "BIOMD0000000389": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 8.041623803137076e-07,
+        "n_shared": 19
+      }
+    }
+  },
+  "BIOMD0000000390": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 5.772732143621947e-07,
+        "n_shared": 7
+      }
+    }
+  },
+  "BIOMD0000000391": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.929753401244703e-07,
+        "n_shared": 16
+      }
+    }
+  },
+  "BIOMD0000000392": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 2.97195805247255e-07,
+        "n_shared": 23
+      }
+    }
+  },
+  "BIOMD0000000393": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 4.2326774087851527e-07,
+        "n_shared": 28
+      }
+    }
+  },
+  "BIOMD0000000394": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 7.59500782748416e-07,
+        "n_shared": 17
+      }
+    }
+  },
+  "BIOMD0000000398": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 3.9184164226176375e-07,
+        "n_shared": 22
+      }
+    }
+  },
+  "BIOMD0000000404": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 5.365618900956037e-07,
+        "n_shared": 25
+      }
+    }
+  },
+  "BIOMD0000000405": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.5594152283411114e-06,
+        "n_shared": 5
+      }
+    }
+  },
+  "BIOMD0000000406": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.2099035714954687e-06,
+        "n_shared": 21
+      }
+    }
+  },
+  "BIOMD0000000407": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 0.0023211515327322433,
+        "n_shared": 47
+      }
+    }
+  },
+  "BIOMD0000000408": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 5.2088031046625855e-05,
+        "n_shared": 11
+      }
+    }
+  },
+  "BIOMD0000000409": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 6.46184731297442e-07,
+        "n_shared": 13
+      }
+    }
+  },
+  "BIOMD0000000410": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.8130889894373987e-05,
+        "n_shared": 53
+      }
+    }
+  },
+  "BIOMD0000000411": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 2.5451997251466017e-07,
+        "n_shared": 7
+      }
+    }
+  },
+  "BIOMD0000000412": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.6158565898265288e-07,
+        "n_shared": 79
+      }
+    }
+  },
+  "BIOMD0000000413": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 4.2576686233105645e-07,
+        "n_shared": 5
+      }
+    }
+  },
+  "BIOMD0000000414": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 2.159305257629447e-06,
+        "n_shared": 1
+      }
+    }
+  },
+  "BIOMD0000000415": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.7651889428853637e-06,
+        "n_shared": 10
+      }
+    }
+  },
+  "BIOMD0000000416": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 9.894066344562472e-07,
+        "n_shared": 32
+      }
+    }
+  },
+  "BIOMD0000000417": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.0756728732907446e-06,
+        "n_shared": 1
+      }
+    }
+  },
+  "BIOMD0000000418": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 3.261507322649369e-06,
+        "n_shared": 1
+      }
+    }
+  },
+  "BIOMD0000000419": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 4.223548631472841e-06,
+        "n_shared": 3
+      }
+    }
+  },
+  "BIOMD0000000420": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 2.022446717391758e-06,
+        "n_shared": 2
+      }
+    }
+  },
+  "BIOMD0000000421": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 2.0123930475441076e-06,
+        "n_shared": 2
+      }
+    }
+  },
+  "BIOMD0000000422": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.220254298022333e-07,
+        "n_shared": 22
+      }
+    }
+  },
+  "BIOMD0000000423": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 3.299860347128235e-07,
+        "n_shared": 9
+      }
+    }
+  },
+  "BIOMD0000000425": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 7.619682221850358e-07,
+        "n_shared": 1
+      }
+    }
+  },
+  "BIOMD0000000426": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.838749732570434e-07,
+        "n_shared": 21
+      }
+    }
+  },
+  "BIOMD0000000427": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.4140902726200332e-07,
+        "n_shared": 18
+      }
+    }
+  },
+  "BIOMD0000000428": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 2.2328674744548506e-07,
+        "n_shared": 26
+      }
+    }
+  },
+  "BIOMD0000000430": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.9559660596006962e-07,
+        "n_shared": 27
+      }
+    }
+  },
+  "BIOMD0000000431": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 5.139782059977994e-08,
+        "n_shared": 27
+      }
+    }
+  },
+  "BIOMD0000000432": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.9581476090589683e-07,
+        "n_shared": 8
+      }
+    }
+  },
+  "BIOMD0000000433": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 9.24997509301805e-08,
+        "n_shared": 8
+      }
+    }
+  },
+  "BIOMD0000000434": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 2.0081530196916845e-07,
+        "n_shared": 19
+      }
+    }
+  },
+  "BIOMD0000000435": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.4636929906862907e-06,
+        "n_shared": 4
+      }
+    }
+  },
+  "BIOMD0000000436": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 4.493239723983784e-07,
+        "n_shared": 11
+      }
+    }
+  },
+  "BIOMD0000000437": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "large",
+        "mean_nrmse": 0.1822798726698358,
+        "n_shared": 54
+      }
+    }
+  },
+  "BIOMD0000000438": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 2.2231540523035167e-07,
+        "n_shared": 10
+      }
+    }
+  },
+  "BIOMD0000000439": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 2.4228928220492856e-06,
+        "n_shared": 20
+      }
+    }
+  },
+  "BIOMD0000000440": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.0156448246263138e-06,
+        "n_shared": 8
+      }
+    }
+  },
+  "BIOMD0000000441": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 5.290781911298979e-07,
+        "n_shared": 8
+      }
+    }
+  },
+  "BIOMD0000000442": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 4.347670016951797e-07,
+        "n_shared": 10
+      }
+    }
+  },
+  "BIOMD0000000445": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 2.1157055765002877e-07,
+        "n_shared": 32
+      }
+    }
+  },
+  "BIOMD0000000446": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 8.124490281088331e-07,
+        "n_shared": 27
+      }
+    }
+  },
+  "BIOMD0000000447": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 8.283228671187982e-07,
+        "n_shared": 13
+      }
+    }
+  },
+  "BIOMD0000000448": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 2.7971779620468643e-07,
+        "n_shared": 27
+      }
+    }
+  },
+  "BIOMD0000000449": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 3.154052132131786e-07,
+        "n_shared": 27
+      }
+    }
+  },
+  "BIOMD0000000452": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.8694260916142158e-05,
+        "n_shared": 109
+      }
+    }
+  },
+  "BIOMD0000000453": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 8.040811683699103e-05,
+        "n_shared": 109
+      }
+    }
+  },
+  "BIOMD0000000454": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 4.4145789350331586e-09,
+        "n_shared": 3
+      }
+    }
+  },
+  "BIOMD0000000455": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 4.4145789350331586e-09,
+        "n_shared": 3
+      }
+    }
+  },
+  "BIOMD0000000456": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 4.379953961901001e-09,
+        "n_shared": 4
+      }
+    }
+  },
+  "BIOMD0000000457": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 0.0004734165773168991,
+        "n_shared": 162
+      }
+    }
+  },
+  "BIOMD0000000458": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.643021649550516e-06,
+        "n_shared": 2
+      }
+    }
+  },
+  "BIOMD0000000459": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 7.812800986515593e-07,
+        "n_shared": 3
+      }
+    }
+  },
+  "BIOMD0000000460": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 4.063645387288458e-07,
+        "n_shared": 3
+      }
+    }
+  },
+  "BIOMD0000000461": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 6.321235353704148e-07,
+        "n_shared": 3
+      }
+    }
+  },
+  "BIOMD0000000462": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "borderline",
+        "mean_nrmse": 0.03739832093267944,
+        "n_shared": 4
+      }
+    }
+  },
+  "BIOMD0000000463": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 2.1346386723080216e-07,
+        "n_shared": 35
+      }
+    }
+  },
+  "BIOMD0000000464": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.0036026278076573e-07,
+        "n_shared": 12
+      }
+    }
+  },
+  "BIOMD0000000465": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 9.102370675886322e-07,
+        "n_shared": 11
+      }
+    }
+  },
+  "BIOMD0000000467": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.5108812113165017e-07,
+        "n_shared": 18
+      }
+    }
+  },
+  "BIOMD0000000475": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.0850575366690357e-06,
+        "n_shared": 23
+      }
+    }
+  },
+  "BIOMD0000000476": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 4.292347268393727e-07,
+        "n_shared": 16
+      }
+    }
+  },
+  "BIOMD0000000478": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.6038010267331703e-07,
+        "n_shared": 29
+      }
+    }
+  },
+  "BIOMD0000000479": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 4.230337753581497e-07,
+        "n_shared": 28
+      }
+    }
+  },
+  "BIOMD0000000481": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 6.478635678250972e-07,
+        "n_shared": 16
+      }
+    }
+  },
+  "BIOMD0000000482": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 3.325593451597955e-07,
+        "n_shared": 23
+      }
+    }
+  },
+  "BIOMD0000000483": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "none",
+        "mean_nrmse": null,
+        "n_shared": 8
+      }
+    }
+  },
+  "BIOMD0000000484": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.5361162808460264e-06,
+        "n_shared": 2
+      }
+    }
+  },
+  "BIOMD0000000485": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 7.572062228669234e-07,
+        "n_shared": 2
+      }
+    }
+  },
+  "BIOMD0000000486": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "none",
+        "mean_nrmse": null,
+        "n_shared": 2
+      }
+    }
+  },
+  "BIOMD0000000487": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "none",
+        "mean_nrmse": null,
+        "n_shared": 6
+      }
+    }
+  },
+  "BIOMD0000000488": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 6.005514651403999e-07,
+        "n_shared": 59
+      }
+    }
+  },
+  "BIOMD0000000489": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 4.571453232272127e-06,
+        "n_shared": 35
+      }
+    }
+  },
+  "BIOMD0000000491": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 4.598669565120834e-07,
+        "n_shared": 57
+      }
+    }
+  },
+  "BIOMD0000000492": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 3.896640716014998e-07,
+        "n_shared": 52
+      }
+    }
+  },
+  "BIOMD0000000493": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 5.983859989477169e-07,
+        "n_shared": 3
+      }
+    }
+  },
+  "BIOMD0000000494": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "borderline",
+        "mean_nrmse": 0.010272746680352971,
+        "n_shared": 45
+      }
+    }
+  },
+  "BIOMD0000000495": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 2.133582761936857e-06,
+        "n_shared": 8
+      }
+    }
+  },
+  "BIOMD0000000502": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 5.284318560154663e-07,
+        "n_shared": 8
+      }
+    }
+  },
+  "BIOMD0000000503": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 4.144111653961457e-07,
+        "n_shared": 28
+      }
+    }
+  },
+  "BIOMD0000000504": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "borderline",
+        "mean_nrmse": 0.011329817853355116,
+        "n_shared": 72
+      }
+    }
+  },
+  "BIOMD0000000505": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.1251977939108573e-06,
+        "n_shared": 45
+      }
+    }
+  },
+  "BIOMD0000000506": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.5084096750730664e-06,
+        "n_shared": 45
+      }
+    }
+  },
+  "BIOMD0000000507": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 2.791207372301747e-06,
+        "n_shared": 2
+      }
+    }
+  },
+  "BIOMD0000000510": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.2194040227002814e-07,
+        "n_shared": 38
+      }
+    }
+  },
+  "BIOMD0000000511": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.8294821505128024e-07,
+        "n_shared": 37
+      }
+    }
+  },
+  "BIOMD0000000513": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 2.077132750952513e-07,
+        "n_shared": 24
+      }
+    }
+  },
+  "BIOMD0000000514": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 2.940975691536133e-07,
+        "n_shared": 37
+      }
+    }
+  },
+  "BIOMD0000000515": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.1202873297389991e-07,
+        "n_shared": 40
+      }
+    }
+  },
+  "BIOMD0000000516": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 2.9112929328692094e-07,
+        "n_shared": 39
+      }
+    }
+  },
+  "BIOMD0000000517": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 6.484733957723249e-07,
+        "n_shared": 4
+      }
+    }
+  },
+  "BIOMD0000000518": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 0.0,
+        "n_shared": 4
+      }
+    }
+  },
+  "BIOMD0000000519": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 0.0,
+        "n_shared": 3
+      }
+    }
+  },
+  "BIOMD0000000520": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 0.0,
+        "n_shared": 3
+      }
+    }
+  },
+  "BIOMD0000000523": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 7.228669235382009e-08,
+        "n_shared": 16
+      }
+    }
+  },
+  "BIOMD0000000524": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 7.896507696700274e-08,
+        "n_shared": 16
+      }
+    }
+  },
+  "BIOMD0000000525": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 7.915712395297751e-08,
+        "n_shared": 16
+      }
+    }
+  },
+  "BIOMD0000000526": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.0496010322853955e-07,
+        "n_shared": 16
+      }
+    }
+  },
+  "BIOMD0000000528": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 3.131780980372066e-06,
+        "n_shared": 12
+      }
+    }
+  },
+  "BIOMD0000000529": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 9.830294991827214e-06,
+        "n_shared": 12
+      }
+    }
+  },
+  "BIOMD0000000530": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 7.262077802811664e-07,
+        "n_shared": 7
+      }
+    }
+  },
+  "BIOMD0000000540": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 8.227610485696768e-07,
+        "n_shared": 18
+      }
+    }
+  },
+  "BIOMD0000000541": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 7.448646079807487e-07,
+        "n_shared": 28
+      }
+    }
+  },
+  "BIOMD0000000542": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 8.665895277007991e-07,
+        "n_shared": 45
+      }
+    }
+  },
+  "BIOMD0000000543": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 0.00026379919032802255,
+        "n_shared": 105
+      }
+    }
+  },
+  "BIOMD0000000544": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 0.00016532887415412982,
+        "n_shared": 102
+      }
+    }
+  },
+  "BIOMD0000000545": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 5.473189093508514e-07,
+        "n_shared": 11
+      }
+    }
+  },
+  "BIOMD0000000546": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 4.993623560422684e-07,
+        "n_shared": 3
+      }
+    }
+  },
+  "BIOMD0000000547": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.0059840717103071e-06,
+        "n_shared": 10
+      }
+    }
+  },
+  "BIOMD0000000552": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 8.039843964697448e-07,
+        "n_shared": 2
+      }
+    }
+  },
+  "BIOMD0000000553": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 8.039843964697448e-07,
+        "n_shared": 2
+      }
+    }
+  },
+  "BIOMD0000000557": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 2.721975895833196e-07,
+        "n_shared": 25
+      }
+    }
+  },
+  "BIOMD0000000558": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 9.929801786619793e-07,
+        "n_shared": 2
+      }
+    }
+  },
+  "BIOMD0000000560": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 9.5562606198694e-05,
+        "n_shared": 62
+      }
+    }
+  },
+  "BIOMD0000000563": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 0.0,
+        "n_shared": 10
+      }
+    }
+  },
+  "BIOMD0000000564": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 3.973761064423822e-07,
+        "n_shared": 19
+      }
+    }
+  },
+  "BIOMD0000000565": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 6.678632685861948e-07,
+        "n_shared": 26
+      }
+    }
+  },
+  "BIOMD0000000568": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 3.240556798866151e-07,
+        "n_shared": 24
+      }
+    }
+  },
+  "BIOMD0000000569": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 4.328949633990254e-05,
+        "n_shared": 21
+      }
+    }
+  },
+  "BIOMD0000000571": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 2.8476200989641756e-07,
+        "n_shared": 58
+      }
+    }
+  },
+  "BIOMD0000000572": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.1202767725677112e-06,
+        "n_shared": 26
+      }
+    }
+  },
+  "BIOMD0000000575": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 3.3114342162807886e-07,
+        "n_shared": 49
+      }
+    }
+  },
+  "BIOMD0000000576": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "borderline",
+        "mean_nrmse": 0.05469832909862954,
+        "n_shared": 34
+      }
+    }
+  },
+  "BIOMD0000000577": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.7659207675415812e-07,
+        "n_shared": 32
+      }
+    }
+  },
+  "BIOMD0000000578": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "large",
+        "mean_nrmse": 0.2541578947940394,
+        "n_shared": 76
+      }
+    }
+  },
+  "BIOMD0000000580": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 2.2493288031778697e-07,
+        "n_shared": 26
+      }
+    }
+  },
+  "BIOMD0000000581": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 6.09650244279311e-08,
+        "n_shared": 25
+      }
+    }
+  },
+  "BIOMD0000000582": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.3287990744503375e-06,
+        "n_shared": 23
+      }
+    }
+  },
+  "BIOMD0000000583": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 2.0975456456185256e-06,
+        "n_shared": 19
+      }
+    }
+  },
+  "BIOMD0000000584": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.4749469332849302e-06,
+        "n_shared": 9
+      }
+    }
+  },
+  "BIOMD0000000586": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 4.597716756368268e-07,
+        "n_shared": 10
+      }
+    }
+  },
+  "BIOMD0000000587": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 3.6218368741427096e-07,
+        "n_shared": 10
+      }
+    }
+  },
+  "BIOMD0000000590": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 5.317547539527772e-07,
+        "n_shared": 9
+      }
+    }
+  },
+  "BIOMD0000000591": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 2.0293212000420697e-07,
+        "n_shared": 8
+      }
+    }
+  },
+  "BIOMD0000000596": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 4.875003217625478e-07,
+        "n_shared": 15
+      }
+    }
+  },
+  "BIOMD0000000597": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.717462298457866e-07,
+        "n_shared": 28
+      }
+    }
+  },
+  "BIOMD0000000598": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 2.956648910317678e-07,
+        "n_shared": 28
+      }
+    }
+  },
+  "BIOMD0000000599": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.1823890863086849e-07,
+        "n_shared": 30
+      }
+    }
+  },
+  "BIOMD0000000602": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 0.0,
+        "n_shared": 14
+      }
+    }
+  },
+  "BIOMD0000000607": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 6.587918090585877e-07,
+        "n_shared": 29
+      }
+    }
+  },
+  "BIOMD0000000610": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 2.5640195760961146e-07,
+        "n_shared": 29
+      }
+    }
+  },
+  "BIOMD0000000611": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 5.7080702595787494e-05,
+        "n_shared": 65
+      }
+    }
+  },
+  "BIOMD0000000612": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 0.00017601488268300842,
+        "n_shared": 33
+      }
+    }
+  },
+  "BIOMD0000000613": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 7.710277276300207e-08,
+        "n_shared": 30
+      }
+    }
+  },
+  "BIOMD0000000614": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 4.372344278617745e-08,
+        "n_shared": 1
+      }
+    }
+  },
+  "BIOMD0000000615": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 0.0003058440775885945,
+        "n_shared": 4
+      }
+    }
+  },
+  "BIOMD0000000616": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.212546823821452e-06,
+        "n_shared": 4
+      }
+    }
+  },
+  "BIOMD0000000617": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 0.0,
+        "n_shared": 1
+      }
+    }
+  },
+  "BIOMD0000000619": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 3.083301874750871e-07,
+        "n_shared": 10
+      }
+    }
+  },
+  "BIOMD0000000620": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 3.88021422207779e-07,
+        "n_shared": 33
+      }
+    }
+  },
+  "BIOMD0000000621": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 3.364725379904756e-07,
+        "n_shared": 33
+      }
+    }
+  },
+  "BIOMD0000000622": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 2.472575773675697e-07,
+        "n_shared": 10
+      }
+    }
+  },
+  "BIOMD0000000623": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.5098510886787964e-07,
+        "n_shared": 25
+      }
+    }
+  },
+  "BIOMD0000000624": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.524957779481097e-06,
+        "n_shared": 6
+      }
+    }
+  },
+  "BIOMD0000000625": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 3.7273774603397827e-07,
+        "n_shared": 17
+      }
+    }
+  },
+  "BIOMD0000000626": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 2.170628496940292e-06,
+        "n_shared": 6
+      }
+    }
+  },
+  "BIOMD0000000628": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.958492676083457e-05,
+        "n_shared": 135
+      }
+    }
+  },
+  "BIOMD0000000629": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 9.492242995902499e-07,
+        "n_shared": 5
+      }
+    }
+  },
+  "BIOMD0000000630": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 3.916495601772014e-06,
+        "n_shared": 4
+      }
+    }
+  },
+  "BIOMD0000000631": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.7247147870433693e-07,
+        "n_shared": 12
+      }
+    }
+  },
+  "BIOMD0000000632": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 0.0,
+        "n_shared": 8
+      }
+    }
+  },
+  "BIOMD0000000633": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.6064068438943074e-07,
+        "n_shared": 30
+      }
+    }
+  },
+  "BIOMD0000000634": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 6.010663602275316e-07,
+        "n_shared": 59
+      }
+    }
+  },
+  "BIOMD0000000635": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 0.0,
+        "n_shared": 72
+      }
+    }
+  },
+  "BIOMD0000000636": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 0.0,
+        "n_shared": 72
+      }
+    }
+  },
+  "BIOMD0000000639": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 7.232644358256123e-07,
+        "n_shared": 7
+      }
+    }
+  },
+  "BIOMD0000000640": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "borderline",
+        "mean_nrmse": 0.050181882368675115,
+        "n_shared": 31
+      }
+    }
+  },
+  "BIOMD0000000646": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 5.113384423374541e-07,
+        "n_shared": 11
+      }
+    }
+  },
+  "BIOMD0000000647": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 3.3950393845836286e-07,
+        "n_shared": 11
+      }
+    }
+  },
+  "BIOMD0000000648": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.3661851813855303e-07,
+        "n_shared": 48
+      }
+    }
+  },
+  "BIOMD0000000652": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 5.055981347745621e-07,
+        "n_shared": 48
+      }
+    }
+  },
+  "BIOMD0000000653": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 5.079871664068133e-07,
+        "n_shared": 48
+      }
+    }
+  },
+  "BIOMD0000000654": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 4.667364964766341e-07,
+        "n_shared": 48
+      }
+    }
+  },
+  "BIOMD0000000655": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.2989857644120254e-07,
+        "n_shared": 48
+      }
+    }
+  },
+  "BIOMD0000000656": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 4.839532826210221e-07,
+        "n_shared": 48
+      }
+    }
+  },
+  "BIOMD0000000657": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 2.2978828835807058e-05,
+        "n_shared": 3
+      }
+    }
+  },
+  "BIOMD0000000658": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 5.49811495138643e-07,
+        "n_shared": 15
+      }
+    }
+  },
+  "BIOMD0000000660": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.539334805143949e-07,
+        "n_shared": 15
+      }
+    }
+  },
+  "BIOMD0000000661": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 3.6645425713804124e-06,
+        "n_shared": 7
+      }
+    }
+  },
+  "BIOMD0000000662": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 2.407547931261512e-07,
+        "n_shared": 3
+      }
+    }
+  },
+  "BIOMD0000000663": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.459651692773783e-05,
+        "n_shared": 3
+      }
+    }
+  },
+  "BIOMD0000000664": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 4.677466768928719e-07,
+        "n_shared": 6
+      }
+    }
+  },
+  "BIOMD0000000666": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 2.520976526071812e-07,
+        "n_shared": 35
+      }
+    }
+  },
+  "BIOMD0000000678": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 3.049364797196567e-05,
+        "n_shared": 2
+      }
+    }
+  },
+  "BIOMD0000000683": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 9.963611418032198e-07,
+        "n_shared": 4
+      }
+    }
+  },
+  "BIOMD0000000687": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.1047177491410648e-07,
+        "n_shared": 15
+      }
+    }
+  },
+  "BIOMD0000000688": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.1669973784932423e-06,
+        "n_shared": 16
+      }
+    }
+  },
+  "BIOMD0000000689": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.017632352387031e-06,
+        "n_shared": 7
+      }
+    }
+  },
+  "BIOMD0000000690": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 7.766512259161201e-07,
+        "n_shared": 7
+      }
+    }
+  },
+  "BIOMD0000000692": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 3.017425085830269e-07,
+        "n_shared": 8
+      }
+    }
+  },
+  "BIOMD0000000697": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.5039536665208875e-06,
+        "n_shared": 13
+      }
+    }
+  },
+  "BIOMD0000000698": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 8.178333592202968e-07,
+        "n_shared": 5
+      }
+    }
+  },
+  "BIOMD0000000699": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.4159540916812367e-07,
+        "n_shared": 24
+      }
+    }
+  },
+  "BIOMD0000000700": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 3.838369895246804e-07,
+        "n_shared": 23
+      }
+    }
+  },
+  "BIOMD0000000701": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.5257547403250608e-07,
+        "n_shared": 24
+      }
+    }
+  },
+  "BIOMD0000000702": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.0022465556075522e-07,
+        "n_shared": 24
+      }
+    }
+  },
+  "BIOMD0000000703": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.1601171155643447e-06,
+        "n_shared": 11
+      }
+    }
+  },
+  "BIOMD0000000704": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 2.3432166819994367e-07,
+        "n_shared": 16
+      }
+    }
+  },
+  "BIOMD0000000705": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 3.8448881526775793e-07,
+        "n_shared": 18
+      }
+    }
+  },
+  "BIOMD0000000706": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.652483750465684e-07,
+        "n_shared": 32
+      }
+    }
+  },
+  "BIOMD0000000707": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.3131190903106015e-05,
+        "n_shared": 5
+      }
+    }
+  },
+  "BIOMD0000000708": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 2.6095417473565337e-07,
+        "n_shared": 5
+      }
+    }
+  },
+  "BIOMD0000000709": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.6328686902631373e-06,
+        "n_shared": 5
+      }
+    }
+  },
+  "BIOMD0000000710": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.3262211945763154e-06,
+        "n_shared": 7
+      }
+    }
+  },
+  "BIOMD0000000711": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 2.05853118319143e-05,
+        "n_shared": 10
+      }
+    }
+  },
+  "BIOMD0000000712": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 8.971757015839245e-07,
+        "n_shared": 3
+      }
+    }
+  },
+  "BIOMD0000000713": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.0983447011509787e-06,
+        "n_shared": 3
+      }
+    }
+  },
+  "BIOMD0000000714": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 5.585355013886972e-06,
+        "n_shared": 4
+      }
+    }
+  },
+  "BIOMD0000000715": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.0127757659165843e-07,
+        "n_shared": 4
+      }
+    }
+  },
+  "BIOMD0000000716": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 8.066625784273419e-07,
+        "n_shared": 4
+      }
+    }
+  },
+  "BIOMD0000000717": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 3.344247513121066e-07,
+        "n_shared": 4
+      }
+    }
+  },
+  "BIOMD0000000719": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 5.165918852596344e-06,
+        "n_shared": 4
+      }
+    }
+  },
+  "BIOMD0000000720": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 2.140821417013069e-05,
+        "n_shared": 8
+      }
+    }
+  },
+  "BIOMD0000000721": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.2834026127983914e-05,
+        "n_shared": 5
+      }
+    }
+  },
+  "BIOMD0000000722": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 7.83900261625595e-07,
+        "n_shared": 5
+      }
+    }
+  },
+  "BIOMD0000000723": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.587302934036336e-05,
+        "n_shared": 25
+      }
+    }
+  },
+  "BIOMD0000000725": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.0686535616878703e-07,
+        "n_shared": 38
+      }
+    }
+  },
+  "BIOMD0000000726": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.094173977684145e-06,
+        "n_shared": 8
+      }
+    }
+  },
+  "BIOMD0000000727": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 2.0963386265312602e-07,
+        "n_shared": 27
+      }
+    }
+  },
+  "BIOMD0000000729": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 9.812363452733842e-06,
+        "n_shared": 3
+      }
+    }
+  },
+  "BIOMD0000000730": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.3695701342043626e-07,
+        "n_shared": 44
+      }
+    }
+  },
+  "BIOMD0000000733": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 3.3541087614045443e-07,
+        "n_shared": 3
+      }
+    }
+  },
+  "BIOMD0000000734": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 0.00024031626593738967,
+        "n_shared": 22
+      }
+    }
+  },
+  "BIOMD0000000735": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 5.547906390591345e-09,
+        "n_shared": 22
+      }
+    }
+  },
+  "BIOMD0000000736": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 0.0,
+        "n_shared": 11
+      }
+    }
+  },
+  "BIOMD0000000737": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 2.9421299291360115e-07,
+        "n_shared": 11
+      }
+    }
+  },
+  "BIOMD0000000738": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 3.4372507366566926e-07,
+        "n_shared": 11
+      }
+    }
+  },
+  "BIOMD0000000739": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.315653415911904e-06,
+        "n_shared": 24
+      }
+    }
+  },
+  "BIOMD0000000741": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 7.466343621836869e-07,
+        "n_shared": 4
+      }
+    }
+  },
+  "BIOMD0000000742": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 3.461864822422663e-06,
+        "n_shared": 2
+      }
+    }
+  },
+  "BIOMD0000000743": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 5.056597491931153e-07,
+        "n_shared": 4
+      }
+    }
+  },
+  "BIOMD0000000744": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 9.974384126944154e-06,
+        "n_shared": 5
+      }
+    }
+  },
+  "BIOMD0000000745": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 9.675962073582286e-07,
+        "n_shared": 5
+      }
+    }
+  },
+  "BIOMD0000000746": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 5.377159628851657e-07,
+        "n_shared": 4
+      }
+    }
+  },
+  "BIOMD0000000747": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 2.699011468299871e-07,
+        "n_shared": 33
+      }
+    }
+  },
+  "BIOMD0000000748": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 2.4076724595458437e-06,
+        "n_shared": 4
+      }
+    }
+  },
+  "BIOMD0000000749": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 8.666334102642763e-06,
+        "n_shared": 2
+      }
+    }
+  },
+  "BIOMD0000000750": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.680041059763174e-06,
+        "n_shared": 8
+      }
+    }
+  },
+  "BIOMD0000000751": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 8.111170884826328e-05,
+        "n_shared": 2
+      }
+    }
+  },
+  "BIOMD0000000752": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.0476741080802072e-05,
+        "n_shared": 3
+      }
+    }
+  },
+  "BIOMD0000000753": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 2.767297117726682e-07,
+        "n_shared": 2
+      }
+    }
+  },
+  "BIOMD0000000754": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 7.534237001366049e-06,
+        "n_shared": 3
+      }
+    }
+  },
+  "BIOMD0000000756": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 4.6637967143304045e-06,
+        "n_shared": 4
+      }
+    }
+  },
+  "BIOMD0000000757": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 2.387159575056237e-07,
+        "n_shared": 7
+      }
+    }
+  },
+  "BIOMD0000000758": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 2.3014815330962034e-05,
+        "n_shared": 2
+      }
+    }
+  },
+  "BIOMD0000000759": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 2.6073811402897365e-06,
+        "n_shared": 6
+      }
+    }
+  },
+  "BIOMD0000000760": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.0269290422193402e-05,
+        "n_shared": 2
+      }
+    }
+  },
+  "BIOMD0000000761": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.7384639662564734e-06,
+        "n_shared": 6
+      }
+    }
+  },
+  "BIOMD0000000762": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 3.163634920266786e-06,
+        "n_shared": 2
+      }
+    }
+  },
+  "BIOMD0000000763": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 0.0021073475455036608,
+        "n_shared": 3
+      }
+    }
+  },
+  "BIOMD0000000764": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 8.707822635315589e-07,
+        "n_shared": 4
+      }
+    }
+  },
+  "BIOMD0000000765": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 3.8697706718922106e-07,
+        "n_shared": 4
+      }
+    }
+  },
+  "BIOMD0000000766": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 2.6588820200390648e-05,
+        "n_shared": 5
+      }
+    }
+  },
+  "BIOMD0000000767": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.4803006569931731e-06,
+        "n_shared": 2
+      }
+    }
+  },
+  "BIOMD0000000768": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.594631248042508e-06,
+        "n_shared": 5
+      }
+    }
+  },
+  "BIOMD0000000769": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.405101648620239e-05,
+        "n_shared": 5
+      }
+    }
+  },
+  "BIOMD0000000770": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 2.0629044165410284e-06,
+        "n_shared": 4
+      }
+    }
+  },
+  "BIOMD0000000771": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 8.060988537905928e-07,
+        "n_shared": 3
+      }
+    }
+  },
+  "BIOMD0000000772": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "large",
+        "mean_nrmse": 0.2453779905465088,
+        "n_shared": 4
+      }
+    }
+  },
+  "BIOMD0000000773": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.0220451673710366e-06,
+        "n_shared": 3
+      }
+    }
+  },
+  "BIOMD0000000774": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.0252816545161055e-06,
+        "n_shared": 2
+      }
+    }
+  },
+  "BIOMD0000000776": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 9.121616381625981e-07,
+        "n_shared": 2
+      }
+    }
+  },
+  "BIOMD0000000777": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 9.050205707629316e-07,
+        "n_shared": 3
+      }
+    }
+  },
+  "BIOMD0000000778": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.888553361706397e-05,
+        "n_shared": 3
+      }
+    }
+  },
+  "BIOMD0000000779": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 3.4175302171434746e-07,
+        "n_shared": 6
+      }
+    }
+  },
+  "BIOMD0000000780": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 7.318187769389034e-07,
+        "n_shared": 4
+      }
+    }
+  },
+  "BIOMD0000000781": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 8.454626327048986e-07,
+        "n_shared": 3
+      }
+    }
+  },
+  "BIOMD0000000782": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 9.907676004362017e-07,
+        "n_shared": 2
+      }
+    }
+  },
+  "BIOMD0000000784": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 6.401301925868038e-06,
+        "n_shared": 3
+      }
+    }
+  },
+  "BIOMD0000000785": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 4.057373584162008e-06,
+        "n_shared": 2
+      }
+    }
+  },
+  "BIOMD0000000786": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 3.5818504192674596e-07,
+        "n_shared": 15
+      }
+    }
+  },
+  "BIOMD0000000787": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 0.0001551565235944151,
+        "n_shared": 2
+      }
+    }
+  },
+  "BIOMD0000000788": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.7298613302602553e-07,
+        "n_shared": 8
+      }
+    }
+  },
+  "BIOMD0000000789": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 3.956711535425105e-06,
+        "n_shared": 3
+      }
+    }
+  },
+  "BIOMD0000000790": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.6272582907648978e-05,
+        "n_shared": 4
+      }
+    }
+  },
+  "BIOMD0000000791": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 7.107518725765646e-06,
+        "n_shared": 5
+      }
+    }
+  },
+  "BIOMD0000000792": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 9.416824468415984e-07,
+        "n_shared": 6
+      }
+    }
+  },
+  "BIOMD0000000793": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.5853135053323646e-06,
+        "n_shared": 2
+      }
+    }
+  },
+  "BIOMD0000000794": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.195894390887478e-07,
+        "n_shared": 15
+      }
+    }
+  },
+  "BIOMD0000000795": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.3074463172561743e-06,
+        "n_shared": 2
+      }
+    }
+  },
+  "BIOMD0000000796": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.919048963765439e-05,
+        "n_shared": 5
+      }
+    }
+  },
+  "BIOMD0000000797": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 2.3299357698409826e-06,
+        "n_shared": 4
+      }
+    }
+  },
+  "BIOMD0000000798": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.0459651550472826e-06,
+        "n_shared": 5
+      }
+    }
+  },
+  "BIOMD0000000799": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 7.708355915026365e-07,
+        "n_shared": 2
+      }
+    }
+  },
+  "BIOMD0000000800": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 4.382153616593057e-06,
+        "n_shared": 3
+      }
+    }
+  },
+  "BIOMD0000000801": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 2.0882389671217288e-05,
+        "n_shared": 4
+      }
+    }
+  },
+  "BIOMD0000000802": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 4.137815912950413e-07,
+        "n_shared": 4
+      }
+    }
+  },
+  "BIOMD0000000804": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 6.921227240063321e-07,
+        "n_shared": 3
+      }
+    }
+  },
+  "BIOMD0000000805": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 8.028621846231812e-07,
+        "n_shared": 4
+      }
+    }
+  },
+  "BIOMD0000000807": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.5941637398279806e-05,
+        "n_shared": 3
+      }
+    }
+  },
+  "BIOMD0000000808": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "borderline",
+        "mean_nrmse": 0.053671653413842384,
+        "n_shared": 6
+      }
+    }
+  },
+  "BIOMD0000000809": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.043714309390964e-06,
+        "n_shared": 5
+      }
+    }
+  },
+  "BIOMD0000000810": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "borderline",
+        "mean_nrmse": 0.08733086778162916,
+        "n_shared": 13
+      }
+    }
+  },
+  "BIOMD0000000811": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 4.3963613465182594e-07,
+        "n_shared": 6
+      }
+    }
+  },
+  "BIOMD0000000812": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 2.560474312868758e-07,
+        "n_shared": 4
+      }
+    }
+  },
+  "BIOMD0000000813": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 4.779489485917064e-07,
+        "n_shared": 3
+      }
+    }
+  },
+  "BIOMD0000000814": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "large",
+        "mean_nrmse": 0.4459047673959347,
+        "n_shared": 3
+      }
+    }
+  },
+  "BIOMD0000000815": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 2.3304873693018855e-05,
+        "n_shared": 2
+      }
+    }
+  },
+  "BIOMD0000000816": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "large",
+        "mean_nrmse": 0.28134086452308177,
+        "n_shared": 6
+      }
+    }
+  },
+  "BIOMD0000000817": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "large",
+        "mean_nrmse": 0.2849149951046036,
+        "n_shared": 5
+      }
+    }
+  },
+  "BIOMD0000000818": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 7.694636152897234e-07,
+        "n_shared": 9
+      }
+    }
+  },
+  "BIOMD0000000819": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 4.1541742462597484e-07,
+        "n_shared": 10
+      }
+    }
+  },
+  "BIOMD0000000820": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 2.667612584961303e-06,
+        "n_shared": 7
+      }
+    }
+  },
+  "BIOMD0000000821": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.3166612321985725e-06,
+        "n_shared": 3
+      }
+    }
+  },
+  "BIOMD0000000822": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "large",
+        "mean_nrmse": 0.10268034782577604,
+        "n_shared": 8
+      }
+    }
+  },
+  "BIOMD0000000823": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.538847705076226e-06,
+        "n_shared": 15
+      }
+    }
+  },
+  "BIOMD0000000824": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 7.839613734680948e-07,
+        "n_shared": 1
+      }
+    }
+  },
+  "BIOMD0000000825": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 7.908322363272607e-07,
+        "n_shared": 2
+      }
+    }
+  },
+  "BIOMD0000000826": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 5.200045930449397e-07,
+        "n_shared": 13
+      }
+    }
+  },
+  "BIOMD0000000827": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.9501842521350577e-06,
+        "n_shared": 10
+      }
+    }
+  },
+  "BIOMD0000000828": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.3282173711247886e-06,
+        "n_shared": 5
+      }
+    }
+  },
+  "BIOMD0000000829": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "large",
+        "mean_nrmse": 0.37938970429036195,
+        "n_shared": 11
+      }
+    }
+  },
+  "BIOMD0000000830": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 3.465556909527206e-07,
+        "n_shared": 6
+      }
+    }
+  },
+  "BIOMD0000000832": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.4797721001375917e-07,
+        "n_shared": 20
+      }
+    }
+  },
+  "BIOMD0000000833": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 4.6853922489168744e-07,
+        "n_shared": 58
+      }
+    }
+  },
+  "BIOMD0000000834": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.8179629426461295e-06,
+        "n_shared": 75
+      }
+    }
+  },
+  "BIOMD0000000835": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.1148480303093562e-06,
+        "n_shared": 31
+      }
+    }
+  },
+  "BIOMD0000000837": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.0512307805674715e-06,
+        "n_shared": 7
+      }
+    }
+  },
+  "BIOMD0000000838": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 4.861134254372554e-07,
+        "n_shared": 3
+      }
+    }
+  },
+  "BIOMD0000000839": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.0714277466487308e-05,
+        "n_shared": 8
+      }
+    }
+  },
+  "BIOMD0000000840": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 5.802464922179465e-07,
+        "n_shared": 5
+      }
+    }
+  },
+  "BIOMD0000000846": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 9.16168629645828e-07,
+        "n_shared": 3
+      }
+    }
+  },
+  "BIOMD0000000848": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 3.071996399256175e-07,
+        "n_shared": 9
+      }
+    }
+  },
+  "BIOMD0000000849": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 5.976290172106737e-07,
+        "n_shared": 15
+      }
+    }
+  },
+  "BIOMD0000000850": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 5.407446166229043e-07,
+        "n_shared": 3
+      }
+    }
+  },
+  "BIOMD0000000851": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 2.0382784601599044e-06,
+        "n_shared": 5
+      }
+    }
+  },
+  "BIOMD0000000852": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 7.125557045097275e-07,
+        "n_shared": 6
+      }
+    }
+  },
+  "BIOMD0000000853": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 3.533473302859838e-07,
+        "n_shared": 9
+      }
+    }
+  },
+  "BIOMD0000000854": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 3.818652244906717e-07,
+        "n_shared": 4
+      }
+    }
+  },
+  "BIOMD0000000855": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.533855784311483e-07,
+        "n_shared": 4
+      }
+    }
+  },
+  "BIOMD0000000856": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 5.247374643628735e-06,
+        "n_shared": 20
+      }
+    }
+  },
+  "BIOMD0000000857": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 5.110031621252763e-06,
+        "n_shared": 9
+      }
+    }
+  },
+  "BIOMD0000000858": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 8.377258610408174e-07,
+        "n_shared": 8
+      }
+    }
+  },
+  "BIOMD0000000861": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "borderline",
+        "mean_nrmse": 0.0140844981181454,
+        "n_shared": 25
+      }
+    }
+  },
+  "BIOMD0000000872": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 2.6528031610328303e-06,
+        "n_shared": 7
+      }
+    }
+  },
+  "BIOMD0000000875": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.1281704116803466e-06,
+        "n_shared": 4
+      }
+    }
+  },
+  "BIOMD0000000876": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 0.002466576379632653,
+        "n_shared": 4
+      }
+    }
+  },
+  "BIOMD0000000877": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.1375787482894228e-07,
+        "n_shared": 4
+      }
+    }
+  },
+  "BIOMD0000000879": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "large",
+        "mean_nrmse": 0.46950272817467215,
+        "n_shared": 3
+      }
+    }
+  },
+  "BIOMD0000000880": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 4.452121504742249e-06,
+        "n_shared": 4
+      }
+    }
+  },
+  "BIOMD0000000882": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 3.519241499230165e-07,
+        "n_shared": 4
+      }
+    }
+  },
+  "BIOMD0000000884": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.0782030714271548e-06,
+        "n_shared": 3
+      }
+    }
+  },
+  "BIOMD0000000885": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.4871299774276097e-07,
+        "n_shared": 4
+      }
+    }
+  },
+  "BIOMD0000000886": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 8.043329055810251e-06,
+        "n_shared": 5
+      }
+    }
+  },
+  "BIOMD0000000887": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 6.772246144665514e-07,
+        "n_shared": 4
+      }
+    }
+  },
+  "BIOMD0000000888": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 9.637274208959082e-07,
+        "n_shared": 4
+      }
+    }
+  },
+  "BIOMD0000000889": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 2.7285093660522084e-07,
+        "n_shared": 12
+      }
+    }
+  },
+  "BIOMD0000000890": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 6.549480358998269e-07,
+        "n_shared": 3
+      }
+    }
+  },
+  "BIOMD0000000891": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 2.4212925474467376e-06,
+        "n_shared": 3
+      }
+    }
+  },
+  "BIOMD0000000892": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.2471508822823235e-06,
+        "n_shared": 4
+      }
+    }
+  },
+  "BIOMD0000000894": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.7426074307767674e-06,
+        "n_shared": 3
+      }
+    }
+  },
+  "BIOMD0000000895": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 4.787757452729372e-07,
+        "n_shared": 9
+      }
+    }
+  },
+  "BIOMD0000000896": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 6.719627158377225e-07,
+        "n_shared": 9
+      }
+    }
+  },
+  "BIOMD0000000897": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 3.3886378397468342e-06,
+        "n_shared": 2
+      }
+    }
+  },
+  "BIOMD0000000898": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 3.4820128557624764e-07,
+        "n_shared": 5
+      }
+    }
+  },
+  "BIOMD0000000902": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "large",
+        "mean_nrmse": 0.2453779905465088,
+        "n_shared": 4
+      }
+    }
+  },
+  "BIOMD0000000903": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 5.144533321446422e-07,
+        "n_shared": 5
+      }
+    }
+  },
+  "BIOMD0000000904": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 4.567371614862738e-07,
+        "n_shared": 4
+      }
+    }
+  },
+  "BIOMD0000000905": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 6.192363273930257e-07,
+        "n_shared": 5
+      }
+    }
+  },
+  "BIOMD0000000906": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.958171858891286e-06,
+        "n_shared": 3
+      }
+    }
+  },
+  "BIOMD0000000907": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "borderline",
+        "mean_nrmse": 0.05527983273272766,
+        "n_shared": 25
+      }
+    }
+  },
+  "BIOMD0000000908": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 4.59635660382253e-07,
+        "n_shared": 7
+      }
+    }
+  },
+  "BIOMD0000000909": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 2.02350815042611e-06,
+        "n_shared": 4
+      }
+    }
+  },
+  "BIOMD0000000910": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 3.7642074921932162e-06,
+        "n_shared": 3
+      }
+    }
+  },
+  "BIOMD0000000911": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 5.912494476750501e-07,
+        "n_shared": 3
+      }
+    }
+  },
+  "BIOMD0000000912": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 7.924514247292563e-05,
+        "n_shared": 3
+      }
+    }
+  },
+  "BIOMD0000000913": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.2280714251000016e-07,
+        "n_shared": 6
+      }
+    }
+  },
+  "BIOMD0000000914": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 3.734317381282077e-07,
+        "n_shared": 5
+      }
+    }
+  },
+  "BIOMD0000000915": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "borderline",
+        "mean_nrmse": 0.03228867189443806,
+        "n_shared": 9
+      }
+    }
+  },
+  "BIOMD0000000916": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 6.482307986801407e-08,
+        "n_shared": 5
+      }
+    }
+  },
+  "BIOMD0000000918": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 6.049682114069573e-07,
+        "n_shared": 8
+      }
+    }
+  },
+  "BIOMD0000000920": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 2.1887227778357283e-06,
+        "n_shared": 4
+      }
+    }
+  },
+  "BIOMD0000000921": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.068410654852038e-07,
+        "n_shared": 5
+      }
+    }
+  },
+  "BIOMD0000000922": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 3.8325108444181785e-07,
+        "n_shared": 3
+      }
+    }
+  },
+  "BIOMD0000000926": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.1694689126904478e-05,
+        "n_shared": 8
+      }
+    }
+  },
+  "BIOMD0000000928": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.5994740643376625e-06,
+        "n_shared": 4
+      }
+    }
+  },
+  "BIOMD0000000929": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 5.177577852845065e-07,
+        "n_shared": 5
+      }
+    }
+  },
+  "BIOMD0000000930": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 2.868989519177555e-06,
+        "n_shared": 4
+      }
+    }
+  },
+  "BIOMD0000000931": {
+    "auto_ten_seconds": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 9.430615609688989e-07,
+        "n_shared": 3
+      }
+    }
+  },
+  "BIOMD0000000933": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 7.80602746556007e-06,
+        "n_shared": 3
+      }
+    }
+  },
+  "BIOMD0000000934": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 4.895137443932773e-07,
+        "n_shared": 13
+      }
+    }
+  },
+  "BIOMD0000000935": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.823701918327155e-06,
+        "n_shared": 2
+      }
+    }
+  },
+  "BIOMD0000000936": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 2.1899624091243763e-06,
+        "n_shared": 1
+      }
+    }
+  },
+  "BIOMD0000000937": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.79996571278466e-05,
+        "n_shared": 3
+      }
+    }
+  },
+  "BIOMD0000000938": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 4.684370798280342e-06,
+        "n_shared": 3
+      }
+    }
+  },
+  "BIOMD0000000939": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 0.0019427557256326976,
+        "n_shared": 54
+      }
+    }
+  },
+  "BIOMD0000000940": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 7.175625990739174e-07,
+        "n_shared": 20
+      }
+    }
+  },
+  "BIOMD0000000941": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 5.8794928419432025e-05,
+        "n_shared": 6
+      }
+    }
+  },
+  "BIOMD0000000942": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 2.612789613029515e-06,
+        "n_shared": 7
+      }
+    }
+  },
+  "BIOMD0000000943": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 2.3447428484234868e-07,
+        "n_shared": 33
+      }
+    }
+  },
+  "BIOMD0000000953": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.5157908335186282e-06,
+        "n_shared": 13
+      }
+    }
+  },
+  "BIOMD0000000954": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.8760738798287706e-06,
+        "n_shared": 18
+      }
+    }
+  },
+  "BIOMD0000000955": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.5699361156230932e-05,
+        "n_shared": 8
+      }
+    }
+  },
+  "BIOMD0000000958": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 0.0006217287486918932,
+        "n_shared": 8
+      }
+    }
+  },
+  "BIOMD0000000960": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 6.712631805482676e-07,
+        "n_shared": 8
+      }
+    }
+  },
+  "BIOMD0000000962": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 7.325607601958531e-07,
+        "n_shared": 4
+      }
+    }
+  },
+  "BIOMD0000000965": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.4966098102664252e-05,
+        "n_shared": 5
+      }
+    }
+  },
+  "BIOMD0000000966": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "borderline",
+        "mean_nrmse": 0.034194641219806886,
+        "n_shared": 7
+      }
+    }
+  },
+  "BIOMD0000000967": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.2926978743594516e-06,
+        "n_shared": 4
+      }
+    }
+  },
+  "BIOMD0000000969": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 2.2112708109094418e-07,
+        "n_shared": 28
+      }
+    }
+  },
+  "BIOMD0000000974": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 6.922985258379498e-07,
+        "n_shared": 5
+      }
+    }
+  },
+  "BIOMD0000000976": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 4.938263247133886e-06,
+        "n_shared": 4
+      }
+    }
+  },
+  "BIOMD0000000977": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 3.969665518600346e-06,
+        "n_shared": 6
+      }
+    }
+  },
+  "BIOMD0000000978": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 4.381397449965218e-07,
+        "n_shared": 4
+      }
+    }
+  },
+  "BIOMD0000000982": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 3.5398299257868936e-06,
+        "n_shared": 3
+      }
+    }
+  },
+  "BIOMD0000000984": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 8.292571897936491e-07,
+        "n_shared": 4
+      }
+    }
+  },
+  "BIOMD0000000987": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 3.383513715426411e-07,
+        "n_shared": 9
+      }
+    }
+  },
+  "BIOMD0000000994": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "large",
+        "mean_nrmse": 0.28246836628685706,
+        "n_shared": 23
+      }
+    }
+  },
+  "BIOMD0000000995": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "large",
+        "mean_nrmse": 0.30668370913838033,
+        "n_shared": 23
+      }
+    }
+  },
+  "BIOMD0000000996": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "large",
+        "mean_nrmse": 0.4281863634799592,
+        "n_shared": 23
+      }
+    }
+  },
+  "BIOMD0000000998": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 3.429015633345012e-07,
+        "n_shared": 23
+      }
+    }
+  },
+  "BIOMD0000000999": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 3.867186529921651e-07,
+        "n_shared": 23
+      }
+    }
+  },
+  "BIOMD0000001000": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 3.986313285080209e-07,
+        "n_shared": 23
+      }
+    }
+  },
+  "BIOMD0000001001": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.750289871991157e-07,
+        "n_shared": 23
+      }
+    }
+  },
+  "BIOMD0000001002": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 2.804801560884824e-07,
+        "n_shared": 23
+      }
+    }
+  },
+  "BIOMD0000001003": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.3396796947272736e-07,
+        "n_shared": 23
+      }
+    }
+  },
+  "BIOMD0000001004": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 2.7140298857302287e-07,
+        "n_shared": 10
+      }
+    }
+  },
+  "BIOMD0000001006": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 2.5053429987846966e-05,
+        "n_shared": 7
+      }
+    }
+  },
+  "BIOMD0000001007": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 4.92663062156739e-06,
+        "n_shared": 3
+      }
+    }
+  },
+  "BIOMD0000001009": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 4.97879087367427e-07,
+        "n_shared": 4
+      }
+    }
+  },
+  "BIOMD0000001011": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 4.524565096495965e-06,
+        "n_shared": 3
+      }
+    }
+  },
+  "BIOMD0000001012": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 6.778429166801401e-05,
+        "n_shared": 4
+      }
+    }
+  },
+  "BIOMD0000001015": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 5.2188086999293665e-06,
+        "n_shared": 6
+      }
+    }
+  },
+  "BIOMD0000001016": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 4.674793357648548e-07,
+        "n_shared": 7
+      }
+    }
+  },
+  "BIOMD0000001017": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.3051812278067847e-06,
+        "n_shared": 11
+      }
+    }
+  },
+  "BIOMD0000001019": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.0763719034661026e-05,
+        "n_shared": 3
+      }
+    }
+  },
+  "BIOMD0000001020": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 0.00029649487857813696,
+        "n_shared": 3
+      }
+    }
+  },
+  "BIOMD0000001021": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 3.84833690821108e-07,
+        "n_shared": 6
+      }
+    }
+  },
+  "BIOMD0000001023": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 3.9550721005914706e-07,
+        "n_shared": 3
+      }
+    }
+  },
+  "BIOMD0000001024": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 0.00010296876062548803,
+        "n_shared": 2
+      }
+    }
+  },
+  "BIOMD0000001026": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 2.8426391785244914e-06,
+        "n_shared": 1
+      }
+    }
+  },
+  "BIOMD0000001030": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 0.0,
+        "n_shared": 2
+      }
+    }
+  },
+  "BIOMD0000001031": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 2.71297280165886e-07,
+        "n_shared": 3
+      }
+    }
+  },
+  "BIOMD0000001032": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 3.193004439487679e-06,
+        "n_shared": 4
+      }
+    }
+  },
+  "BIOMD0000001033": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 8.862755867148293e-05,
+        "n_shared": 6
+      }
+    }
+  },
+  "BIOMD0000001034": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 6.718821357338689e-07,
+        "n_shared": 4
+      }
+    }
+  },
+  "BIOMD0000001036": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 6.585892451422579e-06,
+        "n_shared": 3
+      }
+    }
+  },
+  "BIOMD0000001037": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 7.256600158767229e-07,
+        "n_shared": 2
+      }
+    }
+  },
+  "BIOMD0000001038": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.941456810606214e-06,
+        "n_shared": 3
+      }
+    }
+  },
+  "BIOMD0000001040": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 4.430469824915166e-06,
+        "n_shared": 1
+      }
+    }
+  },
+  "BIOMD0000001041": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 3.206507715399825e-07,
+        "n_shared": 3
+      }
+    }
+  },
+  "BIOMD0000001042": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 4.314348222662444e-07,
+        "n_shared": 6
+      }
+    }
+  },
+  "BIOMD0000001043": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 8.036889356773632e-06,
+        "n_shared": 3
+      }
+    }
+  },
+  "BIOMD0000001044": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 2.165442570371693e-06,
+        "n_shared": 28
+      }
+    }
+  },
+  "BIOMD0000001045": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 3.081700428510495e-06,
+        "n_shared": 3
+      }
+    }
+  },
+  "BIOMD0000001047": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.0136276656928012e-06,
+        "n_shared": 4
+      }
+    }
+  },
+  "BIOMD0000001048": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 4.730373548617041e-07,
+        "n_shared": 3
+      }
+    }
+  },
+  "BIOMD0000001052": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 5.277985037849777e-07,
+        "n_shared": 3
+      }
+    }
+  },
+  "BIOMD0000001053": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 7.803927680408741e-06,
+        "n_shared": 6
+      }
+    }
+  },
+  "BIOMD0000001054": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 1.544199282861438e-07,
+        "n_shared": 7
+      }
+    }
+  },
+  "BIOMD0000001055": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 5.910158313839027e-07,
+        "n_shared": 19
+      }
+    }
+  },
+  "BIOMD0000001056": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 5.543092044657161e-07,
+        "n_shared": 3
+      }
+    }
+  },
+  "BIOMD0000001057": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 9.219389651984119e-07,
+        "n_shared": 2
+      }
+    }
+  },
+  "BIOMD0000001058": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 3.7556344870801593e-06,
+        "n_shared": 10
+      }
+    }
+  },
+  "BIOMD0000001059": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "large",
+        "mean_nrmse": 0.3101070428401961,
+        "n_shared": 10
+      }
+    }
+  },
+  "BIOMD0000001060": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 4.0390060587402735e-05,
+        "n_shared": 2
+      }
+    }
+  },
+  "BIOMD0000001078": {
+    "sim1": {
+      "copasi__tellurium": {
+        "bucket": "good",
+        "mean_nrmse": 8.623410657855941e-07,
+        "n_shared": 2
+      }
+    }
+  }
+}
