@@ -21,7 +21,7 @@
 ### Task 1: Closeness metric primitive
 
 **Files:**
-- Modify: `pbg_biomodels/comparison.py` (add near `bucket_for`)
+- Modify: `viva_biomodels/comparison.py` (add near `bucket_for`)
 - Test: `tests/test_closeness_metric.py` (create)
 
 **Interfaces:**
@@ -33,7 +33,7 @@
 # tests/test_closeness_metric.py
 import numpy as np
 import pytest
-from pbg_biomodels.comparison import closeness_score, closeness_bucket_for
+from viva_biomodels.comparison import closeness_score, closeness_bucket_for
 
 
 def test_identical_series_is_close_zero():
@@ -76,7 +76,7 @@ Expected: FAIL with `ImportError: cannot import name 'closeness_score'`
 
 - [ ] **Step 3: Write minimal implementation**
 
-Add to `pbg_biomodels/comparison.py` (after `bucket_for`):
+Add to `viva_biomodels/comparison.py` (after `bucket_for`):
 
 ```python
 def closeness_score(y1, y2):
@@ -127,7 +127,7 @@ Expected: PASS (6 tests)
 - [ ] **Step 5: Commit**
 
 ```bash
-git add tests/test_closeness_metric.py pbg_biomodels/comparison.py
+git add tests/test_closeness_metric.py viva_biomodels/comparison.py
 git commit -m "Add BioSimulations closeness-score metric primitive"
 ```
 
@@ -136,7 +136,7 @@ git commit -m "Add BioSimulations closeness-score metric primitive"
 ### Task 2: Both metrics in the comparison results
 
 **Files:**
-- Modify: `pbg_biomodels/comparison.py` — `compare_two_engines`, `compare_n_engines`, `compare_two_engines_steady_state`, `compare_n_engines_steady_state`
+- Modify: `viva_biomodels/comparison.py` — `compare_two_engines`, `compare_n_engines`, `compare_two_engines_steady_state`, `compare_n_engines_steady_state`
 - Test: `tests/test_dual_metric_comparison.py` (create)
 
 **Interfaces:**
@@ -147,7 +147,7 @@ git commit -m "Add BioSimulations closeness-score metric primitive"
 
 ```python
 # tests/test_dual_metric_comparison.py
-from pbg_biomodels.comparison import compare_two_engines, compare_n_engines
+from viva_biomodels.comparison import compare_two_engines, compare_n_engines
 
 _UTC_A = {"columns": ["A"], "values": [[1.0], [2.0], [3.0]], "time": [0, 1, 2]}
 _UTC_B = {"columns": ["A"], "values": [[1.0], [2.0], [3.0]], "time": [0, 1, 2]}
@@ -279,7 +279,7 @@ Expected: PASS (new + existing SS tests still green)
 - [ ] **Step 7: Commit**
 
 ```bash
-git add tests/test_dual_metric_comparison.py pbg_biomodels/comparison.py
+git add tests/test_dual_metric_comparison.py viva_biomodels/comparison.py
 git commit -m "Compute closeness score alongside nRMSE in compare_n_engines (+SS)"
 ```
 
@@ -288,7 +288,7 @@ git commit -m "Compute closeness score alongside nRMSE in compare_n_engines (+SS
 ### Task 3: Persist both metrics + preserve run provenance
 
 **Files:**
-- Modify: `pbg_biomodels/two_tier.py` — `write_model` (job entry), `finalize_index` (keep `runs`)
+- Modify: `viva_biomodels/two_tier.py` — `write_model` (job entry), `finalize_index` (keep `runs`)
 - Test: `tests/test_two_tier_provenance.py` (create)
 
 **Interfaces:**
@@ -301,7 +301,7 @@ git commit -m "Compute closeness score alongside nRMSE in compare_n_engines (+SS
 # tests/test_two_tier_provenance.py
 import json
 from pathlib import Path
-from pbg_biomodels.two_tier import write_model, finalize_index
+from viva_biomodels.two_tier import write_model, finalize_index
 
 
 def test_write_model_stores_both_metrics(tmp_path):
@@ -370,7 +370,7 @@ Expected: PASS
 - [ ] **Step 6: Commit**
 
 ```bash
-git add tests/test_two_tier_provenance.py pbg_biomodels/two_tier.py
+git add tests/test_two_tier_provenance.py viva_biomodels/two_tier.py
 git commit -m "Persist both metrics per job and preserve per-engine run provenance in index"
 ```
 
@@ -379,7 +379,7 @@ git commit -m "Persist both metrics per job and preserve per-engine run provenan
 ### Task 4: Overview — dual-metric columns + closeness analysis lens
 
 **Files:**
-- Modify: `pbg_biomodels/lazy_viewer.py` — add `_engine_analysis_closeness`, extend `_overview_rows` + the overview `<thead>` + `applyFilter`
+- Modify: `viva_biomodels/lazy_viewer.py` — add `_engine_analysis_closeness`, extend `_overview_rows` + the overview `<thead>` + `applyFilter`
 - Test: `tests/test_viewer_dual_metric.py` (create)
 
 **Interfaces:**
@@ -390,7 +390,7 @@ git commit -m "Persist both metrics per job and preserve per-engine run provenan
 
 ```python
 # tests/test_viewer_dual_metric.py
-from pbg_biomodels.lazy_viewer import _engine_analysis_closeness, _page
+from viva_biomodels.lazy_viewer import _engine_analysis_closeness, _page
 
 _INDEX = {"models": {"BIOMD1": {"has_series": True, "jobs": {"utc1": {
     "engines": ["copasi", "tellurium", "reference:copasi"],
@@ -479,7 +479,7 @@ Expected: PASS
 - [ ] **Step 6: Commit**
 
 ```bash
-git add tests/test_viewer_dual_metric.py pbg_biomodels/lazy_viewer.py
+git add tests/test_viewer_dual_metric.py viva_biomodels/lazy_viewer.py
 git commit -m "Viewer overview: dual-metric columns + closeness analysis lens"
 ```
 
@@ -488,7 +488,7 @@ git commit -m "Viewer overview: dual-metric columns + closeness analysis lens"
 ### Task 5: Summary tab — all-runs execution + agreement
 
 **Files:**
-- Modify: `pbg_biomodels/lazy_viewer.py` — add `_summary_stats` + `_summary_panel`, add a "Summary" tab to `_page`
+- Modify: `viva_biomodels/lazy_viewer.py` — add `_summary_stats` + `_summary_panel`, add a "Summary" tab to `_page`
 - Test: `tests/test_viewer_summary.py` (create)
 
 **Interfaces:**
@@ -499,7 +499,7 @@ git commit -m "Viewer overview: dual-metric columns + closeness analysis lens"
 
 ```python
 # tests/test_viewer_summary.py
-from pbg_biomodels.lazy_viewer import _summary_stats
+from viva_biomodels.lazy_viewer import _summary_stats
 
 _INDEX = {"models": {
     "M1": {"jobs": {"utc1": {"engines": ["copasi", "tellurium"],
@@ -602,7 +602,7 @@ Expected: PASS
 - [ ] **Step 6: Commit**
 
 ```bash
-git add tests/test_viewer_summary.py pbg_biomodels/lazy_viewer.py
+git add tests/test_viewer_summary.py viva_biomodels/lazy_viewer.py
 git commit -m "Viewer: all-runs Summary tab (per-engine execution + agreement)"
 ```
 
@@ -611,7 +611,7 @@ git commit -m "Viewer: all-runs Summary tab (per-engine execution + agreement)"
 ### Task 6: Drill-down — per-engine execution + agreement run table
 
 **Files:**
-- Modify: `pbg_biomodels/lazy_viewer.py` — add `_run_table(index, bid)` + `/api/runs/<bid>` route; inject the table into `openModel` (server + static)
+- Modify: `viva_biomodels/lazy_viewer.py` — add `_run_table(index, bid)` + `/api/runs/<bid>` route; inject the table into `openModel` (server + static)
 - Test: `tests/test_viewer_run_table.py` (create)
 
 **Interfaces:**
@@ -622,7 +622,7 @@ git commit -m "Viewer: all-runs Summary tab (per-engine execution + agreement)"
 
 ```python
 # tests/test_viewer_run_table.py
-from pbg_biomodels.lazy_viewer import _run_table
+from viva_biomodels.lazy_viewer import _run_table
 
 _INDEX = {"models": {"BIOMD1": {
     "jobs": {"utc1": {"engines": ["copasi", "tellurium"],
@@ -714,7 +714,7 @@ Expected: PASS (pre-existing `test_biomodel_process_runs[pysces]` failure is unr
 - [ ] **Step 6: Commit**
 
 ```bash
-git add tests/test_viewer_run_table.py pbg_biomodels/lazy_viewer.py
+git add tests/test_viewer_run_table.py viva_biomodels/lazy_viewer.py
 git commit -m "Viewer drill-down: per-engine execution + agreement run table"
 ```
 

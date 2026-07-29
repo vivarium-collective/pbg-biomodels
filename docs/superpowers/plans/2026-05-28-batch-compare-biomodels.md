@@ -16,13 +16,13 @@
 
 ## File layout
 
-**New files in `pbg_biomodels/`:**
+**New files in `viva_biomodels/`:**
 - `types.py` — register new bigraph-schema types into the workspace core.
 - `steps/simulator_runner.py` — `SimulatorRunnerStep`.
 - `composites/batch_compare_biomodels.py` — `@composite_generator` for the new composite.
 - `visualizations/batch_compare_overlay.py` — `BatchCompareOverlay` visualization.
 
-**Modified files in `pbg_biomodels/`:**
+**Modified files in `viva_biomodels/`:**
 - `__init__.py` — re-export new types/steps; call new type registration.
 - `run_biomodels.py` — add `extract_all_simulations` alongside the existing `extract_first_uniform_time_course`.
 - `steps/load_biomodel.py` — replace `time`/`n_points` outputs with `sbml_path` + `sedml_jobs`.
@@ -49,8 +49,8 @@ Each new file has one clear responsibility; existing files are only touched wher
 ## Task A1: Register new bigraph-schema types
 
 **Files:**
-- Create: `pbg_biomodels/types.py`
-- Modify: `pbg_biomodels/__init__.py` (call `register_simulation_types` from `register_types`)
+- Create: `viva_biomodels/types.py`
+- Modify: `viva_biomodels/__init__.py` (call `register_simulation_types` from `register_types`)
 - Test: `tests/test_simulation_result_types.py`
 
 - [ ] **Step 1: Write the failing test**
@@ -63,7 +63,7 @@ and `sim_results_per_biomodel` so composites can wire stores by name.
 """
 from process_bigraph import allocate_core
 
-from pbg_biomodels import register_types
+from viva_biomodels import register_types
 
 
 def _core():
@@ -94,13 +94,13 @@ def test_sim_results_per_biomodel_alias_registered():
 - [ ] **Step 2: Run test to verify it fails**
 
 ```bash
-cd /Users/eranagmon/code/pbg-biomodels
+cd /Users/eranagmon/code/viva-biomodels
 .venv/bin/python -m pytest tests/test_simulation_result_types.py -v
 ```
 
 Expected: FAIL — `core.access("simulation_result")` returns None / unresolved.
 
-- [ ] **Step 3: Create `pbg_biomodels/types.py`**
+- [ ] **Step 3: Create `viva_biomodels/types.py`**
 
 ```python
 """Bigraph-schema types for the batch-compare-biomodels composite.
@@ -140,11 +140,11 @@ def register_simulation_types(core):
 
 - [ ] **Step 4: Wire `register_simulation_types` into the workspace `register_types`**
 
-In `pbg_biomodels/__init__.py`, after the existing `TYPES_DICT` block and before the `from pbg_biomodels.steps import …` line, change:
+In `viva_biomodels/__init__.py`, after the existing `TYPES_DICT` block and before the `from viva_biomodels.steps import …` line, change:
 
 ```python
 def register_types(core):
-    """Register pbg-biomodels bigraph-schema types into a ProcessBigraph core."""
+    """Register viva-biomodels bigraph-schema types into a ProcessBigraph core."""
     core.register_types(TYPES_DICT)
     return core
 ```
@@ -152,11 +152,11 @@ def register_types(core):
 to:
 
 ```python
-from pbg_biomodels.types import register_simulation_types  # noqa: E402
+from viva_biomodels.types import register_simulation_types  # noqa: E402
 
 
 def register_types(core):
-    """Register pbg-biomodels bigraph-schema types into a ProcessBigraph core."""
+    """Register viva-biomodels bigraph-schema types into a ProcessBigraph core."""
     core.register_types(TYPES_DICT)
     register_simulation_types(core)
     return core
@@ -173,7 +173,7 @@ Expected: 3 tests PASS.
 - [ ] **Step 6: Commit**
 
 ```bash
-git add pbg_biomodels/types.py pbg_biomodels/__init__.py tests/test_simulation_result_types.py
+git add viva_biomodels/types.py viva_biomodels/__init__.py tests/test_simulation_result_types.py
 git commit -m "$(cat <<'EOF'
 types: register simulation_result + biomodel_jobs for batch-compare schema
 
@@ -192,7 +192,7 @@ EOF
 ## Task A2: SED-ML multi-task extraction
 
 **Files:**
-- Modify: `pbg_biomodels/run_biomodels.py` (add `extract_all_simulations` after the existing `extract_first_uniform_time_course`, no behavior change to the existing function)
+- Modify: `viva_biomodels/run_biomodels.py` (add `extract_all_simulations` after the existing `extract_first_uniform_time_course`, no behavior change to the existing function)
 - Test: `tests/test_sedml_multi_task_parsing.py`
 
 - [ ] **Step 1: Write the failing test**
@@ -210,7 +210,7 @@ import textwrap
 import libsedml
 import pytest
 
-from pbg_biomodels.run_biomodels import extract_all_simulations, read_sedml_doc
+from viva_biomodels.run_biomodels import extract_all_simulations, read_sedml_doc
 
 
 def _write(tmp_path, body) -> str:
@@ -277,7 +277,7 @@ def test_no_simulations_returns_empty_list(tmp_path):
 
 Expected: FAIL — `ImportError: cannot import name 'extract_all_simulations'`.
 
-- [ ] **Step 3: Add `extract_all_simulations` to `pbg_biomodels/run_biomodels.py`**
+- [ ] **Step 3: Add `extract_all_simulations` to `viva_biomodels/run_biomodels.py`**
 
 Find the existing function `extract_first_uniform_time_course` (around line 152). Immediately **after** it, add:
 
@@ -350,7 +350,7 @@ Expected: 3 tests PASS.
 - [ ] **Step 5: Commit**
 
 ```bash
-git add pbg_biomodels/run_biomodels.py tests/test_sedml_multi_task_parsing.py
+git add viva_biomodels/run_biomodels.py tests/test_sedml_multi_task_parsing.py
 git commit -m "$(cat <<'EOF'
 sedml: extract_all_simulations — yield every UTC + SteadyState task
 
@@ -370,7 +370,7 @@ EOF
 ## Task A3: Upgrade `LoadBiomodelStep` to emit `sbml_path` + `sedml_jobs`
 
 **Files:**
-- Modify: `pbg_biomodels/steps/load_biomodel.py`
+- Modify: `viva_biomodels/steps/load_biomodel.py`
 - Test: `tests/test_load_biomodel_step_sedml_jobs.py`
 
 The previous output ports `time` and `n_points` are **removed**: the legacy `compare-biomodel` generator already populates per-biomodel `sim_time_<bid>` / `n_points_<bid>` stores itself, but it does so by wiring `LoadBiomodelStep`'s `time` / `n_points` outputs directly. We must verify no other caller is wired to these names before removing them.
@@ -378,7 +378,7 @@ The previous output ports `time` and `n_points` are **removed**: the legacy `com
 - [ ] **Step 1: Verify the existing legacy generator's wiring will break (and that this is expected)**
 
 ```bash
-grep -rn '"time"\|"n_points"' pbg_biomodels/composites/ | grep -v __pycache__
+grep -rn '"time"\|"n_points"' viva_biomodels/composites/ | grep -v __pycache__
 ```
 
 Expected: lines in `compare_biomodel.py` and `compare_simulators.py` referencing `time`/`n_points` outputs of the load step. **These legacy composites must be updated to call the old behavior some other way OR we keep the old fields on the step.** To minimise blast radius, we keep `time`/`n_points` on the step as **back-compat outputs** (populated from the first UTC job) AND add the new `sedml_jobs` output. The legacy generators continue to work; the new generator reads `sedml_jobs`.
@@ -393,7 +393,7 @@ covering every UTC + SteadyState task in the SED-ML.
 """
 import pytest
 
-from pbg_biomodels.steps.load_biomodel import LoadBiomodelStep
+from viva_biomodels.steps.load_biomodel import LoadBiomodelStep
 
 
 def test_outputs_declare_sedml_jobs():
@@ -439,7 +439,7 @@ Expected: FAIL — `'sedml_jobs' in outs` is False.
 
 - [ ] **Step 4: Update `LoadBiomodelStep` to add `sedml_jobs`**
 
-In `pbg_biomodels/steps/load_biomodel.py`, replace the `outputs` and `update` methods. After modification, the full class body is:
+In `viva_biomodels/steps/load_biomodel.py`, replace the `outputs` and `update` methods. After modification, the full class body is:
 
 ```python
 class LoadBiomodelStep(Step):
@@ -481,7 +481,7 @@ class LoadBiomodelStep(Step):
 
         import biomodels
 
-        from pbg_biomodels.run_biomodels import (
+        from viva_biomodels.run_biomodels import (
             extract_all_simulations,
             load_biomodel,
             read_sedml_doc,
@@ -527,7 +527,7 @@ Expected: all tests PASS (the legacy `compare-biomodel` generator is unaffected 
 - [ ] **Step 6: Commit**
 
 ```bash
-git add pbg_biomodels/steps/load_biomodel.py tests/test_load_biomodel_step_sedml_jobs.py
+git add viva_biomodels/steps/load_biomodel.py tests/test_load_biomodel_step_sedml_jobs.py
 git commit -m "$(cat <<'EOF'
 LoadBiomodelStep: emit sedml_jobs list alongside back-compat time/n_points
 
@@ -546,10 +546,10 @@ EOF
 ## Task B1: Extend simulator registry with SteadyState addresses
 
 **Files:**
-- Modify: `pbg_biomodels/simulators.py` (add `steady_state_step` to `SimulatorSpec`, populate it for all three simulators, add `steady_state_step_address` helper)
+- Modify: `viva_biomodels/simulators.py` (add `steady_state_step` to `SimulatorSpec`, populate it for all three simulators, add `steady_state_step_address` helper)
 - Test: covered by Task B2's tests — no dedicated test for registry data.
 
-- [ ] **Step 1: Modify `SimulatorSpec` and the `_SIMULATORS` registry in `pbg_biomodels/simulators.py`**
+- [ ] **Step 1: Modify `SimulatorSpec` and the `_SIMULATORS` registry in `viva_biomodels/simulators.py`**
 
 Change the `SimulatorSpec` TypedDict:
 
@@ -567,8 +567,8 @@ Update each entry in `_SIMULATORS` to include the new field:
 ```python
 _SIMULATORS: Dict[str, SimulatorSpec] = {
     "copasi": {
-        "utc_step": "local:pbg_biomodels.steps.simulators.BiomodelsCopasiStep",
-        "steady_state_step": "local:pbg_biomodels.steps.simulators.BiomodelsCopasiSteadyStateStep",
+        "utc_step": "local:viva_biomodels.steps.simulators.BiomodelsCopasiStep",
+        "steady_state_step": "local:viva_biomodels.steps.simulators.BiomodelsCopasiSteadyStateStep",
         "process": "local:CopasiUTCProcess",
         "process_config": lambda sbml: {
             "model_source": sbml,
@@ -578,15 +578,15 @@ _SIMULATORS: Dict[str, SimulatorSpec] = {
         "species_out": "species_concentrations",
     },
     "tellurium": {
-        "utc_step": "local:pbg_biomodels.steps.simulators.BiomodelsTelluriumStep",
-        "steady_state_step": "local:pbg_biomodels.steps.simulators.BiomodelsTelluriumSteadyStateStep",
+        "utc_step": "local:viva_biomodels.steps.simulators.BiomodelsTelluriumStep",
+        "steady_state_step": "local:viva_biomodels.steps.simulators.BiomodelsTelluriumSteadyStateStep",
         "process": "local:TelluriumProcess",
         "process_config": lambda sbml: {"model_file": sbml},
         "species_out": "species",
     },
     "simbio": {
-        "utc_step": "local:pbg_biomodels.steps.simulators.BiomodelsSimbioStep",
-        "steady_state_step": "local:pbg_biomodels.steps.simulators.BiomodelsSimbioSteadyStateStep",
+        "utc_step": "local:viva_biomodels.steps.simulators.BiomodelsSimbioStep",
+        "steady_state_step": "local:viva_biomodels.steps.simulators.BiomodelsSimbioSteadyStateStep",
         "process": "local:SimbioUTCProcess",
         "process_config": lambda sbml: {"model_source": sbml, "model_format": "sbml"},
         "species_out": "species_concentrations",
@@ -604,15 +604,15 @@ def steady_state_step_address(name: str) -> str:
 - [ ] **Step 2: Sanity-check the imports still work**
 
 ```bash
-.venv/bin/python -c "from pbg_biomodels.simulators import steady_state_step_address; print(steady_state_step_address('copasi'))"
+.venv/bin/python -c "from viva_biomodels.simulators import steady_state_step_address; print(steady_state_step_address('copasi'))"
 ```
 
-Expected: prints `local:pbg_biomodels.steps.simulators.BiomodelsCopasiSteadyStateStep`.
+Expected: prints `local:viva_biomodels.steps.simulators.BiomodelsCopasiSteadyStateStep`.
 
 - [ ] **Step 3: Commit (registry-only; the actual classes land in B2)**
 
 ```bash
-git add pbg_biomodels/simulators.py
+git add viva_biomodels/simulators.py
 git commit -m "$(cat <<'EOF'
 simulators: register steady_state_step addresses + helper
 
@@ -630,8 +630,8 @@ EOF
 ## Task B2: Add SteadyState adapter Step classes
 
 **Files:**
-- Modify: `pbg_biomodels/steps/simulators.py` (add three SteadyState adapter classes alongside the existing UTC adapters)
-- Modify: `pbg_biomodels/steps/__init__.py` (re-export them)
+- Modify: `viva_biomodels/steps/simulators.py` (add three SteadyState adapter classes alongside the existing UTC adapters)
+- Modify: `viva_biomodels/steps/__init__.py` (re-export them)
 - Test: `tests/test_steady_state_adapters.py`
 
 The adapters lazy-import the upstream `<Sim>SteadyStateStep` so the workspace doesn't break-import when those upstream classes are not yet shipped. Tests patch the lazy import.
@@ -683,7 +683,7 @@ class _FakeSteadyStateClass:
 def test_copasi_steady_state_adapter(monkeypatch):
     _patch_upstream(monkeypatch, "pbg_copasi.processes",
                     "CopasiSteadyStateStep", _FakeSteadyStateClass)
-    from pbg_biomodels.steps.simulators import BiomodelsCopasiSteadyStateStep
+    from viva_biomodels.steps.simulators import BiomodelsCopasiSteadyStateStep
     out = BiomodelsCopasiSteadyStateStep().update({"model_source": "/tmp/m.xml"})
     assert out["result"]["kind"] == "steady_state"
     assert out["result"]["time"] is None
@@ -694,7 +694,7 @@ def test_copasi_steady_state_adapter(monkeypatch):
 def test_tellurium_steady_state_adapter(monkeypatch):
     _patch_upstream(monkeypatch, "pbg_tellurium.processes",
                     "TelluriumSteadyStateStep", _FakeSteadyStateClass)
-    from pbg_biomodels.steps.simulators import BiomodelsTelluriumSteadyStateStep
+    from viva_biomodels.steps.simulators import BiomodelsTelluriumSteadyStateStep
     out = BiomodelsTelluriumSteadyStateStep().update({"model_source": "/tmp/m.xml"})
     assert out["result"]["kind"] == "steady_state"
     assert out["result"]["time"] is None
@@ -704,7 +704,7 @@ def test_tellurium_steady_state_adapter(monkeypatch):
 def test_simbio_steady_state_adapter(monkeypatch):
     _patch_upstream(monkeypatch, "pbg_simbio.processes",
                     "SimbioSteadyStateStep", _FakeSteadyStateClass)
-    from pbg_biomodels.steps.simulators import BiomodelsSimbioSteadyStateStep
+    from viva_biomodels.steps.simulators import BiomodelsSimbioSteadyStateStep
     out = BiomodelsSimbioSteadyStateStep().update({"model_source": "/tmp/m.xml"})
     assert out["result"]["kind"] == "steady_state"
     assert out["result"]["time"] is None
@@ -713,7 +713,7 @@ def test_simbio_steady_state_adapter(monkeypatch):
 
 def test_steady_state_adapter_outputs_simulation_result_shape():
     """The output port declaration is `simulation_result`."""
-    from pbg_biomodels.steps.simulators import BiomodelsCopasiSteadyStateStep
+    from viva_biomodels.steps.simulators import BiomodelsCopasiSteadyStateStep
     assert BiomodelsCopasiSteadyStateStep().outputs() == {
         "result": "simulation_result"
     }
@@ -727,9 +727,9 @@ def test_steady_state_adapter_outputs_simulation_result_shape():
 
 Expected: FAIL — `ImportError: cannot import name 'BiomodelsCopasiSteadyStateStep'`.
 
-- [ ] **Step 3: Add the SteadyState adapters to `pbg_biomodels/steps/simulators.py`**
+- [ ] **Step 3: Add the SteadyState adapters to `viva_biomodels/steps/simulators.py`**
 
-At the end of `pbg_biomodels/steps/simulators.py`, append:
+At the end of `viva_biomodels/steps/simulators.py`, append:
 
 ```python
 # ---------------------------------------------------------------------------
@@ -819,16 +819,16 @@ class BiomodelsSimbioSteadyStateStep(Step):
         return _emit_steady_state(out.get("observables") or {})
 ```
 
-- [ ] **Step 4: Re-export from `pbg_biomodels/steps/__init__.py`**
+- [ ] **Step 4: Re-export from `viva_biomodels/steps/__init__.py`**
 
 Replace the file's contents with:
 
 ```python
-"""Process-bigraph Steps contributed by pbg-biomodels."""
+"""Process-bigraph Steps contributed by viva-biomodels."""
 
-from pbg_biomodels.steps.load_biomodel import LoadBiomodelStep
-from pbg_biomodels.steps.simulator_comparison import SimulatorComparisonStep
-from pbg_biomodels.steps.simulators import (
+from viva_biomodels.steps.load_biomodel import LoadBiomodelStep
+from viva_biomodels.steps.simulator_comparison import SimulatorComparisonStep
+from viva_biomodels.steps.simulators import (
     BiomodelsCopasiStep,
     BiomodelsCopasiSteadyStateStep,
     BiomodelsSimbioStep,
@@ -860,14 +860,14 @@ Expected: 4 tests PASS.
 - [ ] **Step 6: Commit**
 
 ```bash
-git add pbg_biomodels/steps/simulators.py pbg_biomodels/steps/__init__.py tests/test_steady_state_adapters.py
+git add viva_biomodels/steps/simulators.py viva_biomodels/steps/__init__.py tests/test_steady_state_adapters.py
 git commit -m "$(cat <<'EOF'
 simulators: SteadyState adapters for copasi / tellurium / simbio
 
 Adds three Biomodels<Sim>SteadyStateStep adapters that lazy-import the
 upstream `<Sim>SteadyStateStep` classes and reshape the result into the
 simulation_result tagged-union shape (kind=steady_state, time=None,
-observables=map[name, float]). Lazy import lets pbg-biomodels keep
+observables=map[name, float]). Lazy import lets viva-biomodels keep
 working while the upstream PRs are in flight.
 
 Co-Authored-By: Claude Opus 4.7 (1M context) <noreply@anthropic.com>
@@ -880,8 +880,8 @@ EOF
 ## Task C1: SimulatorRunnerStep
 
 **Files:**
-- Create: `pbg_biomodels/steps/simulator_runner.py`
-- Modify: `pbg_biomodels/steps/__init__.py` (re-export `SimulatorRunnerStep`)
+- Create: `viva_biomodels/steps/simulator_runner.py`
+- Modify: `viva_biomodels/steps/__init__.py` (re-export `SimulatorRunnerStep`)
 - Test: `tests/test_simulator_runner_step.py`
 
 - [ ] **Step 1: Write the failing test**
@@ -945,14 +945,14 @@ class _RaisingUTC:
 @pytest.fixture
 def patched_adapters(monkeypatch):
     """Replace the UTC + SS adapter Step classes used by the runner."""
-    import pbg_biomodels.steps.simulator_runner as mod
+    import viva_biomodels.steps.simulator_runner as mod
     monkeypatch.setattr(mod, "_UTC_CLASS_FOR", lambda name: _StubUTC, raising=True)
     monkeypatch.setattr(mod, "_SS_CLASS_FOR",  lambda name: _StubSS,  raising=True)
     return mod
 
 
 def test_runner_dispatches_utc_and_steady_state(patched_adapters):
-    from pbg_biomodels.steps.simulator_runner import SimulatorRunnerStep
+    from viva_biomodels.steps.simulator_runner import SimulatorRunnerStep
     step = SimulatorRunnerStep(config={"simulator_name": "copasi"})
     out = step.update({"models": {
         "BIOMD0000000001": {
@@ -980,9 +980,9 @@ def test_runner_dispatches_utc_and_steady_state(patched_adapters):
 def test_runner_records_per_job_failure(patched_adapters, monkeypatch):
     """A simulator exception is recorded as `{kind, error}` for that job
     and does not abort the runner's other jobs."""
-    import pbg_biomodels.steps.simulator_runner as mod
+    import viva_biomodels.steps.simulator_runner as mod
     monkeypatch.setattr(mod, "_UTC_CLASS_FOR", lambda name: _RaisingUTC)
-    from pbg_biomodels.steps.simulator_runner import SimulatorRunnerStep
+    from viva_biomodels.steps.simulator_runner import SimulatorRunnerStep
 
     step = SimulatorRunnerStep(config={"simulator_name": "copasi"})
     out = step.update({"models": {
@@ -1006,7 +1006,7 @@ def test_runner_records_per_job_failure(patched_adapters, monkeypatch):
 
 def test_runner_writes_one_branch_per_biomodel(patched_adapters):
     """A runner over two biomodels writes both branches into results."""
-    from pbg_biomodels.steps.simulator_runner import SimulatorRunnerStep
+    from viva_biomodels.steps.simulator_runner import SimulatorRunnerStep
     step = SimulatorRunnerStep(config={"simulator_name": "copasi"})
     out = step.update({"models": {
         "BIOMD0000000001": {
@@ -1024,7 +1024,7 @@ def test_runner_writes_one_branch_per_biomodel(patched_adapters):
 
 
 def test_runner_rejects_unknown_simulator():
-    from pbg_biomodels.steps.simulator_runner import SimulatorRunnerStep
+    from viva_biomodels.steps.simulator_runner import SimulatorRunnerStep
     with pytest.raises(ValueError, match="unknown simulator"):
         SimulatorRunnerStep(config={"simulator_name": "fake-sim"}).update(
             {"models": {}}
@@ -1039,7 +1039,7 @@ def test_runner_rejects_unknown_simulator():
 
 Expected: FAIL — `ImportError: cannot import name 'SimulatorRunnerStep'`.
 
-- [ ] **Step 3: Create `pbg_biomodels/steps/simulator_runner.py`**
+- [ ] **Step 3: Create `viva_biomodels/steps/simulator_runner.py`**
 
 ```python
 """SimulatorRunnerStep — runs every SED-ML job of every biomodel under one simulator.
@@ -1061,7 +1061,7 @@ from typing import Any, ClassVar, Dict
 
 from process_bigraph import Step
 
-from pbg_biomodels.simulators import ALL_SIMULATORS
+from viva_biomodels.simulators import ALL_SIMULATORS
 
 
 # ---------------------------------------------------------------------------
@@ -1072,7 +1072,7 @@ from pbg_biomodels.simulators import ALL_SIMULATORS
 
 def _UTC_CLASS_FOR(simulator_name: str):
     """Return the UTC adapter class for the given simulator."""
-    from pbg_biomodels.steps.simulators import (
+    from viva_biomodels.steps.simulators import (
         BiomodelsCopasiStep,
         BiomodelsSimbioStep,
         BiomodelsTelluriumStep,
@@ -1086,7 +1086,7 @@ def _UTC_CLASS_FOR(simulator_name: str):
 
 def _SS_CLASS_FOR(simulator_name: str):
     """Return the SteadyState adapter class for the given simulator."""
-    from pbg_biomodels.steps.simulators import (
+    from viva_biomodels.steps.simulators import (
         BiomodelsCopasiSteadyStateStep,
         BiomodelsSimbioSteadyStateStep,
         BiomodelsTelluriumSteadyStateStep,
@@ -1198,17 +1198,17 @@ class SimulatorRunnerStep(Step):
         return {"results": out}
 ```
 
-- [ ] **Step 4: Re-export from `pbg_biomodels/steps/__init__.py`**
+- [ ] **Step 4: Re-export from `viva_biomodels/steps/__init__.py`**
 
 Add the import + `__all__` entry. After modification, the file's full contents:
 
 ```python
-"""Process-bigraph Steps contributed by pbg-biomodels."""
+"""Process-bigraph Steps contributed by viva-biomodels."""
 
-from pbg_biomodels.steps.load_biomodel import LoadBiomodelStep
-from pbg_biomodels.steps.simulator_comparison import SimulatorComparisonStep
-from pbg_biomodels.steps.simulator_runner import SimulatorRunnerStep
-from pbg_biomodels.steps.simulators import (
+from viva_biomodels.steps.load_biomodel import LoadBiomodelStep
+from viva_biomodels.steps.simulator_comparison import SimulatorComparisonStep
+from viva_biomodels.steps.simulator_runner import SimulatorRunnerStep
+from viva_biomodels.steps.simulators import (
     BiomodelsCopasiStep,
     BiomodelsCopasiSteadyStateStep,
     BiomodelsSimbioStep,
@@ -1241,7 +1241,7 @@ Expected: 4 tests PASS.
 - [ ] **Step 6: Commit**
 
 ```bash
-git add pbg_biomodels/steps/simulator_runner.py pbg_biomodels/steps/__init__.py tests/test_simulator_runner_step.py
+git add viva_biomodels/steps/simulator_runner.py viva_biomodels/steps/__init__.py tests/test_simulator_runner_step.py
 git commit -m "$(cat <<'EOF'
 runner: SimulatorRunnerStep — one Step per simulator, iterates all jobs
 
@@ -1261,7 +1261,7 @@ EOF
 ## Task D1: `compare_n_engines_steady_state`
 
 **Files:**
-- Modify: `pbg_biomodels/comparison.py` (add the SS counterpart to `compare_n_engines`)
+- Modify: `viva_biomodels/comparison.py` (add the SS counterpart to `compare_n_engines`)
 - Test: covered by Task D2's tests — but we keep one unit test here for the math.
 
 - [ ] **Step 1: Write the failing test**
@@ -1270,7 +1270,7 @@ Append to a new file `tests/test_comparison_steady_state.py`:
 
 ```python
 """All-pairs steady-state comparison: |a-b| / max(|a|,|b|, eps) per observable."""
-from pbg_biomodels.comparison import compare_n_engines_steady_state
+from viva_biomodels.comparison import compare_n_engines_steady_state
 
 
 def test_two_engines_identical_are_in_good_bucket():
@@ -1313,9 +1313,9 @@ def test_three_engines_picks_worst_pair():
 
 Expected: FAIL — `ImportError: cannot import name 'compare_n_engines_steady_state'`.
 
-- [ ] **Step 3: Add `compare_n_engines_steady_state` to `pbg_biomodels/comparison.py`**
+- [ ] **Step 3: Add `compare_n_engines_steady_state` to `viva_biomodels/comparison.py`**
 
-Append at the end of `pbg_biomodels/comparison.py`:
+Append at the end of `viva_biomodels/comparison.py`:
 
 ```python
 def compare_two_engines_steady_state(
@@ -1410,7 +1410,7 @@ Expected: 3 tests PASS.
 - [ ] **Step 5: Commit**
 
 ```bash
-git add pbg_biomodels/comparison.py tests/test_comparison_steady_state.py
+git add viva_biomodels/comparison.py tests/test_comparison_steady_state.py
 git commit -m "$(cat <<'EOF'
 comparison: compare_n_engines_steady_state — scalar all-pairs nRMSE
 
@@ -1429,7 +1429,7 @@ EOF
 ## Task D2: BatchCompareStep
 
 **Files:**
-- Modify: `pbg_biomodels/steps/simulator_comparison.py` (add `BatchCompareStep`)
+- Modify: `viva_biomodels/steps/simulator_comparison.py` (add `BatchCompareStep`)
 - Test: `tests/test_batch_compare_step.py`
 
 - [ ] **Step 1: Write the failing test**
@@ -1447,7 +1447,7 @@ import warnings
 
 import pytest
 
-from pbg_biomodels.steps.simulator_comparison import BatchCompareStep
+from viva_biomodels.steps.simulator_comparison import BatchCompareStep
 
 
 def _utc(time, observables):
@@ -1532,7 +1532,7 @@ def test_simulator_with_no_result_for_sedml_doc_is_dropped():
 
 Expected: FAIL — `ImportError: cannot import name 'BatchCompareStep'`.
 
-- [ ] **Step 3: Add `BatchCompareStep` to `pbg_biomodels/steps/simulator_comparison.py`**
+- [ ] **Step 3: Add `BatchCompareStep` to `viva_biomodels/steps/simulator_comparison.py`**
 
 Append at the end of the file:
 
@@ -1562,7 +1562,7 @@ class BatchCompareStep(Step):
         return {"comparisons": "tree"}
 
     def update(self, state: Dict[str, Any]) -> Dict[str, Any]:
-        from pbg_biomodels.comparison import (
+        from viva_biomodels.comparison import (
             bucket_for,
             compare_n_engines,
             compare_n_engines_steady_state,
@@ -1663,7 +1663,7 @@ Expected: 4 tests PASS.
 - [ ] **Step 5: Commit**
 
 ```bash
-git add pbg_biomodels/steps/simulator_comparison.py tests/test_batch_compare_step.py
+git add viva_biomodels/steps/simulator_comparison.py tests/test_batch_compare_step.py
 git commit -m "$(cat <<'EOF'
 comparison: BatchCompareStep — per (bid, sedml_doc) all-pairs across simulators
 
@@ -1684,7 +1684,7 @@ EOF
 ## Task E1: BatchCompareOverlay visualization
 
 **Files:**
-- Create: `pbg_biomodels/visualizations/batch_compare_overlay.py`
+- Create: `viva_biomodels/visualizations/batch_compare_overlay.py`
 - Test: `tests/test_batch_compare_overlay.py`
 
 The viz takes the full nested `results` + `comparisons` and renders a card grid (one card per biomodel, like the legacy viz) where each card expands into a per-sedml-doc tab strip. Each tab is a per-observable overlay across simulators that have data; SS observables render as a bar chart of final values instead of a line.
@@ -1701,7 +1701,7 @@ the deep rendering is exercised in the end-to-end generator test.
 """
 import pytest
 
-from pbg_biomodels.visualizations.batch_compare_overlay import BatchCompareOverlay
+from viva_biomodels.visualizations.batch_compare_overlay import BatchCompareOverlay
 
 
 def _utc(time, observables):
@@ -1764,7 +1764,7 @@ def test_overlay_with_no_results_returns_placeholder():
 
 Expected: FAIL — `ImportError: cannot import name 'BatchCompareOverlay'`.
 
-- [ ] **Step 3: Create `pbg_biomodels/visualizations/batch_compare_overlay.py`**
+- [ ] **Step 3: Create `viva_biomodels/visualizations/batch_compare_overlay.py`**
 
 ```python
 """BatchCompareOverlay — N-simulator + multi-sedml-doc summary-card grid.
@@ -2075,7 +2075,7 @@ Expected: 2 tests PASS.
 - [ ] **Step 5: Commit**
 
 ```bash
-git add pbg_biomodels/visualizations/batch_compare_overlay.py tests/test_batch_compare_overlay.py
+git add viva_biomodels/visualizations/batch_compare_overlay.py tests/test_batch_compare_overlay.py
 git commit -m "$(cat <<'EOF'
 viz: BatchCompareOverlay — multi-sim + multi-sedml-doc card grid
 
@@ -2095,7 +2095,7 @@ EOF
 ## Task E2: batch-compare-biomodels composite generator
 
 **Files:**
-- Create: `pbg_biomodels/composites/batch_compare_biomodels.py`
+- Create: `viva_biomodels/composites/batch_compare_biomodels.py`
 - Test: `tests/test_batch_compare_biomodels_generator.py`
 
 - [ ] **Step 1: Write the failing test**
@@ -2110,7 +2110,7 @@ BatchCompareOverlay viz step.
 """
 import pytest
 
-import pbg_biomodels.composites.batch_compare_biomodels  # noqa: F401
+import viva_biomodels.composites.batch_compare_biomodels  # noqa: F401
 from pbg_superpowers.composite_generator import _REGISTRY, build_generator
 
 
@@ -2206,9 +2206,9 @@ def test_legacy_compare_biomodel_generator_still_registered():
 .venv/bin/python -m pytest tests/test_batch_compare_biomodels_generator.py -v
 ```
 
-Expected: FAIL — `ModuleNotFoundError: No module named 'pbg_biomodels.composites.batch_compare_biomodels'`.
+Expected: FAIL — `ModuleNotFoundError: No module named 'viva_biomodels.composites.batch_compare_biomodels'`.
 
-- [ ] **Step 3: Create `pbg_biomodels/composites/batch_compare_biomodels.py`**
+- [ ] **Step 3: Create `viva_biomodels/composites/batch_compare_biomodels.py`**
 
 ```python
 """Composite generator: batch-compare-biomodels.
@@ -2234,13 +2234,13 @@ from typing import Any, Dict, List
 
 from pbg_superpowers.composite_generator import composite_generator
 
-from pbg_biomodels.simulators import resolve_simulators
+from viva_biomodels.simulators import resolve_simulators
 
 
-LOAD_STEP_ADDRESS    = "local:pbg_biomodels.steps.load_biomodel.LoadBiomodelStep"
-RUNNER_STEP_ADDRESS  = "local:pbg_biomodels.steps.simulator_runner.SimulatorRunnerStep"
-COMPARE_STEP_ADDRESS = "local:pbg_biomodels.steps.simulator_comparison.BatchCompareStep"
-VIZ_STEP_ADDRESS     = "local:pbg_biomodels.visualizations.batch_compare_overlay.BatchCompareOverlay"
+LOAD_STEP_ADDRESS    = "local:viva_biomodels.steps.load_biomodel.LoadBiomodelStep"
+RUNNER_STEP_ADDRESS  = "local:viva_biomodels.steps.simulator_runner.SimulatorRunnerStep"
+COMPARE_STEP_ADDRESS = "local:viva_biomodels.steps.simulator_comparison.BatchCompareStep"
+VIZ_STEP_ADDRESS     = "local:viva_biomodels.visualizations.batch_compare_overlay.BatchCompareOverlay"
 
 
 @composite_generator(
@@ -2374,7 +2374,7 @@ Expected: every test PASSes (network-gated test in `test_load_biomodel_step_sedm
 - [ ] **Step 6: Commit**
 
 ```bash
-git add pbg_biomodels/composites/batch_compare_biomodels.py tests/test_batch_compare_biomodels_generator.py
+git add viva_biomodels/composites/batch_compare_biomodels.py tests/test_batch_compare_biomodels_generator.py
 git commit -m "$(cat <<'EOF'
 composites: batch-compare-biomodels generator (alongside legacy)
 
@@ -2473,10 +2473,10 @@ class _StubSS:
 @pytest.fixture
 def stubbed(monkeypatch):
     """Patch LoadBiomodelStep and the runner's adapter lookups."""
-    import pbg_biomodels.steps.load_biomodel as load_mod
+    import viva_biomodels.steps.load_biomodel as load_mod
     monkeypatch.setattr(load_mod, "LoadBiomodelStep", _StubLoad)
 
-    import pbg_biomodels.steps.simulator_runner as runner_mod
+    import viva_biomodels.steps.simulator_runner as runner_mod
     monkeypatch.setattr(runner_mod, "_UTC_CLASS_FOR", lambda name: _StubUTC)
     monkeypatch.setattr(runner_mod, "_SS_CLASS_FOR",  lambda name: _StubSS)
 
@@ -2490,10 +2490,10 @@ def stubbed(monkeypatch):
 def test_end_to_end_populates_results_and_comparisons(stubbed):
     from process_bigraph import Composite, gather_emitter_results
 
-    from pbg_biomodels import register_types
-    from pbg_biomodels.core import build_core
+    from viva_biomodels import register_types
+    from viva_biomodels.core import build_core
     from pbg_superpowers.composite_generator import _REGISTRY, build_generator
-    import pbg_biomodels.composites.batch_compare_biomodels  # noqa: F401
+    import viva_biomodels.composites.batch_compare_biomodels  # noqa: F401
 
     entry = next(e for e in _REGISTRY.values()
                  if e.name == "batch-compare-biomodels")
@@ -2534,7 +2534,7 @@ def test_end_to_end_populates_results_and_comparisons(stubbed):
 .venv/bin/python -m pytest tests/test_batch_compare_biomodels_end_to_end.py -v
 ```
 
-Expected: 1 test PASS. If it fails on `local:` address resolution for the stubbed `LoadBiomodelStep`, that means the composite's address resolver re-imports the class by name from the module path. The fix is to ensure the test patches *that* module attribute (it does — `pbg_biomodels.steps.load_biomodel.LoadBiomodelStep`), but **also** to make sure the address string in the composite generator matches: `local:pbg_biomodels.steps.load_biomodel.LoadBiomodelStep`. This is already the case.
+Expected: 1 test PASS. If it fails on `local:` address resolution for the stubbed `LoadBiomodelStep`, that means the composite's address resolver re-imports the class by name from the module path. The fix is to ensure the test patches *that* module attribute (it does — `viva_biomodels.steps.load_biomodel.LoadBiomodelStep`), but **also** to make sure the address string in the composite generator matches: `local:viva_biomodels.steps.load_biomodel.LoadBiomodelStep`. This is already the case.
 
 - [ ] **Step 3: Run the full suite one last time**
 

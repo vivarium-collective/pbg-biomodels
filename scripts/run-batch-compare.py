@@ -21,11 +21,11 @@ from pathlib import Path
 
 from process_bigraph import Composite, gather_emitter_results
 
-from pbg_biomodels import register_types
-from pbg_biomodels.core import build_core
-from pbg_biomodels.simulators import ALL_SIMULATORS, resolve_simulators
+from viva_biomodels import register_types
+from viva_biomodels.core import build_core
+from viva_biomodels.simulators import ALL_SIMULATORS, resolve_simulators
 from viva_superpowers.composite_generator import _REGISTRY, build_generator
-import pbg_biomodels.composites.batch_compare_biomodels  # noqa: F401  (registers generator)
+import viva_biomodels.composites.batch_compare_biomodels  # noqa: F401  (registers generator)
 
 
 def run(ids, simulators, reference_results_dir="", reference_simulators=None) -> dict:

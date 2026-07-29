@@ -13,7 +13,7 @@ turning any BioModel into a ready-to-plug process-bigraph module.
 
 ## 📊 Live report
 
-**[BioModels batch comparison — first 10 models →](https://vivarium-collective.github.io/pbg-biomodels/)**
+**[BioModels batch comparison — first 10 models →](https://vivarium-collective.github.io/viva-biomodels/)**
 
 An interactive overlay of the live engines (COPASI, Tellurium, simbio) against
 the **BioSimulators SED-ML reference results** (`reference:copasi`,
@@ -25,7 +25,7 @@ included — and per-run diagnostics. Published to GitHub Pages from
 
 ## CLI
 
-Installed as the `pbg-biomodels` console script (`pip install -e .`).
+Installed as the `viva-biomodels` console script (`pip install -e .`).
 
 ### `compare` — multi-simulator comparison report
 
@@ -35,14 +35,14 @@ plots, the all-pairs matrix, and individual per-simulator plots).
 
 ```bash
 # all simulators (copasi, tellurium, simbio), one report
-pbg-biomodels compare BIOMD0000000001 BIOMD0000000012
+viva-biomodels compare BIOMD0000000001 BIOMD0000000012
 
 # pick a subset
-pbg-biomodels compare BIOMD0000000001 --simulators copasi,simbio
+viva-biomodels compare BIOMD0000000001 --simulators copasi,simbio
 
 # add an external reference dataset, scored as another engine
 #   CSV layout: a `time` column + one column per species id
-pbg-biomodels compare BIOMD0000000001 \
+viva-biomodels compare BIOMD0000000001 \
     --reference BIOMD0000000001:experiment=experiment.csv \
     --out report.html --open
 ```
@@ -58,27 +58,27 @@ larger bigraph and re-point the `species_input` port to couple it in.
 
 ```bash
 # print the composite document
-pbg-biomodels process BIOMD0000000001 --simulator simbio
+viva-biomodels process BIOMD0000000001 --simulator simbio
 
 # write it to a file
-pbg-biomodels process BIOMD0000000001 --simulator simbio --out module.json
+viva-biomodels process BIOMD0000000001 --simulator simbio --out module.json
 
 # run it for 20 steps and print the final species
-pbg-biomodels process BIOMD0000000001 --simulator tellurium --run 20 --interval 1.0
+viva-biomodels process BIOMD0000000001 --simulator tellurium --run 20 --interval 1.0
 ```
 
 ## Composites (also discoverable in the dashboard)
 
 - **`compare-simulators`** — fan out across biomodels, run each simulator, score
-  the all-pairs nRMSE matrix. (`pbg_biomodels.composites.compare_simulators`)
+  the all-pairs nRMSE matrix. (`viva_biomodels.composites.compare_simulators`)
 - **`biomodel-process`** — a single BioModel in one simulator's process, ready
-  to plug. (`pbg_biomodels.composites.biomodel_process`)
+  to plug. (`viva_biomodels.composites.biomodel_process`)
 - **`compare-biomodel`** — the original COPASI-vs-Tellurium(-vs-simbio) overlay
   generator.
 
 ## Adding a simulator backend
 
-One entry in `pbg_biomodels/simulators.py` (the UTC-step adapter address, the
+One entry in `viva_biomodels/simulators.py` (the UTC-step adapter address, the
 canonical `<Sim>UTCProcess` address, its config builder, and its species output
 port) wires a new backend into both the comparison and the pluggable-process
 flows.

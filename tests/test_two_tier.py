@@ -8,9 +8,9 @@ import pytest
 
 pytest.importorskip("pyarrow")
 
-from pbg_biomodels import result_leaf
-from pbg_biomodels.two_tier import write_model
-from pbg_biomodels.lazy_viewer import _parquet_leaves_aligned
+from viva_biomodels import result_leaf
+from viva_biomodels.two_tier import write_model
+from viva_biomodels.lazy_viewer import _parquet_leaves_aligned
 
 
 def _model_results():

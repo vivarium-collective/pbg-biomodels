@@ -4,14 +4,22 @@ import pytest
 
 # Import side-effect: fires the @composite_generator decorator and registers
 # the entry in viva_superpowers.composite_generator._REGISTRY.
-import pbg_biomodels.composites.compare_biomodel  # noqa: F401
+import viva_biomodels.composites.compare_biomodel  # noqa: F401
 from viva_superpowers.composite_generator import _REGISTRY, build_generator
 
 
 def _entry():
     matches = [e for e in _REGISTRY.values() if e.name == "compare-biomodel"]
-    assert len(matches) == 1, f"expected 1 generator named 'compare-biomodel', got {len(matches)}"
-    return matches[0]
+    # composites/__init__ registers a clean module-path alias
+    # (viva_biomodels.composites.compare_biomodel) sharing this name so short
+    # study refs resolve; select the canonical entry whose id ends with the
+    # hyphenated generator name.
+    canonical = [e for e in matches if str(e.id).rsplit(".", 1)[-1] == "compare-biomodel"]
+    assert len(canonical) == 1, (
+        f"expected 1 canonical 'compare-biomodel' generator, got {len(canonical)} "
+        f"(of {len(matches)} name-matches)"
+    )
+    return canonical[0]
 
 
 def test_generator_is_registered_with_list_param():

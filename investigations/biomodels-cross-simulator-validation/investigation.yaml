@@ -1,0 +1,34 @@
+# biomodels-cross-simulator-validation/investigation.yaml — schema v2
+#
+# Groups the cross-simulator comparison studies for the viva-biomodels
+# workspace. The workspace turns any BioModel into a process-bigraph module and
+# compares it across simulators; this investigation is the validation lens over
+# that machinery.
+
+schema_version: 2
+name: biomodels-cross-simulator-validation
+title: Cross-simulator validation of BioModels
+created: '2026-07-29'
+status: active
+
+question: >-
+  Do independent SBML simulators reproduce curated BioModels, and how well do
+  they agree with each other and with the BioSimulators reference results?
+
+hypothesis: >-
+  For well-posed BioModels, COPASI, Tellurium and simbio agree with the
+  BioSimulators references within a small nRMSE; divergences localize to stiff
+  or ill-scaled models and expose engine-specific tolerance sensitivity.
+
+executive:
+  what_is_this: >-
+    A process-bigraph workspace that loads BioModels, runs them under multiple
+    simulators (and the BioSimulators SED-ML references), and scores agreement.
+    Both the interactive report and the zarr results archive are outputs of the
+    batch-compare-biomodels composite.
+  verdict: >-
+    Live engines and references agree on the curated set within the "good"
+    nRMSE bucket for most observables; see the study for the per-model matrix.
+
+members:
+  - cross-simulator-comparison

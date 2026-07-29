@@ -1,7 +1,7 @@
 """All-runs Summary tab: per-engine execution + per-metric agreement,
 using run provenance when present and degrading gracefully without it.
 """
-from pbg_biomodels.lazy_viewer import _summary_stats, _summary_panel, _page
+from viva_biomodels.lazy_viewer import _summary_stats, _summary_panel, _page
 
 _INDEX = {"models": {
     "M1": {"jobs": {"utc1": {"engines": ["copasi", "tellurium"],

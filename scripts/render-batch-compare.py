@@ -22,7 +22,7 @@ import argparse
 import json
 from pathlib import Path
 
-from pbg_biomodels.visualizations.batch_compare_overlay import BatchCompareOverlay
+from viva_biomodels.visualizations.batch_compare_overlay import BatchCompareOverlay
 
 _DEFAULT_TITLE = (
     "BioModels batch comparison — first 10 (COPASI vs Tellurium vs SimBio vs AMICI)"

@@ -1,6 +1,6 @@
 # Workspace bootstrap — friction notes (2026-05-13)
 
-Notes captured during the `pbg-biomodels` workspace bootstrap. Aimed at maintainers of `pbg-superpowers`, `pbg-template`, and `vivarium-dashboard`. Each entry includes the symptom, the root cause we found, and a suggested fix.
+Notes captured during the `viva-biomodels` workspace bootstrap. Aimed at maintainers of `pbg-superpowers`, `pbg-template`, and `vivarium-dashboard`. Each entry includes the symptom, the root cause we found, and a suggested fix.
 
 ## 1. `vivarium-dashboard` is not on PyPI — fresh workspaces fail to install
 
@@ -62,7 +62,7 @@ PID file was written before the process died, so the skill's "stale state" guard
 
 ## 4. Scaffold workspace name vs Python package name
 
-**Symptom.** `python -m pbg_superpowers.scaffold workspace --name pbg-biomodels` produced a package directory `pbg_pbg_biomodels/` (doubled prefix), because the scaffolder unconditionally prepends `pbg_` to the snake_cased workspace name. Discovered before commit — re-scaffolded with `--name biomodels` to get `pbg_biomodels/`.
+**Symptom.** `python -m pbg_superpowers.scaffold workspace --name viva-biomodels` produced a package directory `pbg_viva_biomodels/` (doubled prefix), because the scaffolder unconditionally prepends `pbg_` to the snake_cased workspace name. Discovered before commit — re-scaffolded with `--name biomodels` to get `viva_biomodels/`.
 
 **Suggested fixes.**
 - **pbg-superpowers**: in the scaffold CLI, if the supplied `--name` already starts with `pbg-` or `pbg_`, either (a) strip the prefix before adding it back, or (b) refuse with a clear "name should not start with pbg-; the package will be pbg_<name>" message.
@@ -88,10 +88,10 @@ The `pbg-server` skill description and several other docs refer to "the 5-tab da
 # 1. Scaffold
 /Users/eranagmon/code/venv/bin/python -m pbg_superpowers.scaffold workspace \
     --name biomodels \
-    --target /Users/eranagmon/code/pbg-biomodels \
+    --target /Users/eranagmon/code/viva-biomodels \
     --template-source /Users/eranagmon/code/pbg-template
 
-cd /Users/eranagmon/code/pbg-biomodels
+cd /Users/eranagmon/code/viva-biomodels
 
 # 2. git init
 git init -b main && git add -A && git commit -m "feat(stage-0): workspace bootstrap"

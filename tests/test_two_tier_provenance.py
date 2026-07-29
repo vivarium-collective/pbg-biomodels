@@ -7,7 +7,7 @@ import pytest
 
 pytest.importorskip("pyarrow")  # two_tier is optional (no parquet in base CI)
 
-from pbg_biomodels.two_tier import write_model, finalize_index
+from viva_biomodels.two_tier import write_model, finalize_index
 
 
 def test_write_model_stores_both_metrics(tmp_path):

@@ -1,9 +1,9 @@
 [project]
-# NOTE: workspace dist-name is `pbg-biomodels` (not just `biomodels`) to
+# NOTE: workspace dist-name is `viva-biomodels` (not just `biomodels`) to
 # avoid shadowing the PyPI `biomodels` package — the BioModels REST API
-# client that pbg-biomodels-bundle depends on. The workspace's display
+# client that viva-biomodels-bundle depends on. The workspace's display
 # name in workspace.yaml stays "biomodels".
-name = "pbg-biomodels"
+name = "viva-biomodels"
 version = "0.0.0"
 description = "Process-bigraph research workspace"
 requires-python = ">=3.12"
@@ -32,18 +32,18 @@ dependencies = [
     # batch-compare composite's optional `reference_results_dir` input.
     "h5py",
     # Reads/writes the committed corpus_comparison parquet dataset via the
-    # pbg_biomodels.corpus_results reader (pandas needs a parquet engine).
+    # viva_biomodels.corpus_results reader (pandas needs a parquet engine).
     "pyarrow",
     # Web-based workspace dashboard (server + templates + assets + lib helpers).
     # Extracted from pbg-template as of v0.5.0; provides the `vivarium-workbench
     # serve` CLI invoked by scripts/serve.sh. (Dist renamed from vivarium-dashboard;
     # import package is now vivarium_workbench. The sibling checkout dir is unchanged.)
     "vivarium-workbench",
-    # Simulator wrappers (absorbed from pbg-biomodels-bundle).
+    # Simulator wrappers (absorbed from viva-biomodels-bundle).
     "pbg-tellurium",
     "pbg-copasi",
     "pbg-simbio",
-    # BioModels corpus + SED-ML/SBML parsing (absorbed from pbg-biomodels-bundle).
+    # BioModels corpus + SED-ML/SBML parsing (absorbed from viva-biomodels-bundle).
     "biomodels",
     "rest-process",
     "python-libsedml",
@@ -69,7 +69,7 @@ pysces = ["pbg-pysces"]
 scale = ["ray", "pyarrow"]
 
 [project.scripts]
-pbg-biomodels = "pbg_biomodels.cli:main"
+viva-biomodels = "viva_biomodels.cli:main"
 
 [tool.uv.sources]
 # Canonical git source for pbg-basic-processes (not on PyPI). pbg-superpowers and

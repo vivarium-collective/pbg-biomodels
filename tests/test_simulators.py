@@ -1,10 +1,10 @@
-"""Tests for pbg_biomodels.steps.simulators wrappers."""
+"""Tests for viva_biomodels.steps.simulators wrappers."""
 import pytest
 from importlib.resources import files
 
 from process_bigraph import allocate_core
 
-from pbg_biomodels.steps.simulators import (
+from viva_biomodels.steps.simulators import (
     BiomodelsCopasiStep,
     BiomodelsSimbioStep,
     BiomodelsTelluriumStep,

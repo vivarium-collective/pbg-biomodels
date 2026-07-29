@@ -9,9 +9,9 @@ import libsbml
 import pytest
 from process_bigraph import allocate_core
 
-from pbg_biomodels import result_leaf
-from pbg_biomodels.comparison import compare_two_engines
-from pbg_biomodels.run_biomodels import (
+from viva_biomodels import result_leaf
+from viva_biomodels.comparison import compare_two_engines
+from viva_biomodels.run_biomodels import (
     extract_repeated_tasks,
     mutate_sbml,
     _range_values,
@@ -322,14 +322,14 @@ class _K1EndpointUTC:
 
 
 def test_runner_scan_reduces_to_response_curve(monkeypatch, tmp_path):
-    import pbg_biomodels.steps.simulator_runner as mod
+    import viva_biomodels.steps.simulator_runner as mod
     monkeypatch.setattr(mod, "_UTC_CLASS_FOR", lambda name: _K1EndpointUTC)
     monkeypatch.setattr(mod, "_SS_CLASS_FOR", lambda name: _K1EndpointUTC)
 
     sbml = tmp_path / "m.xml"
     sbml.write_text(_SBML)
 
-    from pbg_biomodels.steps.simulator_runner import SimulatorRunnerStep
+    from viva_biomodels.steps.simulator_runner import SimulatorRunnerStep
     step = SimulatorRunnerStep(
         config={"simulator_name": "copasi"}, core=allocate_core())
     out = step.update({"models": {
@@ -359,8 +359,8 @@ def test_runner_scan_reduces_to_response_curve(monkeypatch, tmp_path):
 
 def test_two_tier_persists_scan_and_viewer_relabels(tmp_path):
     pytest.importorskip("pyarrow")  # two_tier is optional (no parquet in base CI)
-    from pbg_biomodels.two_tier import write_model
-    from pbg_biomodels import lazy_viewer
+    from viva_biomodels.two_tier import write_model
+    from viva_biomodels import lazy_viewer
 
     model_results = {"scan1": {
         "copasi":    {"scan": [0.0, 1.0, 2.0], "A": [2.0, 1.5, 1.0]},
@@ -415,7 +415,7 @@ def _write_scan_h5(path, shape, labels):
 
 
 def test_read_reference_scan_leaf_rank3(tmp_path):
-    from pbg_biomodels.reference_results import read_reference_scan_leaf
+    from viva_biomodels.reference_results import read_reference_scan_leaf
     h5 = tmp_path / "reports.h5"
     _write_scan_h5(h5, (3, 4, 5), ["Time", "A", "B"])  # 3 labels, 4 scan, 5 time
     leaf = read_reference_scan_leaf(h5, scan_values=[0.5, 1.5, 2.5, 3.5])
@@ -426,7 +426,7 @@ def test_read_reference_scan_leaf_rank3(tmp_path):
 
 
 def test_read_reference_scan_leaf_rank4_flattens(tmp_path):
-    from pbg_biomodels.reference_results import read_reference_scan_leaf
+    from viva_biomodels.reference_results import read_reference_scan_leaf
     h5 = tmp_path / "reports.h5"
     _write_scan_h5(h5, (2, 2, 1, 5), ["Time", "A"])  # matches observed 4-D shape
     leaf = read_reference_scan_leaf(h5, scan_values=[10.0, 20.0])
@@ -438,7 +438,7 @@ def test_read_reference_scan_leaf_absent_on_utc_only(tmp_path):
     """A rank-2 (plain UTC) report yields no scan leaf."""
     import h5py
     import numpy as np
-    from pbg_biomodels.reference_results import read_reference_scan_leaf
+    from viva_biomodels.reference_results import read_reference_scan_leaf
     h5 = tmp_path / "reports.h5"
     with h5py.File(h5, "w") as f:
         ds = f.create_group("doc.sedml").create_dataset(

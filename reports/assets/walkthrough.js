@@ -3133,7 +3133,7 @@
         }
         // Send wiring state to bigraph-loom iframe via postMessage
         // "library" = the package the composite ships in; data.module is the
-        // submodule path (e.g. "pbg_biomodels.composites") — drop the
+        // submodule path (e.g. "viva_biomodels.composites") — drop the
         // conventional .composites suffix to get the library name.
         // parameters + overrides + default_n_steps feed the Configure + Run
         // tabs inside the loom iframe.

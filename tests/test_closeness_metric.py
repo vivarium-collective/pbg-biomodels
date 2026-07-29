@@ -3,7 +3,7 @@ biosimulations_runutils hdf5_compare.compare_arrays.
 """
 import numpy as np
 
-from pbg_biomodels.comparison import closeness_score, closeness_bucket_for
+from viva_biomodels.comparison import closeness_score, closeness_bucket_for
 
 
 def test_identical_series_is_close_zero():

@@ -9,19 +9,19 @@ from importlib.resources import files
 import pytest
 from process_bigraph import Composite, gather_emitter_results
 
-from pbg_biomodels import register_types
-from pbg_biomodels.cli import _parse_references, build_parser
-from pbg_biomodels.comparison import compare_n_engines
-from pbg_biomodels.composites.biomodel_process import build_biomodel_process_document
-from pbg_biomodels.composites.compare_simulators import build_compare_document
-from pbg_biomodels.core import build_core
-from pbg_biomodels.report import build_comparison_report
-from pbg_biomodels.simulators import (
+from viva_biomodels import register_types
+from viva_biomodels.cli import _parse_references, build_parser
+from viva_biomodels.comparison import compare_n_engines
+from viva_biomodels.composites.biomodel_process import build_biomodel_process_document
+from viva_biomodels.composites.compare_simulators import build_compare_document
+from viva_biomodels.core import build_core
+from viva_biomodels.report import build_comparison_report
+from viva_biomodels.simulators import (
     ALL_SIMULATORS,
     process_config,
     resolve_simulators,
 )
-from pbg_biomodels.steps.reference_data import load_reference_csv
+from viva_biomodels.steps.reference_data import load_reference_csv
 
 
 def _sbml() -> str:

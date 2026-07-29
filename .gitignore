@@ -28,3 +28,6 @@ reports/assets/cache/
 # Batch-compare results store (runtime artifact; the report HTML embeds its
 # own data, and scripts/run-batch-compare.py regenerates this on demand).
 .pbg/last_batch_results.json
+/out
+/amici_models
+/pysces_models

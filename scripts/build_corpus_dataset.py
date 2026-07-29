@@ -185,7 +185,7 @@ def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument(
         "--source",
-        default="/Users/eranagmon/code/pbg-biomodels/out/compare_all_1054",
+        default="/Users/eranagmon/code/viva-biomodels/out/compare_all_1054",
         help="Directory containing series/*.parquet + index.json",
     )
     ap.add_argument("--out", default="datasets/corpus_comparison", help="Output directory")

@@ -1,0 +1,57 @@
+# cross-simulator-comparison/study.yaml — schema v4
+#
+# A basic study that captures the core of this project: run curated BioModels
+# under several independent simulators, score their agreement, and anchor them
+# against the BioSimulators SED-ML reference results. Its single baseline is the
+# `batch-compare-biomodels` composite — which itself produces BOTH artifacts of
+# this study: the interactive HTML report (BatchCompareOverlay) and the zarr
+# results archive (ZarrExportStep), so the study output is entirely a composite
+# output.
+
+schema_version: 4
+name: cross-simulator-comparison
+created: '2026-07-29'
+status: complete
+phase: Results
+
+title: Cross-simulator comparison of BioModels (reference-anchored)
+
+question: >-
+  Do independent SBML simulators (COPASI, Tellurium, simbio) agree with one
+  another and with the BioSimulators SED-ML reference results on curated
+  BioModels, and where do they diverge?
+
+summary: >-
+  Runs the first curated BioModels under three simulators plus the on-disk
+  BioSimulators reference engines, scores every engine pair with an all-pairs
+  nRMSE matrix and a BioSimulations-style closeness score, and emits an
+  interactive overlay report and a single zarr results archive
+  (biomodel_id / simulator / sedml_job hierarchy, references included).
+
+# The baseline composite MUST resolve in the Composites registry. This is the
+# clean module-path alias registered in viva_biomodels/composites/__init__.py.
+baseline:
+  - name: batch-compare
+    composite: viva_biomodels.composites.batch_compare_biomodels
+    params:
+      biomodel_ids:
+        - BIOMD0000000001
+        - BIOMD0000000002
+        - BIOMD0000000003
+      simulators:
+        - copasi
+        - tellurium
+        - simbio
+      reference_results_dir: datasets/biosimulators_sedml_results
+      zarr_out: out/cross_simulator_comparison.zarr
+
+artifacts:
+  - name: comparison-report
+    kind: report
+    description: Interactive overlay + all-pairs nRMSE matrix + diagnostics (viz_html).
+  - name: results-archive
+    kind: zarr
+    path: out/cross_simulator_comparison.zarr
+    description: >-
+      Single zarr archive of the run, biomodel_id/simulator/sedml_job ->
+      Dataset(value[time|scan, observable]); live + reference_* engines.

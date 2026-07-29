@@ -5,18 +5,24 @@ BatchCompareOverlay viz step.
 """
 import pytest
 
-import pbg_biomodels.composites.batch_compare_biomodels  # noqa: F401
+import viva_biomodels.composites.batch_compare_biomodels  # noqa: F401
 from viva_superpowers.composite_generator import _REGISTRY, build_generator
 
 
 def _entry():
     matches = [e for e in _REGISTRY.values()
                if e.name == "batch-compare-biomodels"]
-    assert len(matches) == 1, (
-        f"expected 1 generator named 'batch-compare-biomodels', "
-        f"got {len(matches)}"
+    # composites/__init__ registers a clean module-path alias
+    # (viva_biomodels.composites.batch_compare_biomodels) sharing this name so
+    # short study refs resolve; select the canonical entry whose id ends with
+    # the hyphenated generator name.
+    canonical = [e for e in matches
+                 if str(e.id).rsplit(".", 1)[-1] == "batch-compare-biomodels"]
+    assert len(canonical) == 1, (
+        f"expected 1 canonical 'batch-compare-biomodels' generator, "
+        f"got {len(canonical)} (of {len(matches)} name-matches)"
     )
-    return matches[0]
+    return canonical[0]
 
 
 def test_generator_is_registered_with_biomodel_and_simulator_params():
@@ -111,7 +117,9 @@ def test_simbio_runner_gets_tolerance_config_others_do_not():
 
 def test_legacy_compare_biomodel_generator_still_registered():
     """The new generator does not displace the legacy one."""
-    legacy = [e for e in _REGISTRY.values() if e.name == "compare-biomodel"]
+    legacy = [e for e in _REGISTRY.values()
+              if e.name == "compare-biomodel"
+              and str(e.id).rsplit(".", 1)[-1] == "compare-biomodel"]
     assert len(legacy) == 1
 
 

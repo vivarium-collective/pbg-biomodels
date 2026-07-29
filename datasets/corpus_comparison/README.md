@@ -7,7 +7,7 @@ output.
 
 ## Provenance
 
-Derived from `out/compare_all_1054/` in the `pbg-biomodels` workspace — the
+Derived from `out/compare_all_1054/` in the `viva-biomodels` workspace — the
 output of the full compare-all sweep across the BioModels corpus (892
 models with usable series data, out of 1054 attempted). That directory is
 scratch: multi-hundred-MB per-model `series/*.parquet` files plus
@@ -65,11 +65,11 @@ automatically retries at 60 points/series and prints a note.
 
 ## Reading it
 
-Use the `pbg_biomodels.corpus_results` reader module (works from this repo
+Use the `viva_biomodels.corpus_results` reader module (works from this repo
 or as a vendored/installed dependency in another repo):
 
 ```python
-from pbg_biomodels.corpus_results import (
+from viva_biomodels.corpus_results import (
     load_corpus_timecourse,
     model_timecourse,
     load_corpus_metrics,

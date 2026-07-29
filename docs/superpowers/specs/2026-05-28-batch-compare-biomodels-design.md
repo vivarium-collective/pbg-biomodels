@@ -50,7 +50,7 @@ models[bid] = {                                     │
 
 ## Bigraph-schema types
 
-Three new named types, registered in `pbg_biomodels/types.py`:
+Three new named types, registered in `viva_biomodels/types.py`:
 
 ```python
 "simulation_result": {
@@ -86,40 +86,40 @@ state.comparisons:  map[biomodel_id, map[sedml_doc, tree]]
 - `pbg_tellurium.processes.TelluriumSteadyStateStep` — wraps `roadrunner.steadyState()`.
 - `pbg_simbio.processes.SimbioSteadyStateStep` — wraps simbio's steady-state solver.
 
-Each takes `model_source` (SBML path) + simulator-specific knobs and emits `{observables: map[name, float]}`. These are real upstream PRs and block the runner's end-to-end tests; pbg-biomodels' own tests use dummy adapters during the period the upstream work is in flight.
+Each takes `model_source` (SBML path) + simulator-specific knobs and emits `{observables: map[name, float]}`. These are real upstream PRs and block the runner's end-to-end tests; viva-biomodels' own tests use dummy adapters during the period the upstream work is in flight.
 
-### `pbg-biomodels` workspace
+### `viva-biomodels` workspace
 
 **Modified:**
 
-- `pbg_biomodels/steps/load_biomodel.py` — `LoadBiomodelStep`:
+- `viva_biomodels/steps/load_biomodel.py` — `LoadBiomodelStep`:
   - Input: `biomodel_id`.
   - Output ports: `sbml_path: string`, `sedml_jobs: list[tree]`.
   - Replaces the `time` / `n_points` outputs.
   - Parses every `SedSimulation` in the SED-ML; emits one job per UTC or SteadyState task. Repeated-task wrappers are skipped with a warning (not expanded — out of scope).
   - Each `sedml_jobs` entry: `{"name": str, "kind": "utc"|"steady_state", "time": float|None, "n_points": int|None}`.
 
-- `pbg_biomodels/steps/simulators.py` — add three adapters parallel to the existing UTC adapters:
+- `viva_biomodels/steps/simulators.py` — add three adapters parallel to the existing UTC adapters:
   - `BiomodelsCopasiSteadyStateStep`
   - `BiomodelsTelluriumSteadyStateStep`
   - `BiomodelsSimbioSteadyStateStep`
 
   Each takes runtime input `model_source: string`, delegates to its upstream `<Sim>SteadyStateStep`, and emits `{result: simulation_result}` with `kind="steady_state"`, `time=None`, `observables: map[name, float]`.
 
-- `pbg_biomodels/steps/simulator_comparison.py` — add `BatchCompareStep`:
+- `viva_biomodels/steps/simulator_comparison.py` — add `BatchCompareStep`:
   - Input: `results` (the full nested map).
   - Output: `comparisons` — `map[bid, map[sedml_doc, tree]]`.
   - For each `(bid, sedml_doc)` it gathers the per-simulator `simulation_result`s, groups by `kind`, and routes to `compare_n_engines_utc` or `compare_n_engines_steady_state`. UTC and SS are not compared cross-kind; both kinds appearing under the same `(bid, sedml_doc)` is a SED-ML pathology — record a warning per-pair and skip.
 
-- `pbg_biomodels/comparison.py` — add `compare_n_engines_steady_state(engines: dict[simulator, dict[observable, float]])`. Metric per shared observable: `|a-b| / max(|a|, |b|, eps)`. Mean across shared observables maps to the existing `bucket_for` thresholds so the bucket vocabulary is the same as UTC.
+- `viva_biomodels/comparison.py` — add `compare_n_engines_steady_state(engines: dict[simulator, dict[observable, float]])`. Metric per shared observable: `|a-b| / max(|a|, |b|, eps)`. Mean across shared observables maps to the existing `bucket_for` thresholds so the bucket vocabulary is the same as UTC.
 
-- `pbg_biomodels/simulators.py` — extend the `SimulatorSpec` registry with `steady_state_step` and `steady_state_adapter` fields per simulator, paralleling the existing `utc_step`. `resolve_simulators` and `utc_step_address` keep their current signatures; add `steady_state_adapter_address(name)`.
+- `viva_biomodels/simulators.py` — extend the `SimulatorSpec` registry with `steady_state_step` and `steady_state_adapter` fields per simulator, paralleling the existing `utc_step`. `resolve_simulators` and `utc_step_address` keep their current signatures; add `steady_state_adapter_address(name)`.
 
 **New:**
 
-- `pbg_biomodels/types.py` — register `simulation_result`, `biomodel_jobs`, `sim_results_per_biomodel` with the workspace core. Invoked from `pbg_biomodels.register_types`.
+- `viva_biomodels/types.py` — register `simulation_result`, `biomodel_jobs`, `sim_results_per_biomodel` with the workspace core. Invoked from `viva_biomodels.register_types`.
 
-- `pbg_biomodels/steps/simulator_runner.py` — `SimulatorRunnerStep`:
+- `viva_biomodels/steps/simulator_runner.py` — `SimulatorRunnerStep`:
   - Config: `{"simulator_name": "copasi"|"tellurium"|"simbio"}` (validated against `ALL_SIMULATORS`).
   - Input: `models` — `map[biomodel_id, biomodel_jobs]`.
   - Output: `results` — `map[bid, map[sedml_doc, simulation_result]]` (the simulator's slice only).
@@ -149,23 +149,23 @@ Each takes `model_source` (SBML path) + simulator-specific knobs and emits `{obs
     ```
   - The adapter `Step` instances are constructed inline per-job (same pattern the current `BiomodelsCopasiStep` already uses to call `CopasiUTCStep`).
 
-- `pbg_biomodels/composites/batch_compare_biomodels.py` — `@composite_generator(name="batch-compare-biomodels")`:
+- `viva_biomodels/composites/batch_compare_biomodels.py` — `@composite_generator(name="batch-compare-biomodels")`:
   - Parameters:
     - `biomodel_ids: list[string]` (one per line in the dashboard form; default `["BIOMD0000000001"]`).
     - `simulators: list[string]` — description lists the allowed values (`copasi`, `tellurium`, `simbio`); default `["copasi", "tellurium", "simbio"]`; validated by `resolve_simulators`.
   - Generates: one `LoadBiomodelStep` per biomodel id writing into `models[bid]`; one `SimulatorRunnerStep` per requested simulator reading `models` and writing into `results.<sim>`; one `BatchCompareStep` reading `results` and writing `comparisons`; one `BatchCompareOverlay` viz step.
   - `with_emitter=True` attaches a `RAMEmitter` emitting `models`, `results`, `comparisons` as `node` so a CLI run can reconstruct the full payload after `run(0.0)`.
 
-- `pbg_biomodels/visualizations/batch_compare_overlay.py` — `BatchCompareOverlay`:
+- `viva_biomodels/visualizations/batch_compare_overlay.py` — `BatchCompareOverlay`:
   - Input: `results: map[bid, map[sim, map[sedml_doc, simulation_result]]]`, `comparisons: map[bid, map[sedml_doc, tree]]`.
   - Output: `html`.
   - Renders the existing card+expand grid. Each biomodel card shows the worst-pair bucket aggregated across its sedml docs. Expanding the card reveals one tab per `sedml_doc`; each tab is a per-observable overlay of all simulators that produced output. SS observables render as a small grouped bar chart of final values instead of a line. Reuses Plotly + the toggle-pane pattern from `compare_overlay.py`.
 
 **Untouched (legacy):**
 
-- `pbg_biomodels/composites/compare_biomodel.py`
-- `pbg_biomodels/composites/compare_simulators.py`
-- `pbg_biomodels/visualizations/compare_overlay.py`
+- `viva_biomodels/composites/compare_biomodel.py`
+- `viva_biomodels/composites/compare_simulators.py`
+- `viva_biomodels/visualizations/compare_overlay.py`
 - The existing two-engine `SimulatorComparisonStep` and the existing `MultiSimulatorComparisonStep` (the latter is conceptually superseded but still wired by `compare-simulators`; leave it).
 
 ## Tests
@@ -191,7 +191,7 @@ Existing `tests/test_compare_biomodel_generator.py` and friends are untouched.
 
 ## Risk callouts
 
-- **Upstream SteadyState PRs:** three real pieces of work in sibling repos that block the runner's end-to-end test. Mitigation: per-simulator SS adapters in `pbg_biomodels.steps.simulators` can be wired to a dummy upstream class for pbg-biomodels' own unit tests; the real upstream PRs run in parallel via `/pbg-expert`. `test_steady_state_adapters.py` is the only test gated on real upstream availability.
+- **Upstream SteadyState PRs:** three real pieces of work in sibling repos that block the runner's end-to-end test. Mitigation: per-simulator SS adapters in `viva_biomodels.steps.simulators` can be wired to a dummy upstream class for viva-biomodels' own unit tests; the real upstream PRs run in parallel via `/pbg-expert`. `test_steady_state_adapters.py` is the only test gated on real upstream availability.
 - **SED-ML SteadyState parsing:** `libsedml` exposes `SedSteadyState`. `extract_first_uniform_time_course` becomes `extract_all_simulations` and must distinguish kinds reliably across libsedml versions. Some BioModels SED-MLs contain repeated-task wrappers — skip with a warning rather than expand.
 - **`maybe[list[float]]` wires:** bigraph-schema's `maybe[...]` is well-tested in scalar form but less so on `list[float]` leaves. Worst case: collapse to `list[float]` with `[]` meaning "no time vector" — but the `kind` tag makes that interpretation unambiguous.
 - **Dashboard parameter form for `list[string]`:** the dashboard renders `list[string]` as a textarea (one entry per line). `simulators` will look the same; the description string is the only place we can list allowed values. Acceptable for v1; a richer enum widget could come later.

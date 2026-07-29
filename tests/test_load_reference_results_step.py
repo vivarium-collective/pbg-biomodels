@@ -11,7 +11,7 @@ import h5py
 import numpy as np
 from process_bigraph import allocate_core
 
-from pbg_biomodels.steps.load_reference_results import LoadReferenceResultsStep
+from viva_biomodels.steps.load_reference_results import LoadReferenceResultsStep
 
 
 def _write_reports_h5(path: Path, *, labels=("Time", "A", "B"), n_time=5):
