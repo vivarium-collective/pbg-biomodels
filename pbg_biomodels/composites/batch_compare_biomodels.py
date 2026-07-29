@@ -32,6 +32,7 @@ LOAD_REF_STEP_ADDRESS = "local:pbg_biomodels.steps.load_reference_results.LoadRe
 RUNNER_STEP_ADDRESS  = "local:pbg_biomodels.steps.simulator_runner.SimulatorRunnerStep"
 COMPARE_STEP_ADDRESS = "local:pbg_biomodels.steps.simulator_comparison.BatchCompareStep"
 VIZ_STEP_ADDRESS     = "local:pbg_biomodels.visualizations.batch_compare_overlay.BatchCompareOverlay"
+ZARR_STEP_ADDRESS    = "local:pbg_biomodels.steps.export_zarr.ZarrExportStep"
 
 
 @composite_generator(
@@ -110,6 +111,16 @@ VIZ_STEP_ADDRESS     = "local:pbg_biomodels.visualizations.batch_compare_overlay
                 "live (pbg) engines among themselves."
             ),
         },
+        "zarr_out": {
+            "type": "string",
+            "default": "",
+            "description": (
+                "When set, append a ZarrExportStep that writes the full results "
+                "store (live + reference engines) to this .zarr path in the "
+                "biomodel_id/simulator/sedml_job hierarchy, and emits `zarr_path`. "
+                "Empty (default) skips zarr export."
+            ),
+        },
     },
     default_n_steps=1,
 )
@@ -123,6 +134,7 @@ def build_batch_compare_biomodels(
     reference_results_dir: str = "",
     reference_simulators: List[str] | None = None,
     include_steady_state: bool = False,
+    zarr_out: str = "",
     with_emitter: bool = True,
     emitter_address: str = "local:RAMEmitter",
 ) -> Dict[str, Any]:
@@ -214,6 +226,20 @@ def build_batch_compare_biomodels(
         "outputs": {"html": ["viz_html"]},
     }
 
+    # Optional: translate the full nested results store to a single zarr
+    # artifact (biomodel_id/simulator/sedml_job hierarchy, references included).
+    # Depends on `comparisons`, so it fires after the compare Step.
+    if zarr_out:
+        state["zarr_path"] = ""
+        state["zarr_export"] = {
+            "_type":   "step",
+            "address": ZARR_STEP_ADDRESS,
+            "config":  {"out_path": zarr_out},
+            "inputs":  {"results": ["results"], "comparisons": ["comparisons"],
+                        "diagnostics": ["diagnostics"]},
+            "outputs": {"zarr_path": ["zarr_path"]},
+        }
+
     if with_emitter:
         state["emitter"] = {
             "_type":   "step",
@@ -225,6 +251,7 @@ def build_batch_compare_biomodels(
                 "comparisons": "node",
                 "diagnostics": "node",
                 "viz_html":    "string",
+                **({"zarr_path": "string"} if zarr_out else {}),
             }},
             "inputs":  {
                 "models":      ["models"],
@@ -233,6 +260,7 @@ def build_batch_compare_biomodels(
                 "comparisons": ["comparisons"],
                 "diagnostics": ["diagnostics"],
                 "viz_html":    ["viz_html"],
+                **({"zarr_path": ["zarr_path"]} if zarr_out else {}),
             },
         }
 
