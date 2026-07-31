@@ -1,7 +1,7 @@
 """``LoadBiomodelStep`` — fetch a BioModel by ID and emit SBML path + UTC spec.
 
 Reads ``biomodel_id`` from its single input port, calls
-:func:`pbg_biomodels.run_biomodels.load_biomodel` (which queries the
+:func:`viva_biomodels.run_biomodels.load_biomodel` (which queries the
 ``biomodels`` REST API, caches the SBML + SED-ML files locally under
 ``models/<id>/``, and parses the first UniformTimeCourse simulation out of
 the SED-ML), and writes the resolved SBML path, simulation duration, and
@@ -68,7 +68,7 @@ class LoadBiomodelStep(Step):
 
         import biomodels
 
-        from pbg_biomodels.run_biomodels import (
+        from viva_biomodels.run_biomodels import (
             extract_all_simulations,
             extract_repeated_tasks,
             load_biomodel,

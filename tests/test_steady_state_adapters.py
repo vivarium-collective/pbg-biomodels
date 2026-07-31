@@ -16,7 +16,7 @@ from process_bigraph import allocate_core
 # upstream module BEFORE `_patch_upstream` ever inserts a stand-in module.
 # Without this, the first test would replace `pbg_copasi.processes` in
 # sys.modules with an empty stub, then fail at simulator-module load.
-import pbg_biomodels.steps.simulators  # noqa: F401
+import viva_biomodels.steps.simulators  # noqa: F401
 
 
 def _patch_upstream(monkeypatch, module_path: str, class_name: str, fake_cls):
@@ -48,7 +48,7 @@ class _FakeSteadyStateClass:
 def test_copasi_steady_state_adapter(monkeypatch):
     _patch_upstream(monkeypatch, "pbg_copasi.processes",
                     "CopasiSteadyStateStep", _FakeSteadyStateClass)
-    from pbg_biomodels.steps.simulators import BiomodelsCopasiSteadyStateStep
+    from viva_biomodels.steps.simulators import BiomodelsCopasiSteadyStateStep
     out = BiomodelsCopasiSteadyStateStep(core=allocate_core()).update({"model_source": "/tmp/m.xml"})
     assert out["result"]["kind"] == "steady_state"
     assert out["result"]["time"] is None
@@ -59,7 +59,7 @@ def test_copasi_steady_state_adapter(monkeypatch):
 def test_tellurium_steady_state_adapter(monkeypatch):
     _patch_upstream(monkeypatch, "pbg_tellurium.processes",
                     "TelluriumSteadyStateStep", _FakeSteadyStateClass)
-    from pbg_biomodels.steps.simulators import BiomodelsTelluriumSteadyStateStep
+    from viva_biomodels.steps.simulators import BiomodelsTelluriumSteadyStateStep
     out = BiomodelsTelluriumSteadyStateStep(core=allocate_core()).update({"model_source": "/tmp/m.xml"})
     assert out["result"]["kind"] == "steady_state"
     assert out["result"]["time"] is None
@@ -69,7 +69,7 @@ def test_tellurium_steady_state_adapter(monkeypatch):
 def test_simbio_steady_state_adapter(monkeypatch):
     _patch_upstream(monkeypatch, "pbg_simbio.processes",
                     "SimbioSteadyStateStep", _FakeSteadyStateClass)
-    from pbg_biomodels.steps.simulators import BiomodelsSimbioSteadyStateStep
+    from viva_biomodels.steps.simulators import BiomodelsSimbioSteadyStateStep
     out = BiomodelsSimbioSteadyStateStep(core=allocate_core()).update({"model_source": "/tmp/m.xml"})
     assert out["result"]["kind"] == "steady_state"
     assert out["result"]["time"] is None
@@ -78,7 +78,7 @@ def test_simbio_steady_state_adapter(monkeypatch):
 
 def test_steady_state_adapter_outputs_simulation_result_shape():
     """The output port declaration is `simulation_result`."""
-    from pbg_biomodels.steps.simulators import BiomodelsCopasiSteadyStateStep
+    from viva_biomodels.steps.simulators import BiomodelsCopasiSteadyStateStep
     assert BiomodelsCopasiSteadyStateStep(core=allocate_core()).outputs() == {
         "result": "simulation_result"
     }

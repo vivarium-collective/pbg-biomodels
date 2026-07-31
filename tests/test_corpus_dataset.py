@@ -3,7 +3,7 @@
 Builds a tiny synthetic ``series/`` directory (mimicking
 ``out/compare_all_1054``) in a tmp dir, runs the builder's core function
 against it, and checks the resulting parquet + metrics json. Also exercises
-the reader module (``pbg_biomodels.corpus_results``) against the same
+the reader module (``viva_biomodels.corpus_results``) against the same
 synthetic output.
 """
 from __future__ import annotations
@@ -33,14 +33,14 @@ builder = _load_builder_module()
 
 def _load_corpus_results_module():
     # Load corpus_results.py directly from its file rather than via
-    # `from pbg_biomodels import corpus_results`: the canonical checkout's
+    # `from viva_biomodels import corpus_results`: the canonical checkout's
     # installed venv currently has an unrelated import-chain mismatch in
-    # pbg_biomodels/__init__.py (composites -> ... -> viva_superpowers,
+    # viva_biomodels/__init__.py (composites -> ... -> viva_superpowers,
     # a package not present in this venv's pbg-superpowers 0.15.0 pin).
     # That's an environment issue orthogonal to this dataset/reader module,
     # so we bypass the package __init__ the same way the builder script
-    # (also not part of the pbg_biomodels package) is loaded above.
-    module_path = REPO_ROOT / "pbg_biomodels" / "corpus_results.py"
+    # (also not part of the viva_biomodels package) is loaded above.
+    module_path = REPO_ROOT / "viva_biomodels" / "corpus_results.py"
     spec = importlib.util.spec_from_file_location("corpus_results", module_path)
     module = importlib.util.module_from_spec(spec)
     assert spec.loader is not None

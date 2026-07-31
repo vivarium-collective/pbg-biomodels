@@ -11,7 +11,7 @@ import warnings
 import pytest
 from process_bigraph import allocate_core
 
-from pbg_biomodels.steps.simulator_comparison import BatchCompareStep
+from viva_biomodels.steps.simulator_comparison import BatchCompareStep
 
 
 def _utc(time, observables):

@@ -1,5 +1,5 @@
 """All-pairs steady-state comparison: |a-b| / max(|a|,|b|, eps) per observable."""
-from pbg_biomodels.comparison import compare_n_engines_steady_state
+from viva_biomodels.comparison import compare_n_engines_steady_state
 
 
 def test_two_engines_identical_are_in_good_bucket():

@@ -10,7 +10,7 @@ Reuses the figure + analysis builders from ``batch_compare_overlay`` server-side
 the plots and cross-engine rollups match the self-contained report exactly.
 
 Run:
-    python -m pbg_biomodels.lazy_viewer --out-dir out/compare_all --port 8900
+    python -m viva_biomodels.lazy_viewer --out-dir out/compare_all --port 8900
 """
 from __future__ import annotations
 
@@ -23,7 +23,7 @@ from urllib.parse import urlparse, parse_qs
 
 from plotly.offline import get_plotlyjs
 
-from pbg_biomodels.visualizations import batch_compare_overlay as bco
+from viva_biomodels.visualizations import batch_compare_overlay as bco
 
 
 def _load_index(out_dir: Path) -> Dict[str, Any]:
@@ -68,7 +68,7 @@ def _cap_leaves(leaves: Dict[str, Any], n: int):
     Returns ``(capped_leaves, shown, total)``. Bounds figure size for models
     with hundreds of observables; the full series remain in the parquet.
     """
-    from pbg_biomodels import result_leaf
+    from viva_biomodels import result_leaf
     order: List[str] = []
     seen: set = set()
     for leaf in leaves.values():
@@ -95,7 +95,7 @@ def _figure_for(out_dir: Path, bid: str, job: str,
     figure is reused and its x-axis relabeled to "scan parameter". The overlay
     is capped at ``_MAX_OBSERVABLES`` subplots to keep big models responsive.
     """
-    from pbg_biomodels import result_leaf
+    from viva_biomodels import result_leaf
     leaves = _parquet_leaves_aligned(out_dir, bid).get(job, {})
     live = {n: leaf for n, leaf in leaves.items() if leaf}
     color_map = bco._build_color_map(set(live.keys()))

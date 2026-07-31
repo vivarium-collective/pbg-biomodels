@@ -8,7 +8,7 @@ reads that engine's ``reports.h5`` into a results leaf and writes it to
 so ``BatchCompareStep`` folds it into the all-pairs nRMSE automatically.
 
 It also emits ``ref_grid[bid][<job>] = <n_samples>``: the reference report's
-sample count, which :class:`~pbg_biomodels.steps.simulator_runner.SimulatorRunnerStep`
+sample count, which :class:`~viva_biomodels.steps.simulator_runner.SimulatorRunnerStep`
 reads to drive the live engines onto the same time grid (so the index-aligned
 comparison math is meaningful).
 
@@ -29,8 +29,8 @@ from typing import Any, ClassVar, Dict, List
 
 from process_bigraph import Step
 
-from pbg_biomodels import reference_results
-from pbg_biomodels.result_leaf import TIME_KEY
+from viva_biomodels import reference_results
+from viva_biomodels.result_leaf import TIME_KEY
 
 
 class LoadReferenceResultsStep(Step):

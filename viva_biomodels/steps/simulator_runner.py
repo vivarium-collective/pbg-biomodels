@@ -11,7 +11,7 @@ runners' slices. One runner instance per simulator replaces the
 
 Each leaf is a flat `map[observable -> timeseries]` (`results` type): UTC jobs
 carry their sample times under the reserved `time` key; steady-state jobs omit
-`time` and store length-1 lists. See `pbg_biomodels.result_leaf`.
+`time` and store length-1 lists. See `viva_biomodels.result_leaf`.
 
 Each job is dispatched in-process, sequentially. A job exception is caught,
 logged via `warnings.warn`, and recorded as an empty leaf `{}` under the job's
@@ -27,8 +27,8 @@ from typing import Any, ClassVar, Dict
 
 from process_bigraph import Step
 
-from pbg_biomodels import provenance
-from pbg_biomodels.simulators import ALL_SIMULATORS
+from viva_biomodels import provenance
+from viva_biomodels.simulators import ALL_SIMULATORS
 
 
 # ---------------------------------------------------------------------------
@@ -50,7 +50,7 @@ def _UTC_CLASS_FOR(simulator_name: str):
     if simulator_name == "pysces":
         from pbg_pysces.processes import PyscesUTCStep
         return PyscesUTCStep
-    from pbg_biomodels.steps.simulators import (
+    from viva_biomodels.steps.simulators import (
         BiomodelsCopasiStep,
         BiomodelsSimbioStep,
         BiomodelsTelluriumStep,
@@ -74,7 +74,7 @@ def _SS_CLASS_FOR(simulator_name: str):
     if simulator_name == "pysces":
         from pbg_pysces.processes import PyscesSteadyStateStep
         return PyscesSteadyStateStep
-    from pbg_biomodels.steps.simulators import (
+    from viva_biomodels.steps.simulators import (
         BiomodelsCopasiSteadyStateStep,
         BiomodelsSimbioSteadyStateStep,
         BiomodelsTelluriumSteadyStateStep,
@@ -254,7 +254,7 @@ class SimulatorRunnerStep(Step):
                         payload = inner.update({"model_source": sbml_path})
                         leaf = _ss_to_results(payload)
                     elif kind == "repeated_task":
-                        from pbg_biomodels.run_biomodels import mutate_sbml
+                        from viva_biomodels.run_biomodels import mutate_sbml
                         subtask = job.get("subtask") or {}
                         subkind = subtask.get("kind") or "utc"
                         scan_values = [float(v) for v in (job.get("scan_values") or [])]

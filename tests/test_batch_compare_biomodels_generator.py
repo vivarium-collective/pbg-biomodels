@@ -5,7 +5,7 @@ BatchCompareOverlay viz step.
 """
 import pytest
 
-import pbg_biomodels.composites.batch_compare_biomodels  # noqa: F401
+import viva_biomodels.composites.batch_compare_biomodels  # noqa: F401
 from viva_superpowers.composite_generator import _REGISTRY, build_generator
 
 

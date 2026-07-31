@@ -3,7 +3,7 @@
 `results` is the per-(biomodel, sedml-job, simulator) leaf written by
 `SimulatorRunnerStep`: a flat `map[observable -> timeseries]`. UTC jobs carry
 their sample times under the reserved key `time`; steady-state jobs omit `time`
-and store each observable as a length-1 list. See `pbg_biomodels.result_leaf`
+and store each observable as a length-1 list. See `viva_biomodels.result_leaf`
 for the accessors that classify and unpack a leaf.
 
 The full results store is nested `biomodel_id > sedml_job_id > simulator >

@@ -1,7 +1,7 @@
 """CompareOverlay renders a summary-card grid for N biomodels, each card
 collapsible to its species small-multiples."""
-from pbg_biomodels.core import build_core
-from pbg_biomodels.visualizations.compare_overlay import CompareOverlay, _build_figure
+from viva_biomodels.core import build_core
+from viva_biomodels.visualizations.compare_overlay import CompareOverlay, _build_figure
 
 
 def _overlay(biomodel_ids):

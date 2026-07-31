@@ -8,7 +8,7 @@ import textwrap
 import libsedml
 import pytest
 
-from pbg_biomodels.run_biomodels import extract_all_simulations, read_sedml_doc
+from viva_biomodels.run_biomodels import extract_all_simulations, read_sedml_doc
 
 
 def _write(tmp_path, body) -> str:

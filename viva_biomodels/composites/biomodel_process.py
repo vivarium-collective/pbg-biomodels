@@ -17,7 +17,7 @@ from typing import Any, Dict, Optional, Tuple
 
 from viva_superpowers.composite_generator import composite_generator
 
-from pbg_biomodels.simulators import (
+from viva_biomodels.simulators import (
     process_address,
     process_config,
     resolve_simulators,
@@ -31,7 +31,7 @@ def _resolve_sbml(biomodel_id: str) -> Tuple[str, float]:
 
     import biomodels
 
-    from pbg_biomodels.run_biomodels import load_biomodel
+    from viva_biomodels.run_biomodels import load_biomodel
 
     meta = biomodels.get_metadata(biomodel_id)
     result = load_biomodel(biomodel_id, meta)

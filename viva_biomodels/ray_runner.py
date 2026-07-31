@@ -8,7 +8,7 @@ exceptions and are recorded as ``crashed`` instead of killing the run, which
 replaces the sequential bisect-on-crash logic.
 
 Usage:
-    python -m pbg_biomodels.ray_runner --n 100 --out-dir out/compare_all \
+    python -m viva_biomodels.ray_runner --n 100 --out-dir out/compare_all \
         [--simulators copasi,tellurium,simbio,amici,pysces] \
         [--reference-results-dir datasets/biosimulators_sedml_results] \
         [--max-points 200] [--address auto]
@@ -31,10 +31,10 @@ def _run_model_store(bid: str, sims: List[str], ref_dir: str,
                      include_steady_state: bool = False) -> Tuple[dict, dict, dict]:
     """Run the batch-compare composite for one model; return its store slice."""
     from process_bigraph import Composite, gather_emitter_results
-    from pbg_biomodels import register_types
-    from pbg_biomodels.core import build_core
+    from viva_biomodels import register_types
+    from viva_biomodels.core import build_core
     from viva_superpowers.composite_generator import _REGISTRY, build_generator
-    import pbg_biomodels.composites.batch_compare_biomodels  # noqa: F401
+    import viva_biomodels.composites.batch_compare_biomodels  # noqa: F401
 
     core = register_types(build_core())
     entry = next(e for e in _REGISTRY.values() if e.name == "batch-compare-biomodels")
@@ -56,7 +56,7 @@ def _task(bid: str, sims: List[str], ref_dir: str, out_dir: str, max_points: int
           include_steady_state: bool = False) -> Dict[str, Any]:
     """Ray task body: run one model, write its parquet, return the index entry."""
     os.chdir(str(ROOT))  # caches (amici_models/, pysces_models/, models/) are cwd-relative
-    from pbg_biomodels.two_tier import write_model
+    from viva_biomodels.two_tier import write_model
     res, comp, diag = _run_model_store(bid, sims, ref_dir, include_steady_state)
     entry = write_model(bid, res.get(bid) or {}, comp.get(bid) or {},
                         Path(out_dir), max_points)
@@ -112,7 +112,7 @@ def main() -> int:
     futures = {remote.remote(bid, sims, ref_dir, out_dir, a.max_points,
                              a.steady_state): bid for bid in ids}
 
-    from pbg_biomodels.two_tier import finalize_index
+    from viva_biomodels.two_tier import finalize_index
     entries: List[Dict[str, Any]] = []
     crashed: List[str] = []
     pending = list(futures.keys())

@@ -14,7 +14,7 @@ The viewer has two tabs:
 
 Inputs are the new nested store ``results[biomodel_id][sedml_job_id][simulator]``
 where each leaf is a flat ``map[observable -> timeseries]`` (`results` type);
-see `pbg_biomodels.result_leaf`. The HTML is a self-contained fragment that
+see `viva_biomodels.result_leaf`. The HTML is a self-contained fragment that
 includes Plotly inline.
 """
 from __future__ import annotations
@@ -24,13 +24,13 @@ from typing import Any, Dict, List
 
 from plotly.offline import get_plotlyjs
 
-from pbg_biomodels import result_leaf
-from pbg_biomodels.comparison import bucket_for
+from viva_biomodels import result_leaf
+from viva_biomodels.comparison import bucket_for
 from viva_superpowers.visualization import Visualization
 
 
 # nRMSE at/below which two engines are treated as agreeing (matches the "good"
-# bucket boundary in pbg_biomodels.comparison.BUCKET_THRESHOLDS).
+# bucket boundary in viva_biomodels.comparison.BUCKET_THRESHOLDS).
 _AGREE_NRMSE = 0.01
 
 
@@ -97,7 +97,7 @@ _BUCKET_COLOR = {
 
 _BUCKET_RANK = {"good": 0, "borderline": 1, "large": 2, "none": -1}
 
-# Stable per-simulator colors, shared with `pbg_biomodels.report._ENGINE_COLORS`
+# Stable per-simulator colors, shared with `viva_biomodels.report._ENGINE_COLORS`
 # so a given engine keeps the SAME color across every figure in the viewer
 # (line overlays and steady-state bars alike). Unknown simulator names fall
 # back to a deterministic palette assigned by sorted order.

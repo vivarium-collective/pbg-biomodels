@@ -4,7 +4,7 @@ import pytest
 
 # Import side-effect: fires the @composite_generator decorator and registers
 # the entry in viva_superpowers.composite_generator._REGISTRY.
-import pbg_biomodels.composites.compare_biomodel  # noqa: F401
+import viva_biomodels.composites.compare_biomodel  # noqa: F401
 from viva_superpowers.composite_generator import _REGISTRY, build_generator
 
 
