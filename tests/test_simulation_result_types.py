@@ -4,7 +4,7 @@ and `sim_results_per_biomodel` types, so composites can wire stores by name.
 """
 from process_bigraph import allocate_core
 
-from pbg_biomodels import register_types
+from viva_biomodels import register_types
 
 
 def _core():

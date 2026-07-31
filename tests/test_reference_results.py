@@ -1,4 +1,4 @@
-"""Unit tests for `pbg_biomodels.reference_results` — reading BioSimulators
+"""Unit tests for `viva_biomodels.reference_results` — reading BioSimulators
 SED-ML reference results (`reports.h5`) into the composite's `results` leaf
 shape and resolving the on-disk `<root>/<bid>/<engine>/<version>/.../reports.h5`
 layout.
@@ -38,7 +38,7 @@ def _write_reports_h5(
 
 
 def test_read_reference_leaf_maps_time_and_observables(tmp_path):
-    from pbg_biomodels.reference_results import read_reference_leaf
+    from viva_biomodels.reference_results import read_reference_leaf
 
     data = _write_reports_h5(tmp_path / "reports.h5", labels=("Time", "A", "B"), n_time=5)
 
@@ -70,7 +70,7 @@ def _zip_reports_h5(zip_path: Path, **kw):
 def test_reads_reports_h5_from_results_zip(tmp_path):
     """Most models ship reports.h5 zipped inside `<ver>/results.zip`; the loader
     must read it without an extracted copy on disk."""
-    from pbg_biomodels.reference_results import (
+    from viva_biomodels.reference_results import (
         discover_reference_engines,
         read_reference_leaf,
         resolve_engine_h5,
@@ -96,7 +96,7 @@ def test_reads_reports_h5_from_results_zip(tmp_path):
 
 
 def test_discover_and_resolve_engine_h5_with_version_dirs(tmp_path):
-    from pbg_biomodels.reference_results import (
+    from viva_biomodels.reference_results import (
         discover_reference_engines,
         resolve_engine_h5,
     )

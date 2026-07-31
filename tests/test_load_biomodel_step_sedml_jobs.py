@@ -4,7 +4,7 @@ covering every UTC + SteadyState task in the SED-ML.
 import pytest
 from process_bigraph import allocate_core
 
-from pbg_biomodels.steps.load_biomodel import LoadBiomodelStep
+from viva_biomodels.steps.load_biomodel import LoadBiomodelStep
 
 
 def test_outputs_declare_sedml_jobs():

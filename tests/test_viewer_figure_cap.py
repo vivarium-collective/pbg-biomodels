@@ -1,5 +1,5 @@
 """The overlay figure is capped so many-observable models stay responsive."""
-from pbg_biomodels.lazy_viewer import _cap_leaves
+from viva_biomodels.lazy_viewer import _cap_leaves
 
 
 def _leaf(nobs):

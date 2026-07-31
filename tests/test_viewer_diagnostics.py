@@ -5,7 +5,7 @@ a dataset overview, per-engine coverage by task kind with reference pairing, a
 divergence roster, a within-pbg closeness matrix, and a runtime/error table that
 degrades to a clear note when no provenance was captured.
 """
-from pbg_biomodels.lazy_viewer import _diagnostics_stats, _page
+from viva_biomodels.lazy_viewer import _diagnostics_stats, _page
 
 # One diverging UTC job (nRMSE 0.5, closeness 137) with a reference, and one
 # clean steady-state job introducing a second engine (amici, steady-state only).

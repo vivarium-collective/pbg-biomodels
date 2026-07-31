@@ -30,10 +30,10 @@ def main() -> int:
     models = index.get("models") or {}
 
     # Lazy heavy imports so --help is instant.
-    from pbg_biomodels import register_types
-    from pbg_biomodels.core import build_core
-    from pbg_biomodels.lazy_viewer import _parquet_leaves_aligned
-    from pbg_biomodels.steps.simulator_comparison import BatchCompareStep
+    from viva_biomodels import register_types
+    from viva_biomodels.core import build_core
+    from viva_biomodels.lazy_viewer import _parquet_leaves_aligned
+    from viva_biomodels.steps.simulator_comparison import BatchCompareStep
 
     core = register_types(build_core())
     step = BatchCompareStep(core=core)

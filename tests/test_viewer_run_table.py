@@ -1,7 +1,7 @@
 """Per-model drill-down run table: per-engine execution (ran/error/absent)
 plus the job's worst metric values; degrades gracefully without provenance.
 """
-from pbg_biomodels.lazy_viewer import _run_table
+from viva_biomodels.lazy_viewer import _run_table
 
 _INDEX = {"models": {"BIOMD1": {
     "jobs": {"utc1": {"engines": ["copasi", "tellurium"],

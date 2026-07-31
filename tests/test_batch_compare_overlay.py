@@ -6,7 +6,7 @@ the deep rendering is exercised in the end-to-end generator test.
 import pytest
 from process_bigraph import allocate_core
 
-from pbg_biomodels.visualizations.batch_compare_overlay import BatchCompareOverlay
+from viva_biomodels.visualizations.batch_compare_overlay import BatchCompareOverlay
 
 
 def _utc(time, observables):
@@ -103,7 +103,7 @@ def test_simulator_colors_are_consistent_across_figures():
     every biomodel — copasi/tellurium/simbio resolve to their canonical hues."""
     import json as _json
 
-    from pbg_biomodels.visualizations import batch_compare_overlay as bco
+    from viva_biomodels.visualizations import batch_compare_overlay as bco
 
     viz = BatchCompareOverlay(
         config={"biomodel_ids": ["BIOMD0000000001", "BIOMD0000000002"]},
@@ -171,7 +171,7 @@ def test_overlay_with_no_results_returns_placeholder():
 
 def test_engine_analysis_splits_pbg_and_reference():
     """_engine_analysis separates pbg↔pbg divergence from pbg↔reference self-match."""
-    from pbg_biomodels.visualizations import batch_compare_overlay as bco
+    from viva_biomodels.visualizations import batch_compare_overlay as bco
     # matrix: live engines copasi/tellurium/simbio + references for copasi/tellurium.
     comparison = {
         "engines": ["copasi", "tellurium", "simbio",
@@ -198,7 +198,7 @@ def test_engine_analysis_splits_pbg_and_reference():
 
 
 def test_cross_engine_tab_renders_rollups():
-    from pbg_biomodels.visualizations import batch_compare_overlay as bco
+    from viva_biomodels.visualizations import batch_compare_overlay as bco
     comparisons = {
         "BIOMD1": {"job": {
             "engines": ["copasi", "tellurium", "reference:copasi"],

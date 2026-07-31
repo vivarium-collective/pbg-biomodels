@@ -66,11 +66,11 @@ class _StubUTC:
 def test_reference_engines_join_results_and_comparison(tmp_path, monkeypatch):
     from process_bigraph import Composite, gather_emitter_results
 
-    from pbg_biomodels import register_types
-    from pbg_biomodels.core import build_core
+    from viva_biomodels import register_types
+    from viva_biomodels.core import build_core
     from viva_superpowers.composite_generator import _REGISTRY, build_generator
-    import pbg_biomodels.composites.batch_compare_biomodels  # noqa: F401
-    import pbg_biomodels.steps.simulator_runner as runner_mod
+    import viva_biomodels.composites.batch_compare_biomodels  # noqa: F401
+    import viva_biomodels.steps.simulator_runner as runner_mod
 
     # Reference dataset with two engines for BIOMD0000000001.
     root = tmp_path / "dataset"
@@ -81,7 +81,7 @@ def test_reference_engines_join_results_and_comparison(tmp_path, monkeypatch):
     monkeypatch.setattr(runner_mod, "_UTC_CLASS_FOR", lambda name: _StubUTC)
 
     core = register_types(build_core())
-    core.register_link("pbg_biomodels.steps.load_biomodel.LoadBiomodelStep", _StubLoad)
+    core.register_link("viva_biomodels.steps.load_biomodel.LoadBiomodelStep", _StubLoad)
 
     entry = next(e for e in _REGISTRY.values() if e.name == "batch-compare-biomodels")
     doc = build_generator(entry, overrides={

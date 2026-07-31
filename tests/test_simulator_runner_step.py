@@ -58,14 +58,14 @@ class _RaisingUTC:
 @pytest.fixture
 def patched_adapters(monkeypatch):
     """Replace the UTC + SS adapter Step classes used by the runner."""
-    import pbg_biomodels.steps.simulator_runner as mod
+    import viva_biomodels.steps.simulator_runner as mod
     monkeypatch.setattr(mod, "_UTC_CLASS_FOR", lambda name: _StubUTC, raising=True)
     monkeypatch.setattr(mod, "_SS_CLASS_FOR",  lambda name: _StubSS,  raising=True)
     return mod
 
 
 def test_runner_dispatches_utc_and_steady_state(patched_adapters):
-    from pbg_biomodels.steps.simulator_runner import SimulatorRunnerStep
+    from viva_biomodels.steps.simulator_runner import SimulatorRunnerStep
     step = SimulatorRunnerStep(
         config={"simulator_name": "copasi"}, core=allocate_core()
     )
@@ -97,9 +97,9 @@ def test_runner_dispatches_utc_and_steady_state(patched_adapters):
 def test_runner_records_per_job_failure(patched_adapters, monkeypatch):
     """A simulator exception leaves an empty results leaf for that job
     (and warns) without aborting the runner's other jobs."""
-    import pbg_biomodels.steps.simulator_runner as mod
+    import viva_biomodels.steps.simulator_runner as mod
     monkeypatch.setattr(mod, "_UTC_CLASS_FOR", lambda name: _RaisingUTC)
-    from pbg_biomodels.steps.simulator_runner import SimulatorRunnerStep
+    from viva_biomodels.steps.simulator_runner import SimulatorRunnerStep
 
     step = SimulatorRunnerStep(
         config={"simulator_name": "copasi"}, core=allocate_core()
@@ -124,7 +124,7 @@ def test_runner_records_per_job_failure(patched_adapters, monkeypatch):
 def test_runner_emits_diagnostics_with_timing_and_provenance(patched_adapters):
     """Alongside results, the runner emits a diagnostics tree with per-run
     timing/status and per-simulator provenance (host, versions, git)."""
-    from pbg_biomodels.steps.simulator_runner import SimulatorRunnerStep
+    from viva_biomodels.steps.simulator_runner import SimulatorRunnerStep
     step = SimulatorRunnerStep(
         config={"simulator_name": "copasi"}, core=allocate_core()
     )
@@ -150,9 +150,9 @@ def test_runner_emits_diagnostics_with_timing_and_provenance(patched_adapters):
 
 def test_runner_failure_is_recorded_in_diagnostics(patched_adapters, monkeypatch):
     """A failed job is status='failed' with the error text in diagnostics."""
-    import pbg_biomodels.steps.simulator_runner as mod
+    import viva_biomodels.steps.simulator_runner as mod
     monkeypatch.setattr(mod, "_UTC_CLASS_FOR", lambda name: _RaisingUTC)
-    from pbg_biomodels.steps.simulator_runner import SimulatorRunnerStep
+    from viva_biomodels.steps.simulator_runner import SimulatorRunnerStep
     step = SimulatorRunnerStep(
         config={"simulator_name": "copasi"}, core=allocate_core()
     )
@@ -169,7 +169,7 @@ def test_runner_failure_is_recorded_in_diagnostics(patched_adapters, monkeypatch
 
 def test_runner_writes_one_branch_per_biomodel(patched_adapters):
     """A runner over two biomodels writes both branches into results."""
-    from pbg_biomodels.steps.simulator_runner import SimulatorRunnerStep
+    from viva_biomodels.steps.simulator_runner import SimulatorRunnerStep
     step = SimulatorRunnerStep(
         config={"simulator_name": "copasi"}, core=allocate_core()
     )
@@ -189,7 +189,7 @@ def test_runner_writes_one_branch_per_biomodel(patched_adapters):
 
 
 def test_runner_rejects_unknown_simulator():
-    from pbg_biomodels.steps.simulator_runner import SimulatorRunnerStep
+    from viva_biomodels.steps.simulator_runner import SimulatorRunnerStep
     with pytest.raises(ValueError, match="unknown simulator"):
         SimulatorRunnerStep(
             config={"simulator_name": "fake-sim"}, core=allocate_core()
@@ -200,7 +200,7 @@ def test_effective_n_points_prefers_reference_grid():
     """The reference grid count overrides the job's own n_points so live
     engines sample on the same grid as the reference; absent a reference, the
     job's n_points (or the default) is used unchanged."""
-    from pbg_biomodels.steps.simulator_runner import effective_n_points
+    from viva_biomodels.steps.simulator_runner import effective_n_points
 
     # No reference override → job's own n_points.
     assert effective_n_points({"n_points": 5}, None) == 5

@@ -83,11 +83,11 @@ class _StubSS:
 def test_end_to_end_populates_results_and_comparisons(monkeypatch):
     from process_bigraph import Composite, gather_emitter_results
 
-    from pbg_biomodels import register_types
-    from pbg_biomodels.core import build_core
+    from viva_biomodels import register_types
+    from viva_biomodels.core import build_core
     from viva_superpowers.composite_generator import _REGISTRY, build_generator
-    import pbg_biomodels.composites.batch_compare_biomodels  # noqa: F401
-    import pbg_biomodels.steps.simulator_runner as runner_mod
+    import viva_biomodels.composites.batch_compare_biomodels  # noqa: F401
+    import viva_biomodels.steps.simulator_runner as runner_mod
 
     # Patch the runner's module-level adapter lookups — those ARE called
     # inside the runner's update(), so monkeypatch.setattr works directly.
@@ -100,7 +100,7 @@ def test_end_to_end_populates_results_and_comparisons(monkeypatch):
     # same dotted name the generator references.
     core = register_types(build_core())
     core.register_link(
-        "pbg_biomodels.steps.load_biomodel.LoadBiomodelStep", _StubLoad
+        "viva_biomodels.steps.load_biomodel.LoadBiomodelStep", _StubLoad
     )
 
     entry = next(e for e in _REGISTRY.values()

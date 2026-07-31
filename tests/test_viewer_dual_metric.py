@@ -1,7 +1,7 @@
 """Lazy-viewer overview surfaces both metrics: nRMSE and closeness, on both
 agreement axes (pbg↔pbg and pbg↔own-reference).
 """
-from pbg_biomodels.lazy_viewer import _engine_analysis_closeness, _page
+from viva_biomodels.lazy_viewer import _engine_analysis_closeness, _page
 
 _INDEX = {"models": {"BIOMD1": {"has_series": True, "jobs": {"utc1": {
     "engines": ["copasi", "tellurium", "reference:copasi"],

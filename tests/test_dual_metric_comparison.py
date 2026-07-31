@@ -1,7 +1,7 @@
 """compare_n_engines (+ steady-state) carry the closeness metric alongside
 nRMSE, without disturbing any existing key.
 """
-from pbg_biomodels.comparison import (
+from viva_biomodels.comparison import (
     compare_two_engines,
     compare_n_engines,
     compare_two_engines_steady_state,
