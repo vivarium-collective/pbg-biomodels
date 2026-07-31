@@ -18,12 +18,12 @@ from typing import Any, Dict, List, Mapping, Optional
 
 from viva_superpowers.composite_generator import composite_generator
 
-from pbg_biomodels.simulators import resolve_simulators, utc_step_address
+from viva_biomodels.simulators import resolve_simulators, utc_step_address
 
-LOAD_STEP_ADDRESS = "local:pbg_biomodels.steps.load_biomodel.LoadBiomodelStep"
-REFERENCE_STEP_ADDRESS = "local:pbg_biomodels.steps.reference_data.ReferenceDataStep"
+LOAD_STEP_ADDRESS = "local:viva_biomodels.steps.load_biomodel.LoadBiomodelStep"
+REFERENCE_STEP_ADDRESS = "local:viva_biomodels.steps.reference_data.ReferenceDataStep"
 COMPARISON_STEP_ADDRESS = (
-    "local:pbg_biomodels.steps.simulator_comparison.MultiSimulatorComparisonStep"
+    "local:viva_biomodels.steps.simulator_comparison.MultiSimulatorComparisonStep"
 )
 
 
@@ -44,7 +44,7 @@ def build_compare_document(
     Args:
         biomodel_ids: BioModels identifiers; one branch per id.
         simulators: ``"all"``, a comma-separated string, or a list of simulator
-            names (see :func:`pbg_biomodels.simulators.resolve_simulators`).
+            names (see :func:`viva_biomodels.simulators.resolve_simulators`).
         references: optional ``{biomodel_id: {reference_name: csv_path}}``.
             Each reference is loaded as an engine and scored like a simulator.
         with_emitter: attach a RAMEmitter capturing every engine result and the
@@ -150,12 +150,12 @@ def run_comparison(
 
     Returns ``{biomodel_id: {"engines": {name: numeric_result},
     "comparison": ..., "error": str|None}}`` suitable for
-    :func:`pbg_biomodels.report.build_comparison_report`.
+    :func:`viva_biomodels.report.build_comparison_report`.
     """
     from process_bigraph import Composite, gather_emitter_results
 
-    from pbg_biomodels import register_types
-    from pbg_biomodels.core import build_core
+    from viva_biomodels import register_types
+    from viva_biomodels.core import build_core
 
     sims = resolve_simulators(simulators)
     references = references or {}

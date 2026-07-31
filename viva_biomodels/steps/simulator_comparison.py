@@ -5,7 +5,7 @@ and Tellurium UTC steps in ``pbsim_common``):
 
     {"time": list[float], "columns": list[str], "values": list[list[float]]}
 
-The Step delegates to ``pbg_biomodels.comparison.compare_two_engines``
+The Step delegates to ``viva_biomodels.comparison.compare_two_engines``
 so the math is shared with the post-hoc HTML report builder in
 ``analysis.py``. Output ``comparison`` is a free-form dict containing per-
 species RMSE, normalized RMSE, mean nRMSE, and a coarse quality bucket.
@@ -16,7 +16,7 @@ from typing import Any, ClassVar, Dict
 
 from process_bigraph import Step
 
-from pbg_biomodels.comparison import compare_n_engines, compare_two_engines
+from viva_biomodels.comparison import compare_n_engines, compare_two_engines
 
 
 class SimulatorComparisonStep(Step):
@@ -39,7 +39,7 @@ class SimulatorComparisonStep(Step):
 
     def outputs(self) -> Dict[str, Any]:
         # Concrete struct shape matches the dict returned by
-        # `pbg_biomodels.comparison.compare_two_engines`. Declared
+        # `viva_biomodels.comparison.compare_two_engines`. Declared
         # inline (rather than registered as a named type) so the bundle has
         # no module-init order requirement on workspace `register_types`.
         return {
@@ -117,12 +117,12 @@ class BatchCompareStep(Step):
         return {"comparisons": "tree"}
 
     def update(self, state: Dict[str, Any]) -> Dict[str, Any]:
-        from pbg_biomodels.comparison import (
+        from viva_biomodels.comparison import (
             bucket_for,
             compare_n_engines,
             compare_n_engines_steady_state,
         )
-        from pbg_biomodels import result_leaf
+        from viva_biomodels import result_leaf
         import warnings
 
         results = state.get("results") or {}

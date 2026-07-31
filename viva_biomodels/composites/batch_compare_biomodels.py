@@ -24,14 +24,14 @@ from typing import Any, Dict, List
 
 from viva_superpowers.composite_generator import composite_generator
 
-from pbg_biomodels.simulators import resolve_simulators
+from viva_biomodels.simulators import resolve_simulators
 
 
-LOAD_STEP_ADDRESS    = "local:pbg_biomodels.steps.load_biomodel.LoadBiomodelStep"
-LOAD_REF_STEP_ADDRESS = "local:pbg_biomodels.steps.load_reference_results.LoadReferenceResultsStep"
-RUNNER_STEP_ADDRESS  = "local:pbg_biomodels.steps.simulator_runner.SimulatorRunnerStep"
-COMPARE_STEP_ADDRESS = "local:pbg_biomodels.steps.simulator_comparison.BatchCompareStep"
-VIZ_STEP_ADDRESS     = "local:pbg_biomodels.visualizations.batch_compare_overlay.BatchCompareOverlay"
+LOAD_STEP_ADDRESS    = "local:viva_biomodels.steps.load_biomodel.LoadBiomodelStep"
+LOAD_REF_STEP_ADDRESS = "local:viva_biomodels.steps.load_reference_results.LoadReferenceResultsStep"
+RUNNER_STEP_ADDRESS  = "local:viva_biomodels.steps.simulator_runner.SimulatorRunnerStep"
+COMPARE_STEP_ADDRESS = "local:viva_biomodels.steps.simulator_comparison.BatchCompareStep"
+VIZ_STEP_ADDRESS     = "local:viva_biomodels.visualizations.batch_compare_overlay.BatchCompareOverlay"
 
 
 @composite_generator(

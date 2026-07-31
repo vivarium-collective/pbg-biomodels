@@ -28,7 +28,7 @@ from plotly.offline import get_plotlyjs
 
 from process_bigraph import Step
 
-from pbg_biomodels.comparison import compare_two_engines
+from viva_biomodels.comparison import compare_two_engines
 
 
 # ---------------------------------------------------------------------------
@@ -48,7 +48,7 @@ def _load_results(results_dir: str) -> List[Dict[str, Any]]:
 def _compute_model_summary(model: Dict[str, Any]) -> Dict[str, Any]:
     """Compute per-species RMSE, normalized RMSE, and a quality bucket.
 
-    Thin shim around :func:`pbg_biomodels.comparison.compare_two_engines`
+    Thin shim around :func:`viva_biomodels.comparison.compare_two_engines`
     that pulls the COPASI/Tellurium payloads out of a stored per-model record.
     Both engines are looked up by name; absent engines fall through to the
     "no comparison" bucket.

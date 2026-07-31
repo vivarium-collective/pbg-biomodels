@@ -29,8 +29,8 @@ class SimulatorSpec(TypedDict):
 
 _SIMULATORS: Dict[str, SimulatorSpec] = {
     "copasi": {
-        "utc_step": "local:pbg_biomodels.steps.simulators.BiomodelsCopasiStep",
-        "steady_state_step": "local:pbg_biomodels.steps.simulators.BiomodelsCopasiSteadyStateStep",
+        "utc_step": "local:viva_biomodels.steps.simulators.BiomodelsCopasiStep",
+        "steady_state_step": "local:viva_biomodels.steps.simulators.BiomodelsCopasiSteadyStateStep",
         "process": "local:CopasiUTCProcess",
         "process_config": lambda sbml: {
             "model_source": sbml,
@@ -40,15 +40,15 @@ _SIMULATORS: Dict[str, SimulatorSpec] = {
         "species_out": "species_concentrations",
     },
     "tellurium": {
-        "utc_step": "local:pbg_biomodels.steps.simulators.BiomodelsTelluriumStep",
-        "steady_state_step": "local:pbg_biomodels.steps.simulators.BiomodelsTelluriumSteadyStateStep",
+        "utc_step": "local:viva_biomodels.steps.simulators.BiomodelsTelluriumStep",
+        "steady_state_step": "local:viva_biomodels.steps.simulators.BiomodelsTelluriumSteadyStateStep",
         "process": "local:TelluriumProcess",
         "process_config": lambda sbml: {"model_file": sbml},
         "species_out": "species",
     },
     "simbio": {
-        "utc_step": "local:pbg_biomodels.steps.simulators.BiomodelsSimbioStep",
-        "steady_state_step": "local:pbg_biomodels.steps.simulators.BiomodelsSimbioSteadyStateStep",
+        "utc_step": "local:viva_biomodels.steps.simulators.BiomodelsSimbioStep",
+        "steady_state_step": "local:viva_biomodels.steps.simulators.BiomodelsSimbioSteadyStateStep",
         "process": "local:SimbioUTCProcess",
         "process_config": lambda sbml: {"model_source": sbml, "model_format": "sbml"},
         "species_out": "species_concentrations",

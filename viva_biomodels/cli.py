@@ -48,9 +48,9 @@ def _parse_references(items: Optional[List[str]]) -> Dict[str, Dict[str, str]]:
 
 
 def _cmd_compare(args: argparse.Namespace) -> int:
-    from pbg_biomodels.composites.compare_simulators import run_comparison
-    from pbg_biomodels.report import build_comparison_report
-    from pbg_biomodels.simulators import resolve_simulators
+    from viva_biomodels.composites.compare_simulators import run_comparison
+    from viva_biomodels.report import build_comparison_report
+    from viva_biomodels.simulators import resolve_simulators
 
     sims = resolve_simulators(args.simulators)
     references = _parse_references(args.reference)
@@ -77,7 +77,7 @@ def _cmd_compare(args: argparse.Namespace) -> int:
 
 
 def _cmd_process(args: argparse.Namespace) -> int:
-    from pbg_biomodels.composites.biomodel_process import (
+    from viva_biomodels.composites.biomodel_process import (
         build_biomodel_process_document,
     )
 
@@ -88,8 +88,8 @@ def _cmd_process(args: argparse.Namespace) -> int:
     if args.run:
         from process_bigraph import Composite, gather_emitter_results
 
-        from pbg_biomodels import register_types
-        from pbg_biomodels.core import build_core
+        from viva_biomodels import register_types
+        from viva_biomodels.core import build_core
 
         composite = Composite(doc, core=register_types(build_core()))
         composite.run(args.run * args.interval)
@@ -113,7 +113,7 @@ def _cmd_process(args: argparse.Namespace) -> int:
 
 
 def build_parser() -> argparse.ArgumentParser:
-    from pbg_biomodels.simulators import ALL_SIMULATORS
+    from viva_biomodels.simulators import ALL_SIMULATORS
 
     parser = argparse.ArgumentParser(
         prog="pbg-biomodels",

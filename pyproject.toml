@@ -3,7 +3,7 @@
 # avoid shadowing the PyPI `biomodels` package — the BioModels REST API
 # client that pbg-biomodels-bundle depends on. The workspace's display
 # name in workspace.yaml stays "biomodels".
-name = "pbg-biomodels"
+name = "viva-biomodels"
 version = "0.0.0"
 description = "Process-bigraph research workspace"
 requires-python = ">=3.12"
@@ -69,7 +69,8 @@ pysces = ["pbg-pysces"]
 scale = ["ray", "pyarrow"]
 
 [project.scripts]
-pbg-biomodels = "pbg_biomodels.cli:main"
+viva-biomodels = "viva_biomodels.cli:main"
+pbg-biomodels = "viva_biomodels.cli:main"   # back-compat alias (deprecated)
 
 [tool.uv.sources]
 # Canonical git source for pbg-basic-processes (not on PyPI). pbg-superpowers and

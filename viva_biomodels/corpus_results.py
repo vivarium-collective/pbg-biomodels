@@ -6,7 +6,7 @@ sweep (``out/compare_all_1054``, not committed). It's small and
 git-friendly on purpose so other repos can vendor or read it directly
 without touching the multi-hundred-MB raw run output.
 
-    from pbg_biomodels.corpus_results import (
+    from viva_biomodels.corpus_results import (
         load_corpus_timecourse,
         model_timecourse,
         load_corpus_metrics,
@@ -23,7 +23,7 @@ from pathlib import Path
 
 import pandas as pd
 
-# Package root is pbg_biomodels/; the dataset lives at
+# Package root is viva_biomodels/; the dataset lives at
 # <repo_root>/datasets/corpus_comparison/ (a sibling of the package dir).
 _PACKAGE_DIR = Path(__file__).resolve().parent
 _REPO_ROOT = _PACKAGE_DIR.parent

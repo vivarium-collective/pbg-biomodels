@@ -11,14 +11,14 @@ datasets shaped ``[n_dataset, n_timepoint]``. The row labels are carried in the
 
 :func:`read_reference_leaf` converts the UTC report into the same flat
 ``map[observable -> timeseries]`` leaf the live runners emit (the ``Time`` row
-becomes the reserved ``time`` key — see :mod:`pbg_biomodels.result_leaf`).
+becomes the reserved ``time`` key — see :mod:`viva_biomodels.result_leaf`).
 """
 from __future__ import annotations
 
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
-from pbg_biomodels.result_leaf import SCAN_KEY, TIME_KEY
+from viva_biomodels.result_leaf import SCAN_KEY, TIME_KEY
 
 # Case-insensitive label that marks the sample-time row inside a SED-ML report.
 _TIME_LABEL = "time"

@@ -43,7 +43,7 @@ def series_table(model_results: Dict[str, Any], max_points: int = 200) -> pa.Tab
     times: List[float] = []
     values: List[float] = []
     nan = float("nan")
-    from pbg_biomodels import result_leaf
+    from viva_biomodels import result_leaf
 
     for job, engine_map in (model_results or {}).items():
         for engine, leaf in (engine_map or {}).items():
@@ -123,7 +123,7 @@ def write_model(
 
 
 def _job_kind(leaves: Dict[str, Any]) -> str:
-    from pbg_biomodels import result_leaf
+    from viva_biomodels import result_leaf
     has_data = False
     for leaf in (leaves or {}).values():
         if leaf and isinstance(leaf, dict):
