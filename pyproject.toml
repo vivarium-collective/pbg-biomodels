@@ -8,14 +8,10 @@ version = "0.0.0"
 description = "Process-bigraph research workspace"
 requires-python = ">=3.12"
 dependencies = [
-    # Aligned on process-bigraph 1.5.0, which provides `process_bigraph.composite_spec`
-    # (pbg-superpowers imports it at top level — `from process_bigraph import composite_spec`
-    # in composite_generator.py / composite_discovery.py). The earlier 1.4.12 pin
-    # (kept because pb 1.4.17 relocated `SQLiteEmitter` out to pbg-emitters and the
-    # dashboard still imported it from `process_bigraph.emitter`) is now unsatisfiable
-    # against composite_spec. The dashboard's SQLiteEmitter import was migrated to
-    # pbg-emitters (vivarium-dashboard PR #420), so 1.5.0 now satisfies the whole graph.
-    "process-bigraph==1.5.0",
+    # >=1.7.0 to match vivarium-workbench@main (which requires process-bigraph>=1.7.0);
+    # an exact ==1.5.0 pin made the graph unsatisfiable once workbench moved to 1.7.
+    # 1.7+ still provides `process_bigraph.composite_spec` (used by viva-superpowers).
+    "process-bigraph>=1.7.0",
     "bigraph-schema",
     # Required by pbg-superpowers' readout_resolver / readout_validation /
     # study_evaluator subpackages (undeclared optional import upstream); without
