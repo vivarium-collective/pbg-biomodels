@@ -8,14 +8,10 @@ version = "0.0.0"
 description = "Process-bigraph research workspace"
 requires-python = ">=3.12"
 dependencies = [
-    # Aligned on process-bigraph 1.5.0, which provides `process_bigraph.composite_spec`
-    # (pbg-superpowers imports it at top level — `from process_bigraph import composite_spec`
-    # in composite_generator.py / composite_discovery.py). The earlier 1.4.12 pin
-    # (kept because pb 1.4.17 relocated `SQLiteEmitter` out to pbg-emitters and the
-    # dashboard still imported it from `process_bigraph.emitter`) is now unsatisfiable
-    # against composite_spec. The dashboard's SQLiteEmitter import was migrated to
-    # pbg-emitters (vivarium-dashboard PR #420), so 1.5.0 now satisfies the whole graph.
-    "process-bigraph==1.5.0",
+    # >=1.7.0 to match vivarium-workbench@main (which requires process-bigraph>=1.7.0);
+    # an exact ==1.5.0 pin made the graph unsatisfiable once workbench moved to 1.7.
+    # 1.7+ still provides `process_bigraph.composite_spec` (used by viva-superpowers).
+    "process-bigraph>=1.7.0",
     "bigraph-schema",
     # Required by pbg-superpowers' readout_resolver / readout_validation /
     # study_evaluator subpackages (undeclared optional import upstream); without
@@ -82,14 +78,20 @@ pbg-biomodels = "viva_biomodels.cli:main"   # back-compat alias (deprecated)
 # requirement across the graph to this single spec. Keep it matching the upstream
 # branch="main" form.
 pbg-basic-processes = { git = "https://github.com/vivarium-collective/pbg-basic-processes.git", branch = "main" }
-# Dist renamed vivarium-dashboard -> vivarium-workbench; the on-disk checkout dir
-# is unchanged, so the local editable path stays ../vivarium-dashboard.
-vivarium-workbench = { path = "../vivarium-dashboard", editable = true }
-pbg-tellurium = { path = "../pbg-tellurium", editable = true }
-pbg-copasi = { path = "../pbg-copasi", editable = true }
-pbg-simbio = { path = "../pbg-simbio", editable = true }
-pbg-amici = { path = "../pbg-amici", editable = true }
-pbg-pysces = { path = "../pbg-pysces", editable = true }
+# These sibling process-packages are not on PyPI. Declare them as GIT sources
+# (like pbg-basic-processes above), NOT local `path = ../…` sources: uv honors a
+# git-installed package's [tool.uv.sources], so a local path here leaks into every
+# consumer that installs viva-biomodels from git (e.g. viva-human-atlas' dashboard
+# CI), where `../vivarium-dashboard` doesn't exist and the whole install aborts.
+# Git sources resolve everywhere. For LOCAL editable dev of a sibling, override it
+# per-checkout (e.g. `uv pip install -e ../vivarium-dashboard` after sync, or a
+# personal uv workspace) rather than pinning the path in the published pyproject.
+vivarium-workbench = { git = "https://github.com/vivarium-collective/vivarium-workbench.git", branch = "main" }
+pbg-tellurium = { git = "https://github.com/vivarium-collective/pbg-tellurium.git", branch = "main" }
+pbg-copasi = { git = "https://github.com/vivarium-collective/pbg-copasi.git", branch = "main" }
+pbg-simbio = { git = "https://github.com/vivarium-collective/pbg-simbio.git", branch = "main" }
+pbg-amici = { git = "https://github.com/vivarium-collective/pbg-amici.git", branch = "main" }
+pbg-pysces = { git = "https://github.com/vivarium-collective/pbg-pysces.git", branch = "main" }
 
 [build-system]
 requires = ["hatchling"]
