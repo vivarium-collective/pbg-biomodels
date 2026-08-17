@@ -32,12 +32,11 @@ dependencies = [
     "pyarrow",
     # Web-based workspace dashboard (server + templates + assets + lib helpers).
     # Extracted from pbg-template as of v0.5.0; provides the `vivarium-workbench
-    # serve` CLI invoked by scripts/serve.sh. (Dist renamed from vivarium-dashboard;
-    # import package is now vivarium_workbench. The sibling checkout dir is unchanged.)
+    # serve` CLI invoked by scripts/serve.sh (import package: vivarium_workbench).
     "vivarium-workbench",
     # Simulator wrappers (absorbed from pbg-biomodels-bundle).
-    "pbg-tellurium",
-    "pbg-copasi",
+    "viva-tellurium",
+    "viva-copasi",
     "pbg-simbio",
     # BioModels corpus + SED-ML/SBML parsing (absorbed from pbg-biomodels-bundle).
     "biomodels",
@@ -81,17 +80,20 @@ pbg-basic-processes = { git = "https://github.com/vivarium-collective/pbg-basic-
 # These sibling process-packages are not on PyPI. Declare them as GIT sources
 # (like pbg-basic-processes above), NOT local `path = ../…` sources: uv honors a
 # git-installed package's [tool.uv.sources], so a local path here leaks into every
-# consumer that installs viva-biomodels from git (e.g. viva-human-atlas' dashboard
-# CI), where `../vivarium-dashboard` doesn't exist and the whole install aborts.
+# consumer that installs viva-biomodels from git (e.g. viva-human-atlas' publish
+# CI), where the sibling dir doesn't exist and the whole install aborts.
 # Git sources resolve everywhere. For LOCAL editable dev of a sibling, override it
-# per-checkout (e.g. `uv pip install -e ../vivarium-dashboard` after sync, or a
+# per-checkout (e.g. `uv pip install -e ../vivarium-workbench` after sync, or a
 # personal uv workspace) rather than pinning the path in the published pyproject.
+# NOTE: source keys must match each package's DIST name — copasi/tellurium/the
+# workbench were renamed to viva-*; simbio/amici/pysces keep their pbg-* dist name
+# even though their repos/dirs are now viva-*.
 vivarium-workbench = { git = "https://github.com/vivarium-collective/vivarium-workbench.git", branch = "main" }
-pbg-tellurium = { git = "https://github.com/vivarium-collective/pbg-tellurium.git", branch = "main" }
-pbg-copasi = { git = "https://github.com/vivarium-collective/pbg-copasi.git", branch = "main" }
-pbg-simbio = { git = "https://github.com/vivarium-collective/pbg-simbio.git", branch = "main" }
-pbg-amici = { git = "https://github.com/vivarium-collective/pbg-amici.git", branch = "main" }
-pbg-pysces = { git = "https://github.com/vivarium-collective/pbg-pysces.git", branch = "main" }
+viva-tellurium = { git = "https://github.com/vivarium-collective/viva-tellurium.git", branch = "main" }
+viva-copasi = { git = "https://github.com/vivarium-collective/viva-copasi.git", branch = "main" }
+pbg-simbio = { git = "https://github.com/vivarium-collective/viva-simbio.git", branch = "main" }
+pbg-amici = { git = "https://github.com/vivarium-collective/viva-amici.git", branch = "main" }
+pbg-pysces = { git = "https://github.com/vivarium-collective/viva-pysces.git", branch = "main" }
 
 [build-system]
 requires = ["hatchling"]
