@@ -25,7 +25,7 @@ from viva_biomodels.steps.reference_data import load_reference_csv
 
 
 def _sbml() -> str:
-    return str(files("pbg_copasi.composites") / "repressilator.xml")
+    return str(files("viva_copasi.composites") / "repressilator.xml")
 
 
 def _nr(scale=1.0):
