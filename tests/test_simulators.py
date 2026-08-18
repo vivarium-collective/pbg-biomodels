@@ -15,8 +15,8 @@ from pbg_tellurium.processes import TelluriumUTCStep
 
 
 def _model_path() -> str:
-    """Path to a small SBML model — pbg-copasi's bundled Repressilator."""
-    return str(files('pbg_copasi.composites') / 'repressilator.xml')
+    """Path to a small SBML model — viva-copasi's bundled Repressilator."""
+    return str(files('viva_copasi.composites') / 'repressilator.xml')
 
 
 @pytest.fixture
